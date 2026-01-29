@@ -153,7 +153,7 @@ function formatPrice(value) {
                 aria-label="Breadcrumb"
             >
                 <Link
-                    href="/"
+                    :href="route('home')"
                     class="inline-flex items-center gap-1.5 rounded px-1 py-0.5 transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none dark:hover:text-slate-100"
                 >
                     Home

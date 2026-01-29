@@ -9,27 +9,15 @@ import {
 } from '@/components/ui/sheet';
 import { useAppearance } from '@/composables/useAppearance';
 import { Link } from '@inertiajs/vue3';
-import {
-    Menu,
-    Search,
-} from 'lucide-vue-next';
+import { Menu, Search } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 
 // Dark mode toggle
-const {
-    resolvedAppearance,
-    updateAppearance,
-} = useAppearance();
-const isDark = computed(
-    () =>
-        resolvedAppearance.value ===
-        'dark',
-);
+const { resolvedAppearance, updateAppearance } = useAppearance();
+const isDark = computed(() => resolvedAppearance.value === 'dark');
 
 const toggleDarkMode = () => {
-    updateAppearance(
-        isDark.value ? 'light' : 'dark',
-    );
+    updateAppearance(isDark.value ? 'light' : 'dark');
 };
 
 // Cart badge count
@@ -42,76 +30,64 @@ const isMobileMenuOpen = ref(false);
 <template>
     <!-- Navbar -->
     <nav
-        class="bg-background/95 supports-backdrop-filter:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur"
+        class="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60"
         role="navigation"
         aria-label="Main navigation"
     >
-        <div
-            class="container mx-auto px-4 sm:px-6 lg:px-8"
-        >
-            <div
-                class="flex h-16 items-center justify-between"
-            >
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex h-16 items-center justify-between">
                 <!-- Logo -->
                 <Link
                     href="/"
-                    class="text-primary flex items-center transition-opacity hover:opacity-80"
+                    class="flex items-center text-primary transition-opacity hover:opacity-80"
                     aria-label="Home"
                 >
-                    <AppLogoIcon
-                        class="size-30"
-                    />
+                    <AppLogoIcon class="size-30" />
                 </Link>
 
                 <!-- Desktop: Search Bar -->
-                <div
-                    class="mx-8 hidden max-w-md flex-1 md:block"
-                >
-                    <div
-                        class="relative"
-                    >
+                <div class="mx-8 hidden max-w-md flex-1 md:block">
+                    <div class="relative">
                         <input
                             type="search"
                             placeholder="Search products..."
-                            class="border-input bg-background focus:ring-primary h-10 w-full rounded-lg border pr-4 pl-10 text-sm focus:border-transparent focus:ring-2 focus:outline-none"
+                            class="h-10 w-full rounded-lg border border-input bg-background pr-4 pl-10 text-sm focus:border-transparent focus:ring-2 focus:ring-primary focus:outline-none"
                             aria-label="Search products"
                         />
                         <Search
-                            class="text-muted-foreground absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2"
+                            class="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-muted-foreground"
                             aria-hidden="true"
                         />
                     </div>
                 </div>
 
                 <!-- Desktop: Navigation Links -->
-                <div
-                    class="hidden items-center gap-6 md:flex"
-                >
+                <div class="hidden items-center gap-6 md:flex">
                     <Link
                         href="/"
-                        class="text-foreground hover:text-primary text-sm font-medium transition-colors"
+                        class="text-sm font-medium text-foreground transition-colors hover:text-primary"
                         aria-label="Browse categories"
                     >
                         Home
                     </Link>
                     <Link
                         href="#categories"
-                        class="text-foreground hover:text-primary text-sm font-medium transition-colors"
+                        class="text-sm font-medium text-foreground transition-colors hover:text-primary"
                         aria-label="Browse categories"
                     >
                         Categories
                     </Link>
 
                     <Link
-                        href="/products"
-                        class="text-foreground hover:text-primary text-sm font-medium transition-colors"
+                        :href="route('products')"
+                        class="text-sm font-medium text-foreground transition-colors hover:text-primary"
                         aria-label="Products"
                     >
                         Products
                     </Link>
                     <Link
                         href="#contact-us"
-                        class="text-foreground hover:text-primary text-sm font-medium transition-colors"
+                        class="text-sm font-medium text-foreground transition-colors hover:text-primary"
                         aria-label="Contact Us"
                     >
                         Contact Us
@@ -119,26 +95,18 @@ const isMobileMenuOpen = ref(false);
                 </div>
 
                 <!-- Action Icons -->
-                <div
-                    class="flex items-center gap-2 sm:gap-4"
-                >
+                <div class="flex items-center gap-2 sm:gap-4">
                     <!-- Mobile: Hamburger Menu -->
-                    <Sheet
-                        v-model:open="
-                            isMobileMenuOpen
-                        "
-                    >
+                    <Sheet v-model:open="isMobileMenuOpen">
                         <SheetTrigger
                             as-child
                             class="md:hidden"
                         >
                             <button
-                                class="hover:bg-accent rounded-lg p-2 transition-colors"
+                                class="rounded-lg p-2 transition-colors hover:bg-accent"
                                 aria-label="Open menu"
                             >
-                                <Menu
-                                    class="h-6 w-6"
-                                />
+                                <Menu class="h-6 w-6" />
                             </button>
                         </SheetTrigger>
                         <SheetContent
@@ -146,86 +114,67 @@ const isMobileMenuOpen = ref(false);
                             class="w-[300px] sm:w-[400px]"
                         >
                             <SheetHeader>
-                                <SheetTitle
-                                    class="text-left"
-                                >
+                                <SheetTitle class="text-left">
                                     Menu
                                 </SheetTitle>
                             </SheetHeader>
-                            <div
-                                class="mt-6 space-y-6"
-                            >
+                            <div class="mt-6 space-y-6">
                                 <!-- Mobile Search Bar -->
-                                <div
-                                    class="px-4"
-                                >
+                                <div class="px-4">
                                     <label
                                         for="mobile-search"
                                         class="mb-2 block text-sm font-medium"
                                     >
                                         Search
                                     </label>
-                                    <div
-                                        class="relative"
-                                    >
+                                    <div class="relative">
                                         <input
                                             id="mobile-search"
                                             type="search"
                                             placeholder="Search products..."
-                                            class="border-input bg-background focus:ring-primary h-10 w-full rounded-md border pr-4 pl-10 text-sm focus:border-transparent focus:ring-1 focus:outline-none"
+                                            class="h-10 w-full rounded-md border border-input bg-background pr-4 pl-10 text-sm focus:border-transparent focus:ring-1 focus:ring-primary focus:outline-none"
                                             aria-label="Search products"
                                         />
                                         <Search
-                                            class="text-muted-foreground absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2"
+                                            class="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-muted-foreground"
                                             aria-hidden="true"
                                         />
                                     </div>
                                 </div>
 
                                 <!-- Mobile Navigation Links -->
-                                <nav
-                                    class="space-y-2"
-                                >
+                                <nav class="space-y-2">
                                     <Link
                                         href="/"
-                                        @click="
-                                            isMobileMenuOpen = false
-                                        "
-                                        class="text-foreground hover:bg-accent hover:text-primary block rounded-lg px-4 py-3 text-base font-medium transition-colors"
+                                        @click="isMobileMenuOpen = false"
+                                        class="block rounded-lg px-4 py-3 text-base font-medium text-foreground transition-colors hover:bg-accent hover:text-primary"
                                         aria-label="Browse categories"
                                     >
                                         Home
                                     </Link>
                                     <Link
                                         href="#categories"
-                                        @click="
-                                            isMobileMenuOpen = false
-                                        "
-                                        class="text-foreground hover:bg-accent hover:text-primary block rounded-lg px-4 py-3 text-base font-medium transition-colors"
+                                        @click="isMobileMenuOpen = false"
+                                        class="block rounded-lg px-4 py-3 text-base font-medium text-foreground transition-colors hover:bg-accent hover:text-primary"
                                         aria-label="Browse categories"
                                     >
                                         Categories
                                     </Link>
                                     <Link
-                                        href="/products"
-                                        @click="
-                                            isMobileMenuOpen = false
-                                        "
-                                        class="text-foreground hover:bg-accent hover:text-primary block rounded-lg px-4 py-3 text-base font-medium transition-colors"
+                                        :href="route('products')"
+                                        @click="isMobileMenuOpen = false"
+                                        class="block rounded-lg px-4 py-3 text-base font-medium text-foreground transition-colors hover:bg-accent hover:text-primary"
                                         aria-label="Products"
                                     >
                                         Products
                                     </Link>
                                     <Link
                                         href="#contact-us"
-                                        @click="
-                                            isMobileMenuOpen = false
-                                        "
-                                        class="text-foreground hover:bg-accent hover:text-primary block rounded-lg px-4 py-3 text-base font-medium transition-colors"
+                                        @click="isMobileMenuOpen = false"
+                                        class="block rounded-lg px-4 py-3 text-base font-medium text-foreground transition-colors hover:bg-accent hover:text-primary"
                                         aria-label="Contact Us"
                                     >
-                                        Contact
-                                        Us
+                                        Contact Us
                                     </Link>
                                 </nav>
                             </div>
@@ -234,10 +183,8 @@ const isMobileMenuOpen = ref(false);
 
                     <!-- Dark Mode Toggle -->
                     <button
-                        @click="
-                            toggleDarkMode
-                        "
-                        class="hover:text-primary cursor-pointer rounded-lg p-2 transition-colors"
+                        @click="toggleDarkMode"
+                        class="cursor-pointer rounded-lg p-2 transition-colors hover:text-primary"
                         :aria-label="
                             isDark
                                 ? 'Switch to light mode'
@@ -245,9 +192,7 @@ const isMobileMenuOpen = ref(false);
                         "
                     >
                         <svg
-                            v-if="
-                                isDark
-                            "
+                            v-if="isDark"
                             class="h-5 w-5"
                             fill="none"
                             stroke="currentColor"
@@ -280,7 +225,7 @@ const isMobileMenuOpen = ref(false);
 
                     <!-- Cart -->
                     <button
-                        class="hover:text-primary relative cursor-pointer rounded-lg p-2 transition-colors"
+                        class="relative cursor-pointer rounded-lg p-2 transition-colors hover:text-primary"
                         aria-label="View shopping cart"
                     >
                         <svg
@@ -298,22 +243,17 @@ const isMobileMenuOpen = ref(false);
                             />
                         </svg>
                         <span
-                            v-if="
-                                cartItemsCount >
-                                0
-                            "
-                            class="bg-primary text-primary-foreground absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full text-xs font-bold"
+                            v-if="cartItemsCount > 0"
+                            class="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground"
                             aria-label="Items in cart: {{ cartItemsCount }}"
                         >
-                            {{
-                                cartItemsCount
-                            }}
+                            {{ cartItemsCount }}
                         </span>
                     </button>
 
                     <!-- Account -->
                     <button
-                        class="hover:text-primary cursor-pointer rounded-lg p-2 transition-colors"
+                        class="cursor-pointer rounded-lg p-2 transition-colors hover:text-primary"
                         aria-label="Account menu"
                     >
                         <svg
