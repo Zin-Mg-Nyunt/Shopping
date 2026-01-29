@@ -4,9 +4,11 @@ namespace Database\Seeders;
 
 use App\Models\Brand;
 use App\Models\Category;
+use App\Models\Product;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 
 class DatabaseSeeder extends Seeder
@@ -66,15 +68,20 @@ class DatabaseSeeder extends Seeder
             ]);
         };
 
-        $admin->products()->create([
-            'brand_id' => Brand::where('name', 'Apple')->first()->id,
-            'thumbnail' => 'https://via.placeholder.com/150',
-            'name' => 'iPhone 15',
-            'slug' => Str::slug('iPhone 15'),
-            'description' => 'The latest iPhone from Apple with a 6.1-inch display, A17 Pro chip, 12MP camera, and 5G support.',
-            'price' => 1000,
-            'discount_price' => 900,
-            'stock' => 100,
-        ]);
+        $response=Http::get('https://fakestoreapi.com/products?limit=10')->json();
+        foreach($response as $product){
+            $product=Product::create([
+                'user_id' => $admin->id,
+                'brand_id' => Brand::inRandomOrder()->first()->id,
+                'thumbnail' => $product['image'],
+                'name' => $product['title'],
+                'slug' => Str::slug($product['title']),
+                'description' => $product['description'],
+                'price' => $product['price'],
+                'discount_price' => $product['price']-100,
+                'stock' => rand(10, 100),
+            ]);
+            $product->categories()->sync(Category::inRandomOrder()->limit(rand(1,3))->pluck('id'));
+        }
     }
 }

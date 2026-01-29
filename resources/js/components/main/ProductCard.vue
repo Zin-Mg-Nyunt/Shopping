@@ -7,26 +7,20 @@ const { products } = defineProps({
 });
 </script>
 <template>
-    <div
-        class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4"
-    >
+    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
         <div
             v-for="product in products"
             :key="product.id"
-            class="group bg-card border-border relative overflow-hidden rounded-xl border transition-all hover:shadow-lg"
+            class="group relative overflow-hidden rounded-xl border border-border bg-card transition-all hover:shadow-lg"
         >
-            <div
-                class="bg-muted relative aspect-square overflow-hidden"
-            >
+            <div class="relative aspect-square overflow-hidden bg-muted">
                 <img
-                    :src="product.image"
+                    :src="product.thumbnail"
                     :alt="product.name"
                     class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
                 />
                 <div
-                    v-if="
-                        product.originalPrice
-                    "
+                    v-if="product.originalPrice"
                     class="absolute top-3 left-3"
                 >
                     <Badge
@@ -35,8 +29,7 @@ const { products } = defineProps({
                     >
                         {{
                             Math.round(
-                                ((product.originalPrice -
-                                    product.price) /
+                                ((product.originalPrice - product.price) /
                                     product.originalPrice) *
                                     100,
                             )
@@ -56,26 +49,17 @@ const { products } = defineProps({
                 </div>
             </div>
             <div class="p-4">
-                <h3
-                    class="mb-2 line-clamp-2 font-semibold"
-                >
+                <h3 class="mb-2 line-clamp-2 font-semibold">
                     {{ product.name }}
                 </h3>
-                <div
-                    class="mb-2 flex items-center gap-2"
-                >
-                    <div
-                        class="flex items-center"
-                    >
+                <div class="mb-2 flex items-center gap-2">
+                    <div class="flex items-center">
                         <svg
                             v-for="i in 5"
                             :key="i"
                             class="h-4 w-4"
                             :class="
-                                i <=
-                                Math.floor(
-                                    product.rating,
-                                )
+                                i <= Math.floor(product.rating)
                                     ? 'fill-yellow-400 text-yellow-400'
                                     : 'text-muted-foreground'
                             "
@@ -88,38 +72,20 @@ const { products } = defineProps({
                             />
                         </svg>
                     </div>
-                    <span
-                        class="text-muted-foreground text-sm"
-                    >
-                        ({{
-                            product.reviews
-                        }})
+                    <span class="text-sm text-muted-foreground">
+                        ({{ product.reviews ?? 0 }})
                     </span>
                 </div>
-                <div
-                    class="flex items-center justify-between"
-                >
+                <div class="flex items-center justify-between">
                     <div>
-                        <span
-                            class="text-primary text-xl font-bold"
-                        >
-                            ${{
-                                product.price.toFixed(
-                                    2,
-                                )
-                            }}
+                        <span class="text-xl font-bold text-primary">
+                            ${{ Number(product.price).toFixed(2) }}
                         </span>
                         <span
-                            v-if="
-                                product.originalPrice
-                            "
-                            class="text-muted-foreground ml-2 text-sm line-through"
+                            v-if="product.originalPrice"
+                            class="ml-2 text-sm text-muted-foreground line-through"
                         >
-                            ${{
-                                product.originalPrice.toFixed(
-                                    2,
-                                )
-                            }}
+                            ${{ product.originalPrice.toFixed(2) }}
                         </span>
                     </div>
                 </div>

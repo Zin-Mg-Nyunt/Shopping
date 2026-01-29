@@ -9,81 +9,21 @@ const priceMax = ref(300);
 const selectedRating = ref(4);
 const sortBy = ref('default');
 
-const categories = [
-    'All',
-    'Electronics',
-    'Apparel',
-    'Home & Garden',
-    'Sports',
-    'Beauty',
-    'Books',
-];
-
 const starOptions = [4, 3, 2, 1];
 
-const products = [
-    {
-        id: 1,
-        title: 'Premium Wireless Headphones',
-        category: 'Electronics',
-        price: 129.99,
-        rating: 4.5,
-    },
-    {
-        id: 2,
-        title: 'Minimalist Leather Watch',
-        category: 'Apparel',
-        price: 89.5,
-        rating: 4.8,
-    },
-    {
-        id: 3,
-        title: 'Organic Cotton Throw Pillow',
-        category: 'Home & Garden',
-        price: 34.99,
-        rating: 4.2,
-    },
-    {
-        id: 4,
-        title: 'Running shoes Pro',
-        category: 'Sports',
-        price: 149.0,
-        rating: 4.6,
-    },
-    {
-        id: 5,
-        title: 'Hydrating Face Serum',
-        category: 'Beauty',
-        price: 42.0,
-        rating: 4.4,
-    },
-    {
-        id: 6,
-        title: 'Smart Desk Lamp',
-        category: 'Electronics',
-        price: 59.99,
-        rating: 4.7,
-    },
-    {
-        id: 7,
-        title: 'Classic Denim Jacket',
-        category: 'Apparel',
-        price: 79.99,
-        rating: 4.3,
-    },
-    {
-        id: 8,
-        title: 'Yoga Mat Premium',
-        category: 'Sports',
-        price: 45.0,
-        rating: 4.5,
-    },
-];
+const { products, categories } = defineProps({
+    products: Array,
+    categories: Array,
+});
 
 const sortOptions = [
     {
         value: 'default',
-        label: 'Default',
+        label: 'Latest (Default)',
+    },
+    {
+        value: 'oldest',
+        label: 'Oldest',
     },
     {
         value: 'price-asc',
@@ -92,14 +32,6 @@ const sortOptions = [
     {
         value: 'price-desc',
         label: 'Price: High to Low',
-    },
-    {
-        value: 'newest',
-        label: 'Newest',
-    },
-    {
-        value: 'rating',
-        label: 'Rating',
     },
 ];
 
@@ -111,26 +43,14 @@ const sortedProducts = computed(() => {
     if (sortBy.value === 'price-desc') {
         return list.sort((a, b) => b.price - a.price);
     }
-
-    if (sortBy.value === 'newest') {
+    if (sortBy.value === 'default') {
         return list.sort((a, b) => b.id - a.id);
     }
-    if (sortBy.value === 'rating') {
-        return list.sort((a, b) => b.rating - a.rating);
+    if (sortBy.value === 'oldest') {
+        return list.sort((a, b) => a.id - b.id);
     }
     return list;
 });
-
-const productsForCard = computed(() =>
-    sortedProducts.value.map((p) => ({
-        id: p.id,
-        name: p.title,
-        image: `https://placehold.co/400x400/e2e8f0/64748b?text=Product+${p.id}`,
-        price: p.price,
-        rating: p.rating,
-        reviews: Math.floor(p.rating * 10) || 0,
-    })),
-);
 
 function formatPrice(value) {
     return new Intl.NumberFormat('en-US', {
@@ -182,18 +102,30 @@ function formatPrice(value) {
                     class="flex w-max shrink-0 gap-2 sm:w-auto sm:flex-wrap sm:gap-3"
                 >
                     <button
-                        v-for="cat in categories"
-                        :key="cat"
                         type="button"
                         :class="[
                             'rounded-full px-4 py-2 text-sm font-medium transition-all duration-200',
-                            activeCategory === cat
+                            activeCategory == 'all'
                                 ? 'bg-primary text-white shadow-md dark:bg-primary dark:text-white'
                                 : 'bg-muted/80 text-muted-foreground hover:bg-muted hover:text-foreground dark:bg-slate-800/80 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100',
                         ]"
-                        @click="activeCategory = cat"
+                        @click="activeCategory = 'all'"
                     >
-                        {{ cat }}
+                        All
+                    </button>
+                    <button
+                        v-for="cat in categories"
+                        :key="cat.id"
+                        type="button"
+                        :class="[
+                            'rounded-full px-4 py-2 text-sm font-medium transition-all duration-200',
+                            activeCategory === cat.id
+                                ? 'bg-primary text-white shadow-md dark:bg-primary dark:text-white'
+                                : 'bg-muted/80 text-muted-foreground hover:bg-muted hover:text-foreground dark:bg-slate-800/80 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100',
+                        ]"
+                        @click="activeCategory = cat.id"
+                    >
+                        {{ cat.name }}
                     </button>
                 </div>
             </div>
@@ -320,7 +252,7 @@ function formatPrice(value) {
                             </select>
                         </div>
                     </div>
-                    <ProductCard :products="productsForCard" />
+                    <ProductCard :products="sortedProducts" />
                 </div>
             </div>
         </div>

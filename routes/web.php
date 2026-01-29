@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
@@ -8,9 +9,7 @@ Route::get('/', function () {
     return Inertia::render('Home');
 })->name('home');
 
-Route::get('/products', function () {
-    return Inertia::render('Products');
-})->name('products');
+Route::get('/products', [ProductController::class, 'index'])->name('products');
 
 Route::get('dashboard', function () {
     return Inertia::render('Dashboard');
