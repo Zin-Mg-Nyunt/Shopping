@@ -5,7 +5,10 @@ import { Spinner } from '@/components/ui/spinner';
 import AuthLayout from '@/layouts/AuthLayout.vue';
 import { logout } from '@/routes';
 import { send } from '@/routes/verification';
-import { Form, Head } from '@inertiajs/vue3';
+import {
+    Form,
+    Head,
+} from '@inertiajs/vue3';
 
 defineProps<{
     status?: string;
@@ -17,14 +20,21 @@ defineProps<{
         title="Verify email"
         description="Please verify your email address by clicking on the link we just emailed to you."
     >
-        <Head title="Email verification" />
+        <Head
+            title="Email verification"
+        />
 
         <div
-            v-if="status === 'verification-link-sent'"
+            v-if="
+                status ===
+                'verification-link-sent'
+            "
             class="mb-4 text-center text-sm font-medium text-green-600"
         >
-            A new verification link has been sent to the email address you
-            provided during registration.
+            A new verification link has
+            been sent to the email
+            address you provided during
+            registration.
         </div>
 
         <Form
@@ -32,9 +42,15 @@ defineProps<{
             class="space-y-6 text-center"
             v-slot="{ processing }"
         >
-            <Button :disabled="processing" variant="secondary">
-                <Spinner v-if="processing" />
-                Resend verification email
+            <Button
+                :disabled="processing"
+                variant="secondary"
+            >
+                <Spinner
+                    v-if="processing"
+                />
+                Resend verification
+                email
             </Button>
 
             <TextLink

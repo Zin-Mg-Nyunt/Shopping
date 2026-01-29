@@ -9,21 +9,31 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import SettingsLayout from '@/layouts/settings/Layout.vue';
 import { edit } from '@/routes/user-password';
 import { type BreadcrumbItem } from '@/types';
-import { Form, Head } from '@inertiajs/vue3';
+import {
+    Form,
+    Head,
+} from '@inertiajs/vue3';
 
-const breadcrumbItems: BreadcrumbItem[] = [
-    {
-        title: 'Password settings',
-        href: edit().url,
-    },
-];
+const breadcrumbItems: BreadcrumbItem[] =
+    [
+        {
+            title: 'Password settings',
+            href: edit().url,
+        },
+    ];
 </script>
 
 <template>
-    <AppLayout :breadcrumbs="breadcrumbItems">
-        <Head title="Password settings" />
+    <AppLayout
+        :breadcrumbs="breadcrumbItems"
+    >
+        <Head
+            title="Password settings"
+        />
 
-        <h1 class="sr-only">Password Settings</h1>
+        <h1 class="sr-only">
+            Password Settings
+        </h1>
 
         <SettingsLayout>
             <div class="space-y-6">
@@ -34,7 +44,9 @@ const breadcrumbItems: BreadcrumbItem[] = [
                 />
 
                 <Form
-                    v-bind="PasswordController.update.form()"
+                    v-bind="
+                        PasswordController.update.form()
+                    "
                     :options="{
                         preserveScroll: true,
                     }"
@@ -45,10 +57,21 @@ const breadcrumbItems: BreadcrumbItem[] = [
                         'current_password',
                     ]"
                     class="space-y-6"
-                    v-slot="{ errors, processing, recentlySuccessful }"
+                    v-slot="{
+                        errors,
+                        processing,
+                        recentlySuccessful,
+                    }"
                 >
-                    <div class="grid gap-2">
-                        <Label for="current_password">Current password</Label>
+                    <div
+                        class="grid gap-2"
+                    >
+                        <Label
+                            for="current_password"
+                        >
+                            Current
+                            password
+                        </Label>
                         <Input
                             id="current_password"
                             name="current_password"
@@ -57,11 +80,21 @@ const breadcrumbItems: BreadcrumbItem[] = [
                             autocomplete="current-password"
                             placeholder="Current password"
                         />
-                        <InputError :message="errors.current_password" />
+                        <InputError
+                            :message="
+                                errors.current_password
+                            "
+                        />
                     </div>
 
-                    <div class="grid gap-2">
-                        <Label for="password">New password</Label>
+                    <div
+                        class="grid gap-2"
+                    >
+                        <Label
+                            for="password"
+                        >
+                            New password
+                        </Label>
                         <Input
                             id="password"
                             name="password"
@@ -70,13 +103,22 @@ const breadcrumbItems: BreadcrumbItem[] = [
                             autocomplete="new-password"
                             placeholder="New password"
                         />
-                        <InputError :message="errors.password" />
+                        <InputError
+                            :message="
+                                errors.password
+                            "
+                        />
                     </div>
 
-                    <div class="grid gap-2">
-                        <Label for="password_confirmation"
-                            >Confirm password</Label
+                    <div
+                        class="grid gap-2"
+                    >
+                        <Label
+                            for="password_confirmation"
                         >
+                            Confirm
+                            password
+                        </Label>
                         <Input
                             id="password_confirmation"
                             name="password_confirmation"
@@ -85,15 +127,25 @@ const breadcrumbItems: BreadcrumbItem[] = [
                             autocomplete="new-password"
                             placeholder="Confirm password"
                         />
-                        <InputError :message="errors.password_confirmation" />
+                        <InputError
+                            :message="
+                                errors.password_confirmation
+                            "
+                        />
                     </div>
 
-                    <div class="flex items-center gap-4">
+                    <div
+                        class="flex items-center gap-4"
+                    >
                         <Button
-                            :disabled="processing"
+                            :disabled="
+                                processing
+                            "
                             data-test="update-password-button"
-                            >Save password</Button
                         >
+                            Save
+                            password
+                        </Button>
 
                         <Transition
                             enter-active-class="transition ease-in-out"
@@ -102,7 +154,9 @@ const breadcrumbItems: BreadcrumbItem[] = [
                             leave-to-class="opacity-0"
                         >
                             <p
-                                v-show="recentlySuccessful"
+                                v-show="
+                                    recentlySuccessful
+                                "
                                 class="text-sm text-neutral-600"
                             >
                                 Saved.

@@ -4,23 +4,43 @@ import type { DefineComponent } from 'vue';
 import { createApp, h } from 'vue';
 import '../css/app.css';
 import { initializeTheme } from './composables/useAppearance';
+import DefaultLayout from './layouts/DefaultLayout.vue';
 
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+const appName =
+    import.meta.env.VITE_APP_NAME ||
+    'Laravel';
 
 createInertiaApp({
-    title: (title) => (title ? `${title} - ${appName}` : appName),
-    resolve: (name) =>
-        resolvePageComponent(
-            `./pages/${name}.vue`,
-            import.meta.glob<DefineComponent>('./pages/**/*.vue'),
-        ),
+    title: (title) =>
+        title
+            ? `${title} - ${appName}`
+            : appName,
+    resolve: (name) => {
+        const page =
+            resolvePageComponent(
+                `./pages/${name}.vue`,
+                import.meta.glob<DefineComponent>(
+                    './pages/**/*.vue',
+                ),
+            );
+        page.then((module) => {
+            module.default.layout =
+                module.default
+                    .layout === null
+                    ? null
+                    : DefaultLayout;
+        });
+        return page;
+    },
     setup({ el, App, props, plugin }) {
-        createApp({ render: () => h(App, props) })
+        createApp({
+            render: () => h(App, props),
+        })
             .use(plugin)
             .mount(el);
     },
     progress: {
-        color: '#4B5563',
+        color: '#f97316',
     },
 });
 

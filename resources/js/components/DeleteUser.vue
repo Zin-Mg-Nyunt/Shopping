@@ -18,7 +18,9 @@ import { Label } from '@/components/ui/label';
 import { Form } from '@inertiajs/vue3';
 import { useTemplateRef } from 'vue';
 
-const passwordInput = useTemplateRef('passwordInput');
+const passwordInput = useTemplateRef(
+    'passwordInput',
+);
 </script>
 
 <template>
@@ -31,47 +33,98 @@ const passwordInput = useTemplateRef('passwordInput');
         <div
             class="space-y-4 rounded-lg border border-red-100 bg-red-50 p-4 dark:border-red-200/10 dark:bg-red-700/10"
         >
-            <div class="relative space-y-0.5 text-red-600 dark:text-red-100">
-                <p class="font-medium">Warning</p>
+            <div
+                class="relative space-y-0.5 text-red-600 dark:text-red-100"
+            >
+                <p class="font-medium">
+                    Warning
+                </p>
                 <p class="text-sm">
-                    Please proceed with caution, this cannot be undone.
+                    Please proceed with
+                    caution, this cannot
+                    be undone.
                 </p>
             </div>
             <Dialog>
                 <DialogTrigger as-child>
-                    <Button variant="destructive" data-test="delete-user-button"
-                        >Delete account</Button
+                    <Button
+                        variant="destructive"
+                        data-test="delete-user-button"
                     >
+                        Delete account
+                    </Button>
                 </DialogTrigger>
                 <DialogContent>
                     <Form
-                        v-bind="ProfileController.destroy.form()"
+                        v-bind="
+                            ProfileController.destroy.form()
+                        "
                         reset-on-success
-                        @error="() => passwordInput?.$el?.focus()"
+                        @error="
+                            () =>
+                                passwordInput?.$el?.focus()
+                        "
                         :options="{
                             preserveScroll: true,
                         }"
                         class="space-y-6"
-                        v-slot="{ errors, processing, reset, clearErrors }"
+                        v-slot="{
+                            errors,
+                            processing,
+                            reset,
+                            clearErrors,
+                        }"
                     >
-                        <DialogHeader class="space-y-3">
-                            <DialogTitle
-                                >Are you sure you want to delete your
-                                account?</DialogTitle
-                            >
+                        <DialogHeader
+                            class="space-y-3"
+                        >
+                            <DialogTitle>
+                                Are you
+                                sure you
+                                want to
+                                delete
+                                your
+                                account?
+                            </DialogTitle>
                             <DialogDescription>
-                                Once your account is deleted, all of its
-                                resources and data will also be permanently
-                                deleted. Please enter your password to confirm
-                                you would like to permanently delete your
+                                Once
+                                your
+                                account
+                                is
+                                deleted,
+                                all of
+                                its
+                                resources
+                                and data
+                                will
+                                also be
+                                permanently
+                                deleted.
+                                Please
+                                enter
+                                your
+                                password
+                                to
+                                confirm
+                                you
+                                would
+                                like to
+                                permanently
+                                delete
+                                your
                                 account.
                             </DialogDescription>
                         </DialogHeader>
 
-                        <div class="grid gap-2">
-                            <Label for="password" class="sr-only"
-                                >Password</Label
+                        <div
+                            class="grid gap-2"
+                        >
+                            <Label
+                                for="password"
+                                class="sr-only"
                             >
+                                Password
+                            </Label>
                             <Input
                                 id="password"
                                 type="password"
@@ -79,11 +132,19 @@ const passwordInput = useTemplateRef('passwordInput');
                                 ref="passwordInput"
                                 placeholder="Password"
                             />
-                            <InputError :message="errors.password" />
+                            <InputError
+                                :message="
+                                    errors.password
+                                "
+                            />
                         </div>
 
-                        <DialogFooter class="gap-2">
-                            <DialogClose as-child>
+                        <DialogFooter
+                            class="gap-2"
+                        >
+                            <DialogClose
+                                as-child
+                            >
                                 <Button
                                     variant="secondary"
                                     @click="
@@ -100,10 +161,13 @@ const passwordInput = useTemplateRef('passwordInput');
                             <Button
                                 type="submit"
                                 variant="destructive"
-                                :disabled="processing"
+                                :disabled="
+                                    processing
+                                "
                                 data-test="confirm-delete-user-button"
                             >
-                                Delete account
+                                Delete
+                                account
                             </Button>
                         </DialogFooter>
                     </Form>

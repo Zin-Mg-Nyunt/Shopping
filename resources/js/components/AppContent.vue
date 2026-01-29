@@ -8,11 +8,18 @@ type Props = {
 };
 
 const props = defineProps<Props>();
-const className = computed(() => props.class);
+const className = computed(
+    () => props.class,
+);
 </script>
 
 <template>
-    <SidebarInset v-if="props.variant === 'sidebar'" :class="className">
+    <SidebarInset
+        v-if="
+            props.variant === 'sidebar'
+        "
+        :class="className"
+    >
         <slot />
     </SidebarInset>
     <main
