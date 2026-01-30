@@ -1,10 +1,10 @@
 <script setup>
 import ProductCard from '@/components/main/ProductCard.vue';
+import { useFilter } from '@/composables/useFilter';
 import { Head, Link } from '@inertiajs/vue3';
 import { ChevronRight, Star } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 
-const activeCategory = ref('All');
 const priceMax = ref(300);
 const selectedRating = ref(4);
 const sortBy = ref('default');
@@ -15,7 +15,6 @@ const { products, categories } = defineProps({
     products: Array,
     categories: Array,
 });
-
 const sortOptions = [
     {
         value: 'default',
@@ -59,6 +58,8 @@ function formatPrice(value) {
         minimumFractionDigits: 2,
     }).format(value);
 }
+
+const { activeCategory, filterBy } = useFilter();
 </script>
 
 <template>
@@ -109,7 +110,7 @@ function formatPrice(value) {
                                 ? 'bg-primary text-white shadow-md dark:bg-primary dark:text-white'
                                 : 'bg-muted/80 text-muted-foreground hover:bg-muted hover:text-foreground dark:bg-slate-800/80 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100',
                         ]"
-                        @click="activeCategory = 'all'"
+                        @click="filterBy('category')"
                     >
                         All
                     </button>
@@ -119,11 +120,11 @@ function formatPrice(value) {
                         type="button"
                         :class="[
                             'rounded-full px-4 py-2 text-sm font-medium transition-all duration-200',
-                            activeCategory === cat.id
+                            activeCategory == cat.slug
                                 ? 'bg-primary text-white shadow-md dark:bg-primary dark:text-white'
                                 : 'bg-muted/80 text-muted-foreground hover:bg-muted hover:text-foreground dark:bg-slate-800/80 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100',
                         ]"
-                        @click="activeCategory = cat.id"
+                        @click="filterBy('category', cat.slug)"
                     >
                         {{ cat.name }}
                     </button>

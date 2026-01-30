@@ -8,6 +8,7 @@ import {
     SheetTrigger,
 } from '@/components/ui/sheet';
 import { useAppearance } from '@/composables/useAppearance';
+import { useFilter } from '@/composables/useFilter';
 import { Link } from '@inertiajs/vue3';
 import { Menu, Search } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
@@ -25,6 +26,8 @@ const cartItemsCount = ref(3);
 
 // Mobile menu state
 const isMobileMenuOpen = ref(false);
+
+const { search, filterBy } = useFilter();
 </script>
 
 <template>
@@ -53,6 +56,8 @@ const isMobileMenuOpen = ref(false);
                             placeholder="Search products..."
                             class="h-10 w-full rounded-lg border border-input bg-background pr-4 pl-10 text-sm focus:border-transparent focus:ring-2 focus:ring-primary focus:outline-none"
                             aria-label="Search products"
+                            @input="filterBy('search', $event.target.value)"
+                            v-model="search"
                         />
                         <Search
                             class="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-muted-foreground"
