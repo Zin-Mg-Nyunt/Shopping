@@ -12,8 +12,9 @@ class ProductController extends Controller
         $filter=[
             'category' => $request->category,
             'search' => $request->search,
+            'sortBy' => $request->sortBy,
         ];
-        $products=Product::filter($filter)->get();
+        $products=Product::filter($filter)->latest()->get();
         return inertia('Products',[
             'products' => $products,
             'categories' => Category::all(),

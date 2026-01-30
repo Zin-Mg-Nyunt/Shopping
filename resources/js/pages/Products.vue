@@ -3,11 +3,10 @@ import ProductCard from '@/components/main/ProductCard.vue';
 import { useFilter } from '@/composables/useFilter';
 import { Head, Link } from '@inertiajs/vue3';
 import { ChevronRight, Star } from 'lucide-vue-next';
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 
 const priceMax = ref(300);
 const selectedRating = ref(4);
-const sortBy = ref('default');
 
 const starOptions = [4, 3, 2, 1];
 
@@ -25,31 +24,14 @@ const sortOptions = [
         label: 'Oldest',
     },
     {
-        value: 'price-asc',
+        value: 'price_asc',
         label: 'Price: Low to High',
     },
     {
-        value: 'price-desc',
+        value: 'price_desc',
         label: 'Price: High to Low',
     },
 ];
-
-const sortedProducts = computed(() => {
-    const list = [...products];
-    if (sortBy.value === 'price-asc') {
-        return list.sort((a, b) => a.price - b.price);
-    }
-    if (sortBy.value === 'price-desc') {
-        return list.sort((a, b) => b.price - a.price);
-    }
-    if (sortBy.value === 'default') {
-        return list.sort((a, b) => b.id - a.id);
-    }
-    if (sortBy.value === 'oldest') {
-        return list.sort((a, b) => a.id - b.id);
-    }
-    return list;
-});
 
 function formatPrice(value) {
     return new Intl.NumberFormat('en-US', {
@@ -59,7 +41,7 @@ function formatPrice(value) {
     }).format(value);
 }
 
-const { activeCategory, filterBy } = useFilter();
+const { activeCategory, filterBy, sortBy } = useFilter();
 </script>
 
 <template>
@@ -241,6 +223,9 @@ const { activeCategory, filterBy } = useFilter();
                             <select
                                 id="sort-by"
                                 v-model="sortBy"
+                                @change="
+                                    filterBy('sortBy', $event.target.value)
+                                "
                                 class="min-w-44 cursor-pointer rounded-lg border border-border bg-background px-3 py-2 pr-9 text-sm text-foreground transition-colors focus:border-primary focus:outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:border-primary"
                             >
                                 <option
@@ -253,7 +238,7 @@ const { activeCategory, filterBy } = useFilter();
                             </select>
                         </div>
                     </div>
-                    <ProductCard :products="sortedProducts" />
+                    <ProductCard :products="products" />
                 </div>
             </div>
         </div>

@@ -34,6 +34,14 @@ class Product extends Model
                 $query->where('name','like','%'.$search.'%')
                 ->orWhere('description','like','%'.$search.'%');
             });
+        })->when($filter['sortBy'],function($query,$sortBy){
+            $query->when($sortBy === 'oldest', function($query){
+                $query->orderBy('created_at','asc');
+            })->when($sortBy === 'price_asc',function($query){
+                $query->orderBy('discount_price','asc');
+            })->when($sortBy === 'price_desc',function($query){
+                $query->orderBy('discount_price','desc');
+            });
         });
     }
 }

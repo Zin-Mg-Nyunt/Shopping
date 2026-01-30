@@ -7,20 +7,16 @@ export const useFilter = () => {
 
     const activeCategory = ref(filter?.category || 'all');
     let search = ref(filter?.search || '');
+    let sortBy = ref(filter?.sortBy || 'default');
 
     const normalFilter = (key, value) => {
-        let params = { ...usePage().props.filter };
+        let params = { ...usePage().props.filter, [key]: value || null };
 
-        if (key == 'category') {
-            value
-                ? (activeCategory.value = value)
-                : (activeCategory.value = 'all');
-            params[key] = value;
-            params['search'] || delete params['search'];
-        } else {
-            value ? (params[key] = value) : delete params[key];
-            params['category'] || delete params['category'];
-        }
+        if (key == 'category') activeCategory.value = value || 'all';
+
+        Object.keys(params).forEach((k) => {
+            if (!params[k] || params[k] === null) delete params[k];
+        });
 
         router.get(route('products'), params, {
             preserveState: true,
@@ -34,16 +30,17 @@ export const useFilter = () => {
     }, 300);
 
     const filterBy = (key, value) => {
-        if (key == 'category') {
-            normalFilter(key, value);
-        } else {
+        if (key == 'search') {
             debounceFilter(key, value);
+        } else {
+            normalFilter(key, value);
         }
     };
 
     return {
         activeCategory,
         search,
+        sortBy,
         filterBy,
     };
 };
