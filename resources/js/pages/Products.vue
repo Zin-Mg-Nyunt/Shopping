@@ -5,14 +5,14 @@ import { Head, Link } from '@inertiajs/vue3';
 import { ChevronRight, Star } from 'lucide-vue-next';
 import { ref } from 'vue';
 
-const priceMax = ref(300);
 const selectedRating = ref(4);
 
 const starOptions = [4, 3, 2, 1];
 
-const { products, categories } = defineProps({
+const { products, categories, brands } = defineProps({
     products: Array,
     categories: Array,
+    brands: Array,
 });
 const sortOptions = [
     {
@@ -33,15 +33,7 @@ const sortOptions = [
     },
 ];
 
-function formatPrice(value) {
-    return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD',
-        minimumFractionDigits: 2,
-    }).format(value);
-}
-
-const { activeCategory, filterBy, sortBy } = useFilter();
+const { activeCategory, filterBy, sortBy, priceMax, brand } = useFilter();
 </script>
 
 <template>
@@ -129,6 +121,36 @@ const { activeCategory, filterBy, sortBy } = useFilter();
                             Filters
                         </h2>
 
+                        <!-- Brand -->
+                        <div class="mb-6">
+                            <label
+                                for="filter-brand"
+                                class="mb-2 block text-sm font-medium text-muted-foreground dark:text-slate-400"
+                            >
+                                Brand
+                            </label>
+                            <select
+                                id="filter-brand"
+                                v-model="brand"
+                                @change="filterBy('brand', brand)"
+                                class="w-full cursor-pointer appearance-none rounded-lg border border-border bg-background px-3 py-2 pr-9 text-sm text-foreground transition-colors focus:border-primary focus:outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:border-primary"
+                            >
+                                <option
+                                    :value="null"
+                                    selected
+                                >
+                                    All brands
+                                </option>
+                                <option
+                                    v-for="brand in brands"
+                                    :key="brand.id"
+                                    :value="brand.slug"
+                                >
+                                    {{ brand.name }}
+                                </option>
+                            </select>
+                        </div>
+
                         <!-- Price Slider -->
                         <div class="mb-6">
                             <label
@@ -141,17 +163,20 @@ const { activeCategory, filterBy, sortBy } = useFilter();
                                 <input
                                     id="price-range"
                                     v-model.number="priceMax"
+                                    @change="filterBy('price', priceMax)"
                                     type="range"
                                     min="0"
-                                    max="500"
+                                    max="2000"
                                     step="10"
                                     class="price-slider h-2 w-full cursor-pointer appearance-none rounded-full bg-muted dark:bg-slate-800 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:bg-primary [&::-moz-range-thumb]:transition-transform [&::-moz-range-thumb]:duration-200 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:transition-all [&::-webkit-slider-thumb]:duration-200 [&::-webkit-slider-thumb]:hover:scale-110"
                                 />
-                                <span
-                                    class="min-w-16 text-right text-sm font-medium text-foreground tabular-nums dark:text-slate-200"
-                                >
-                                    {{ formatPrice(priceMax) }}
-                                </span>
+                                <input
+                                    type="number"
+                                    max="2000"
+                                    v-model.number="priceMax"
+                                    @input="filterBy('price', priceMax)"
+                                    class="w-12 text-right text-sm font-medium text-foreground tabular-nums focus-visible:ring-0 focus-visible:outline-none dark:text-slate-200"
+                                />
                             </div>
                         </div>
 

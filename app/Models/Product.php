@@ -29,6 +29,10 @@ class Product extends Model
             $query->whereHas('categories',function($query) use ($category){
                 $query->where('slug',$category);
             });
+        })->when($filter['brand'],function($query,$brand){
+            $query->whereHas('brand',function($query) use($brand){
+                $query->where('slug',$brand);
+            });
         })->when($filter['search'],function($query,$search){
             $query->where(function($query) use ($search){
                 $query->where('name','like','%'.$search.'%')
@@ -42,6 +46,8 @@ class Product extends Model
             })->when($sortBy === 'price_desc',function($query){
                 $query->orderBy('discount_price','desc');
             });
+        })->when($filter['price'],function($query,$price){
+            $query->where('discount_price','<=',$price);
         });
     }
 }

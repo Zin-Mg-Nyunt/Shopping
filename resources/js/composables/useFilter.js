@@ -8,15 +8,17 @@ export const useFilter = () => {
     const activeCategory = ref(filter?.category || 'all');
     let search = ref(filter?.search || '');
     let sortBy = ref(filter?.sortBy || 'default');
+    const priceMax = ref(filter?.price || 0);
+    const brand = ref(filter?.brand || null);
 
     const normalFilter = (key, value) => {
         let params = { ...usePage().props.filter, [key]: value || null };
-
         if (key == 'category') activeCategory.value = value || 'all';
 
         Object.keys(params).forEach((k) => {
             if (!params[k] || params[k] === null) delete params[k];
         });
+        console.log(params);
 
         router.get(route('products'), params, {
             preserveState: true,
@@ -30,7 +32,7 @@ export const useFilter = () => {
     }, 300);
 
     const filterBy = (key, value) => {
-        if (key == 'search') {
+        if (key == 'search' || key == 'price') {
             debounceFilter(key, value);
         } else {
             normalFilter(key, value);
@@ -41,6 +43,8 @@ export const useFilter = () => {
         activeCategory,
         search,
         sortBy,
+        priceMax,
+        brand,
         filterBy,
     };
 };
