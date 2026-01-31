@@ -17,11 +17,16 @@ class ProductController extends Controller
             'price' => $request->price,
             'brand' => $request->brand,
         ];
-        $products=Product::filter($filter)->latest()->get();
+        $products=Product::filter($filter)
+                        ->latest()
+                        ->paginate(8)
+                        ->withQueryString();
+        $categories=Category::all();
+        $brands=Brand::all();
         return inertia('Products',[
             'products' => $products,
-            'categories' => Category::all(),
-            'brands' => Brand::all(),
+            'categories' => $categories,
+            'brands' => $brands,
             'filter' => $filter,
         ]);
     }

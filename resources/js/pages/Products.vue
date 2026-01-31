@@ -1,4 +1,5 @@
 <script setup>
+import Pagination from '@/components/main/Pagination.vue';
 import ProductCard from '@/components/main/ProductCard.vue';
 import { useFilter } from '@/composables/useFilter';
 import { Head, Link } from '@inertiajs/vue3';
@@ -10,10 +11,11 @@ const selectedRating = ref(4);
 const starOptions = [4, 3, 2, 1];
 
 const { products, categories, brands } = defineProps({
-    products: Array,
+    products: Object,
     categories: Array,
     brands: Array,
 });
+console.log(products);
 const sortOptions = [
     {
         value: 'default',
@@ -235,7 +237,7 @@ const { activeCategory, filterBy, sortBy, priceMax, brand } = useFilter();
                         <p
                             class="text-sm text-muted-foreground dark:text-slate-400"
                         >
-                            {{ products.length }}
+                            {{ products.total }}
                             products
                         </p>
                         <div class="flex items-center gap-2">
@@ -263,7 +265,8 @@ const { activeCategory, filterBy, sortBy, priceMax, brand } = useFilter();
                             </select>
                         </div>
                     </div>
-                    <ProductCard :products="products" />
+                    <ProductCard :products="products.data" />
+                    <Pagination :meta="products" />
                 </div>
             </div>
         </div>
