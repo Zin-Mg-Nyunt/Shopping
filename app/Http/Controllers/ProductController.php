@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 class ProductController extends Controller
 {
     public function index(Request $request) {
+        // dd($request->all());
         $filter=[
             'category' => $request->category,
             'search' => $request->search,
@@ -23,11 +24,6 @@ class ProductController extends Controller
                         ->withQueryString();
         $categories=Category::all();
         $brands=Brand::all();
-        return inertia('Products',[
-            'products' => $products,
-            'categories' => $categories,
-            'brands' => $brands,
-            'filter' => $filter,
-        ]);
+        return inertia('Products', compact('products', 'categories', 'brands', 'filter'));
     }
 }

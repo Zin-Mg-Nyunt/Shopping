@@ -1,4 +1,5 @@
 <script setup>
+import CategoryList from '@/components/main/CategoryList.vue';
 import Pagination from '@/components/main/Pagination.vue';
 import ProductCard from '@/components/main/ProductCard.vue';
 import { useFilter } from '@/composables/useFilter';
@@ -15,7 +16,6 @@ const { products, categories, brands } = defineProps({
     categories: Array,
     brands: Array,
 });
-console.log(products);
 const sortOptions = [
     {
         value: 'default',
@@ -34,6 +34,7 @@ const sortOptions = [
         label: 'Price: High to Low',
     },
 ];
+const url = window.location.pathname;
 
 const { activeCategory, filterBy, sortBy, priceMax, brand } = useFilter();
 </script>
@@ -73,39 +74,10 @@ const { activeCategory, filterBy, sortBy, priceMax, brand } = useFilter();
                 All Products
             </h1>
 
-            <!-- Category Pills -->
-            <div class="mb-8 overflow-x-auto pb-2">
-                <div
-                    class="flex w-max shrink-0 gap-2 sm:w-auto sm:flex-wrap sm:gap-3"
-                >
-                    <button
-                        type="button"
-                        :class="[
-                            'rounded-full px-4 py-2 text-sm font-medium transition-all duration-200',
-                            activeCategory == 'all'
-                                ? 'bg-primary text-white shadow-md dark:bg-primary dark:text-white'
-                                : 'bg-muted/80 text-muted-foreground hover:bg-muted hover:text-foreground dark:bg-slate-800/80 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100',
-                        ]"
-                        @click="filterBy('category')"
-                    >
-                        All
-                    </button>
-                    <button
-                        v-for="cat in categories"
-                        :key="cat.id"
-                        type="button"
-                        :class="[
-                            'rounded-full px-4 py-2 text-sm font-medium transition-all duration-200',
-                            activeCategory == cat.slug
-                                ? 'bg-primary text-white shadow-md dark:bg-primary dark:text-white'
-                                : 'bg-muted/80 text-muted-foreground hover:bg-muted hover:text-foreground dark:bg-slate-800/80 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100',
-                        ]"
-                        @click="filterBy('category', cat.slug)"
-                    >
-                        {{ cat.name }}
-                    </button>
-                </div>
-            </div>
+            <CategoryList
+                :categories="categories"
+                :url="url"
+            />
 
             <!-- Split Layout: Sidebar + Grid -->
             <div class="flex flex-col gap-8 lg:flex-row">
@@ -134,7 +106,7 @@ const { activeCategory, filterBy, sortBy, priceMax, brand } = useFilter();
                             <select
                                 id="filter-brand"
                                 v-model="brand"
-                                @change="filterBy('brand', brand)"
+                                @change="filterBy(url, 'brand', brand)"
                                 class="w-full cursor-pointer appearance-none rounded-lg border border-border bg-background px-3 py-2 pr-9 text-sm text-foreground transition-colors focus:border-primary focus:outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:border-primary"
                             >
                                 <option
@@ -165,7 +137,7 @@ const { activeCategory, filterBy, sortBy, priceMax, brand } = useFilter();
                                 <input
                                     id="price-range"
                                     v-model.number="priceMax"
-                                    @change="filterBy('price', priceMax)"
+                                    @change="filterBy(url, 'price', priceMax)"
                                     type="range"
                                     min="0"
                                     max="2000"
@@ -176,7 +148,7 @@ const { activeCategory, filterBy, sortBy, priceMax, brand } = useFilter();
                                     type="number"
                                     max="2000"
                                     v-model.number="priceMax"
-                                    @input="filterBy('price', priceMax)"
+                                    @input="filterBy(url, 'price', priceMax)"
                                     class="w-12 text-right text-sm font-medium text-foreground tabular-nums focus-visible:ring-0 focus-visible:outline-none dark:text-slate-200"
                                 />
                             </div>
@@ -251,7 +223,7 @@ const { activeCategory, filterBy, sortBy, priceMax, brand } = useFilter();
                                 id="sort-by"
                                 v-model="sortBy"
                                 @change="
-                                    filterBy('sortBy', $event.target.value)
+                                    filterBy(url, 'sortBy', $event.target.value)
                                 "
                                 class="min-w-44 cursor-pointer rounded-lg border border-border bg-background px-3 py-2 pr-9 text-sm text-foreground transition-colors focus:border-primary focus:outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:border-primary"
                             >

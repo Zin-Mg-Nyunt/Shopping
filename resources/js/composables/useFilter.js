@@ -11,31 +11,29 @@ export const useFilter = () => {
     const priceMax = ref(filter?.price || 0);
     const brand = ref(filter?.brand || null);
 
-    const normalFilter = (key, value) => {
+    const normalFilter = (url, key, value) => {
         let params = { ...usePage().props.filter, [key]: value || null };
         if (key == 'category') activeCategory.value = value || 'all';
 
         Object.keys(params).forEach((k) => {
             if (!params[k] || params[k] === null) delete params[k];
         });
-        console.log(params);
-
-        router.get(route('products'), params, {
+        router.get(url, params, {
             preserveState: true,
             preserveScroll: true,
             replace: true,
         });
     };
 
-    const debounceFilter = debounce((key, value) => {
-        normalFilter(key, value);
+    const debounceFilter = debounce((url, key, value) => {
+        normalFilter(url, key, value);
     }, 300);
 
-    const filterBy = (key, value) => {
+    const filterBy = (url, key, value) => {
         if (key == 'search' || key == 'price') {
-            debounceFilter(key, value);
+            debounceFilter(url, key, value);
         } else {
-            normalFilter(key, value);
+            normalFilter(url, key, value);
         }
     };
 

@@ -56,7 +56,13 @@ const { search, filterBy } = useFilter();
                             placeholder="Search products..."
                             class="h-10 w-full rounded-lg border border-input bg-background pr-4 pl-10 text-sm focus:border-transparent focus:ring-2 focus:ring-primary focus:outline-none"
                             aria-label="Search products"
-                            @input="filterBy('search', $event.target.value)"
+                            @input="
+                                filterBy(
+                                    '/products',
+                                    'search',
+                                    $event.target.value,
+                                )
+                            "
                             v-model="search"
                         />
                         <Search

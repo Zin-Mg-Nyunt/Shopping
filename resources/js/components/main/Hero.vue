@@ -1,7 +1,9 @@
 <script setup>
+import { ArrowRight, ImageIcon, ShoppingBag } from 'lucide-vue-next';
+import Button from '../ui/button/Button.vue';
+
 const heroContent = {
-    headline:
-        'Discover Amazing Products',
+    headline: 'Discover Amazing Products',
     subHeadline: 'at Unbeatable Prices',
     description:
         'Shop the latest trends and find everything you need in one place. Quality products, fast delivery, and exceptional service.',
@@ -15,13 +17,9 @@ const heroContent = {
         aria-label="Hero section"
     >
         <!-- Background Image with Overlay -->
-        <div
-            class="absolute inset-0 z-0"
-        >
+        <div class="absolute inset-0 z-0">
             <img
-                :src="
-                    heroContent.backgroundImage
-                "
+                :src="heroContent.backgroundImage"
                 alt="Hero background"
                 class="h-full w-full object-cover"
             />
@@ -32,23 +30,15 @@ const heroContent = {
         </div>
 
         <!-- Content Container -->
-        <div
-            class="relative z-10 container mx-auto px-4 py-20 sm:px-6 lg:px-8"
-        >
+        <div class="relative z-10 container mx-auto px-4 py-20 sm:px-6 lg:px-8">
             <div class="max-w-3xl">
                 <!-- Headline -->
                 <h1
                     class="mb-6 text-4xl leading-tight font-bold text-white drop-shadow-lg sm:text-5xl lg:text-6xl xl:text-7xl"
                 >
-                    {{
-                        heroContent.headline
-                    }}
-                    <span
-                        class="text-primary"
-                    >
-                        {{
-                            heroContent.subHeadline
-                        }}
+                    {{ heroContent.headline }}
+                    <span class="text-primary">
+                        {{ heroContent.subHeadline }}
                     </span>
                 </h1>
 
@@ -56,40 +46,38 @@ const heroContent = {
                 <p
                     class="mb-10 max-w-2xl text-lg leading-relaxed text-white/90 drop-shadow-md sm:text-xl lg:text-2xl"
                 >
-                    {{
-                        heroContent.description
-                    }}
+                    {{ heroContent.description }}
                 </p>
 
                 <!-- CTA Buttons -->
-                <div
-                    class="flex flex-col gap-4 sm:flex-row"
-                >
+                <div class="flex flex-col gap-4 sm:flex-row">
                     <Button
                         size="lg"
-                        class="group bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-6 text-base shadow-xl sm:text-lg"
+                        class="group flex items-center justify-center gap-2 bg-primary px-8 py-6 text-base text-primary-foreground shadow-xl hover:bg-primary/90 sm:text-lg"
                         aria-label="Start shopping now"
                     >
                         <ShoppingBag
-                            class="mr-2 h-5 w-5"
+                            class="size-5 shrink-0 transition-all duration-300 group-hover:scale-110"
+                            aria-hidden="true"
                         />
                         Shop Now
                         <ArrowRight
-                            class="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1"
+                            class="size-5 transition-all duration-300 group-hover:translate-x-1"
                         />
                     </Button>
                     <Button
                         size="lg"
                         variant="outline"
-                        class="group border-white/20 bg-white/10 px-8 py-6 text-base text-white backdrop-blur-sm hover:bg-white/20 sm:text-lg"
+                        class="group flex items-center justify-center gap-2 border-white/20 bg-white/10 px-8 py-6 text-base text-white backdrop-blur-sm hover:bg-white/20 sm:text-lg"
                         aria-label="View product gallery"
                     >
                         <ImageIcon
-                            class="mr-2 h-5 w-5"
+                            class="size-5 shrink-0 transition-all duration-300 group-hover:scale-110"
+                            aria-hidden="true"
                         />
                         View Gallery
                         <ArrowRight
-                            class="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1"
+                            class="size-5 transition-all duration-300 group-hover:translate-x-1"
                         />
                     </Button>
                 </div>
