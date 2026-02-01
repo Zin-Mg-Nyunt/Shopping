@@ -57,11 +57,11 @@ const visiblePages = computed(() => {
         (_, i) => windowStart + i,
     );
 
-    if (last - windowEnd == 1) {
+    if (last - windowEnd == 1 && windowStart > 1) {
         return [1, '...', ...windowNumbers, last];
     } else if (windowEnd < last) {
         return [...windowNumbers, '...', last];
-    } else if (windowEnd == last) {
+    } else if (windowEnd == last && windowStart > 1) {
         return [1, '...', ...windowNumbers];
     }
 

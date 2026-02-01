@@ -24,6 +24,6 @@ class ProductController extends Controller
                         ->withQueryString();
         $categories=Category::all();
         $brands=Brand::all();
-        return inertia('Products', compact('products', 'categories', 'brands', 'filter'));
+        return inertia('Products/index', compact('products', 'categories', 'brands', 'filter'));
     }
 }

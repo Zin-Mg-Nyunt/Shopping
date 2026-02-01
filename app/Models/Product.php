@@ -42,12 +42,12 @@ class Product extends Model
             $query->when($sortBy === 'oldest', function($query){
                 $query->orderBy('created_at','asc');
             })->when($sortBy === 'price_asc',function($query){
-                $query->orderBy('discount_price','asc');
+                $query->orderByRaw('COALESCE(discount_price,price) asc');
             })->when($sortBy === 'price_desc',function($query){
-                $query->orderBy('discount_price','desc');
+                $query->orderByRaw('COALESCE(discount_price,price) desc');
             });
         })->when($filter['price'],function($query,$price){
-            $query->where('discount_price','<=',$price);
+            $query->whereRaw('COALESCE(discount_price,price) <= ?',[$price]);
         });
     }
 }
