@@ -1,10 +1,15 @@
 <script setup>
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { router } from '@inertiajs/vue3';
 
 const { products } = defineProps({
     products: Array,
 });
+
+const viewProduct = (slug) => {
+    router.get(route('product.show', slug));
+};
 </script>
 <template>
     <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -48,7 +53,10 @@ const { products } = defineProps({
                     </Badge>
                 </div>
             </div>
-            <div class="p-4">
+            <div
+                class="p-4"
+                @click="viewProduct(product.slug)"
+            >
                 <h3 class="mb-2 line-clamp-2 font-semibold">
                     {{ product.name }}
                 </h3>

@@ -51,7 +51,6 @@ const sortedProducts = computed(() => {
     }
     return list;
 });
-
 function formatPrice(value) {
     return new Intl.NumberFormat('en-US', {
         style: 'currency',

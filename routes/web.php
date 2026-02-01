@@ -10,6 +10,7 @@ Route::get('/', function () {
 })->name('home');
 
 Route::get('/products', [ProductController::class, 'index'])->name('products');
+Route::get('/products/{product:slug}', [ProductController::class, 'show'])->name('product.show');
 
 Route::get('dashboard', function () {
     return Inertia::render('Dashboard');
