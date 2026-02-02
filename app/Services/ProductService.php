@@ -44,12 +44,13 @@ class ProductService
         }elseif($relatedProducts->count() < 4)
         {
             $neededProducts= 4 - $relatedProducts->count();
-            Product::where('id','!=',$product->id)
+            $extraProducts=Product::where('id','!=',$product->id)
                     ->whereNotIn('id',$relatedProducts->pluck('id'))
                     ->latest()
                     ->limit($neededProducts)
-                    ->get()
-                    ->merge($relatedProducts);
+                    ->get();
+                    
+            $relatedProducts = $relatedProducts->merge($extraProducts);
         }
 
         return $relatedProducts;

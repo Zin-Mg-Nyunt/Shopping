@@ -14,10 +14,13 @@ import {
     Truck,
 } from 'lucide-vue-next';
 import { ref } from 'vue';
+import { toast } from 'vue-sonner';
 
 const props = defineProps({
     product: Object,
 });
+
+const quantity = ref(1);
 
 // Static UI setup: which product tab is active (Description / Specifications / Shipping & Returns)
 const activeTab = ref('description');
@@ -68,6 +71,24 @@ const placeholderReviews = [
         text: 'Good product overall. Would recommend to others.',
     },
 ];
+
+const copyToClipboard = async () => {
+    const shareData = {
+        title: props.product?.name,
+        text: 'Check out this product!',
+        url: window.location.href,
+    };
+    try {
+        if (navigator.share) {
+            await navigator.share(shareData);
+        } else {
+            await navigator.clipboard.writeText(shareData.url);
+            toast.success('Link copied to clipboard');
+        }
+    } catch (error) {
+        console.error('Failed to share or copy:', error);
+    }
+};
 </script>
 
 <template>
@@ -259,21 +280,28 @@ const placeholderReviews = [
                                 size="icon"
                                 class="h-10 w-10 rounded-r-none"
                                 aria-label="Decrease quantity"
-                                :disabled="(product?.stock ?? 0) < 1"
+                                :disabled="quantity <= 1"
+                                @click="quantity = Math.max(1, quantity - 1)"
                             >
                                 <Minus class="size-4" />
                             </Button>
                             <span
                                 class="flex h-10 w-12 items-center justify-center border-x border-border text-sm font-medium tabular-nums dark:border-slate-800"
                             >
-                                1
+                                {{ quantity }}
                             </span>
                             <Button
                                 variant="ghost"
                                 size="icon"
                                 class="h-10 w-10 rounded-l-none"
                                 aria-label="Increase quantity"
-                                :disabled="(product?.stock ?? 0) < 1"
+                                :disabled="quantity >= (product?.stock ?? 0)"
+                                @click="
+                                    quantity = Math.min(
+                                        product.stock,
+                                        quantity + 1,
+                                    )
+                                "
                             >
                                 <Plus class="size-4" />
                             </Button>
@@ -332,6 +360,7 @@ const placeholderReviews = [
                             size="sm"
                             class="shrink-0 gap-2"
                             aria-label="Share product"
+                            @click="copyToClipboard"
                         >
                             <Share2 class="size-4" />
                             Share
