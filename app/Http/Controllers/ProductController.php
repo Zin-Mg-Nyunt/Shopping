@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Product;
+use App\Services\ProductService;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
@@ -14,9 +15,9 @@ class ProductController extends Controller
             'categories' => Category::all()
         ]);
     }
-    public function show(Product $product) {
+    public function show(Product $product, ProductService $productService) {
         return inertia('Products/show',[
-            'product' => $product->load('brand')
+            'product' => $productService->getProductDetail($product)
         ]);
     }
 }

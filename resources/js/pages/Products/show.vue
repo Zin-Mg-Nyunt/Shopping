@@ -34,20 +34,12 @@ const discountPercent = props.product?.discount_price
       )
     : 0;
 
-function formatPrice(value) {
-    if (value == null) return '';
-    return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD',
-        minimumFractionDigits: 2,
-    }).format(Number(value));
-}
-
 // Placeholder thumbnails for gallery (same as main when no separate images). TODO: Replace with actual product images array when available.
 const galleryThumbnails = [
     props.product?.thumbnail,
-    props.product?.thumbnail,
-    props.product?.thumbnail,
+    'https://res.cloudinary.com/rsc/image/upload/b_rgb:FFFFFF,c_pad,dpr_2.625,f_auto,h_214,q_auto,w_380/c_pad,h_214,w_380/Y2444576-01?pgw=1',
+    'https://m.media-amazon.com/images/I/81hDMqd2KFL.jpg',
+    'https://i5.walmartimages.com/asr/62a9abd1-926c-4ff9-8f93-a3c2f4d4314d_1.b263a12f4422d31e6c24560b928b4418.jpeg',
 ].filter(Boolean);
 
 // Placeholder rating breakdown (5–1 stars with percentage). TODO: Populate from dynamic rating data (e.g. API).
@@ -74,34 +66,6 @@ const placeholderReviews = [
         rating: 4,
         date: 'Jan 10, 2025',
         text: 'Good product overall. Would recommend to others.',
-    },
-];
-
-// Placeholder related products for grid. TODO: Fetch related products (e.g. same category) and render dynamically.
-const placeholderRelated = [
-    {
-        id: 1,
-        name: 'Related Product 1',
-        price: 29.99,
-        thumbnail: props.product?.thumbnail,
-    },
-    {
-        id: 2,
-        name: 'Related Product 2',
-        price: 44.99,
-        thumbnail: props.product?.thumbnail,
-    },
-    {
-        id: 3,
-        name: 'Related Product 3',
-        price: 19.99,
-        thumbnail: props.product?.thumbnail,
-    },
-    {
-        id: 4,
-        name: 'Related Product 4',
-        price: 59.99,
-        thumbnail: props.product?.thumbnail,
     },
 ];
 </script>
@@ -189,7 +153,7 @@ const placeholderRelated = [
                             </Badge>
                         </div>
                     </div>
-                    <!-- Thumbnail strip. TODO: Add your logic here — on thumbnail click, update main image src; optionally add active state and image transition effects. -->
+
                     <div
                         class="scrollbar-thin flex gap-2 overflow-x-auto pb-1"
                         role="list"
@@ -202,6 +166,7 @@ const placeholderRelated = [
                             class="h-16 w-16 shrink-0 overflow-hidden rounded-lg border-2 border-border bg-muted transition-colors hover:border-primary focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none dark:border-slate-800 dark:bg-slate-900/50"
                             :aria-label="`View image ${index + 1}`"
                             :aria-pressed="index === 0"
+                            @click="product.thumbnail = thumb"
                         >
                             <img
                                 :src="thumb"
@@ -253,13 +218,13 @@ const placeholderRelated = [
                         <span
                             class="text-2xl font-bold text-primary sm:text-3xl dark:text-primary"
                         >
-                            {{ formatPrice(displayPrice) }}
+                            ${{ displayPrice }}
                         </span>
                         <span
                             v-if="product?.discount_price"
                             class="text-base text-muted-foreground line-through sm:text-lg dark:text-slate-400"
                         >
-                            {{ formatPrice(product?.price) }}
+                            ${{ product?.price }}
                         </span>
                     </div>
 
@@ -665,15 +630,13 @@ const placeholderRelated = [
                 >
                     You May Also Like
                 </h2>
-                <!-- TODO: Add your logic here — fetch related products (e.g. same category) and render with v-for; link each card to product detail page. -->
-                <!-- TODO: Replace placeholderRelated with actual related products; use product.slug in route('product.show', product.slug). -->
                 <div
                     class="mt-6 grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4"
                 >
                     <Link
-                        v-for="item in placeholderRelated"
+                        v-for="item in product.related_products"
                         :key="item.id"
-                        :href="'#'"
+                        :href="route('product.show', item.slug)"
                         class="group flex flex-col overflow-hidden rounded-xl border border-border bg-card transition-shadow hover:shadow-md focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none dark:border-slate-800 dark:bg-slate-900/50"
                     >
                         <div
@@ -701,7 +664,7 @@ const placeholderRelated = [
                             <p
                                 class="mt-auto pt-2 text-sm font-semibold text-primary dark:text-primary"
                             >
-                                {{ formatPrice(item.price) }}
+                                ${{ item.price }}
                             </p>
                         </div>
                     </Link>
