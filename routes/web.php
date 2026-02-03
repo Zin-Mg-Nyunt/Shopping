@@ -1,9 +1,9 @@
 <?php
 
+use App\Http\Controllers\AddToCartController;
 use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use Laravel\Fortify\Features;
 
 Route::get('/', function () {
     return Inertia::render('Home');
@@ -11,6 +11,7 @@ Route::get('/', function () {
 
 Route::get('/products', [ProductController::class, 'index'])->name('products');
 Route::get('/products/{product:slug}', [ProductController::class, 'show'])->name('product.show');
+Route::post('/cart', AddToCartController::class)->name('cart.add');
 
 Route::get('dashboard', function () {
     return Inertia::render('Dashboard');

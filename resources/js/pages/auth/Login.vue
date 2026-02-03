@@ -10,10 +10,7 @@ import AuthBase from '@/layouts/AuthLayout.vue';
 import { register } from '@/routes';
 import { store } from '@/routes/login';
 import { request } from '@/routes/password';
-import {
-    Form,
-    Head,
-} from '@inertiajs/vue3';
+import { Form, Head } from '@inertiajs/vue3';
 
 defineProps<{
     status?: string;
@@ -42,20 +39,13 @@ defineOptions({
 
         <Form
             v-bind="store.form()"
-            :reset-on-success="[
-                'password',
-            ]"
-            v-slot="{
-                errors,
-                processing,
-            }"
+            :reset-on-success="['password']"
+            v-slot="{ errors, processing }"
             class="flex flex-col gap-6"
         >
             <div class="grid gap-6">
                 <div class="grid gap-2">
-                    <Label for="email">
-                        Email address
-                    </Label>
+                    <Label for="email"> Email address </Label>
                     <Input
                         id="email"
                         type="email"
@@ -66,36 +56,19 @@ defineOptions({
                         autocomplete="email"
                         placeholder="email@example.com"
                     />
-                    <InputError
-                        :message="
-                            errors.email
-                        "
-                    />
+                    <InputError :message="errors.email" />
                 </div>
 
                 <div class="grid gap-2">
-                    <div
-                        class="flex items-center justify-between"
-                    >
-                        <Label
-                            for="password"
-                        >
-                            Password
-                        </Label>
+                    <div class="flex items-center justify-between">
+                        <Label for="password"> Password </Label>
                         <TextLink
-                            v-if="
-                                canResetPassword
-                            "
-                            :href="
-                                request()
-                            "
+                            v-if="canResetPassword"
+                            :href="request()"
                             class="text-sm"
-                            :tabindex="
-                                5
-                            "
+                            :tabindex="5"
                         >
-                            Forgot
-                            password?
+                            Forgot password?
                         </TextLink>
                     </div>
                     <Input
@@ -107,16 +80,10 @@ defineOptions({
                         autocomplete="current-password"
                         placeholder="Password"
                     />
-                    <InputError
-                        :message="
-                            errors.password
-                        "
-                    />
+                    <InputError :message="errors.password" />
                 </div>
 
-                <div
-                    class="flex items-center justify-between"
-                >
+                <div class="flex items-center justify-between">
                     <Label
                         for="remember"
                         class="flex items-center space-x-3"
@@ -124,13 +91,9 @@ defineOptions({
                         <Checkbox
                             id="remember"
                             name="remember"
-                            :tabindex="
-                                3
-                            "
+                            :tabindex="3"
                         />
-                        <span>
-                            Remember me
-                        </span>
+                        <span> Remember me </span>
                     </Label>
                 </div>
 
@@ -138,22 +101,16 @@ defineOptions({
                     type="submit"
                     class="mt-4 w-full"
                     :tabindex="4"
-                    :disabled="
-                        processing
-                    "
+                    :disabled="processing"
                     data-test="login-button"
                 >
-                    <Spinner
-                        v-if="
-                            processing
-                        "
-                    />
+                    <Spinner v-if="processing" />
                     Log in
                 </Button>
             </div>
 
             <div
-                class="text-muted-foreground text-center text-sm"
+                class="text-center text-sm text-muted-foreground"
                 v-if="canRegister"
             >
                 Don't have an account?

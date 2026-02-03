@@ -1,6 +1,7 @@
 <script setup>
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { useAddToCart } from '@/composables/useAddToCart';
 import { Head, Link } from '@inertiajs/vue3';
 import {
     ChevronRight,
@@ -71,6 +72,8 @@ const placeholderReviews = [
         text: 'Good product overall. Would recommend to others.',
     },
 ];
+
+const { addToCart } = useAddToCart();
 
 const copyToClipboard = async () => {
     const shareData = {
@@ -311,6 +314,13 @@ const copyToClipboard = async () => {
                             aria-label="Add to cart"
                             :disabled="
                                 product?.stock != null && product.stock < 1
+                            "
+                            @click="
+                                addToCart(
+                                    product.id,
+                                    quantity,
+                                    product.thumbnail,
+                                )
                             "
                         >
                             <ShoppingCart class="size-4 shrink-0" />

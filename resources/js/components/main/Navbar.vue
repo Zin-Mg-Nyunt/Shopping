@@ -10,7 +10,7 @@ import {
 import { useAppearance } from '@/composables/useAppearance';
 import { Link } from '@inertiajs/vue3';
 import { Menu, Search } from 'lucide-vue-next';
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 
 // Dark mode toggle
 const { resolvedAppearance, updateAppearance } = useAppearance();
@@ -20,8 +20,25 @@ const toggleDarkMode = () => {
     updateAppearance(isDark.value ? 'light' : 'dark');
 };
 
-// Cart badge count
-const cartItemsCount = ref(3);
+// Cart badge count from local storage
+const getLocalCartCount = () => Number(localStorage.getItem('cart_count')) || 0;
+const cartItemsCount = ref(getLocalCartCount());
+
+onMounted(() => {
+    window.addEventListener('cart-count-updated', () => {
+        cartItemsCount.value = getLocalCartCount();
+    });
+});
+// for animation when cart count increases
+const cartIconBounce = ref(false);
+watch(cartItemsCount, (newCount, oldCount) => {
+    if (newCount > oldCount) {
+        cartIconBounce.value = true;
+        setTimeout(() => {
+            cartIconBounce.value = false;
+        }, 500);
+    }
+});
 
 // Mobile menu state
 const isMobileMenuOpen = ref(false);
@@ -228,24 +245,31 @@ const isMobileMenuOpen = ref(false);
                         class="relative cursor-pointer rounded-lg p-2 transition-colors hover:text-primary"
                         aria-label="View shopping cart"
                     >
-                        <svg
-                            class="h-5 w-5"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                            aria-hidden="true"
+                        <span
+                            class="inline-block transition-transform"
+                            :class="{
+                                'animate-cart-bounce': cartIconBounce,
+                            }"
                         >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-                            />
-                        </svg>
+                            <svg
+                                class="h-5 w-5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+                                />
+                            </svg>
+                        </span>
                         <span
                             v-if="cartItemsCount > 0"
                             class="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground"
-                            aria-label="Items in cart: {{ cartItemsCount }}"
+                            :aria-label="`Items in cart: ${cartItemsCount}`"
                         >
                             {{ cartItemsCount }}
                         </span>

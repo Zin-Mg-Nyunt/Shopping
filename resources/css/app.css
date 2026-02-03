@@ -9,62 +9,37 @@
 
 @theme inline {
     --font-sans:
-        Instrument Sans, ui-sans-serif,
-        system-ui, sans-serif,
-        'Apple Color Emoji',
-        'Segoe UI Emoji',
-        'Segoe UI Symbol',
+        Instrument Sans, ui-sans-serif, system-ui, sans-serif,
+        'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
         'Noto Color Emoji';
 
     --radius-lg: var(--radius);
-    --radius-md: calc(
-        var(--radius) - 2px
-    );
-    --radius-sm: calc(
-        var(--radius) - 4px
-    );
+    --radius-md: calc(var(--radius) - 2px);
+    --radius-sm: calc(var(--radius) - 4px);
 
-    --color-background: var(
-        --background
-    );
-    --color-foreground: var(
-        --foreground
-    );
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
 
     --color-card: var(--card);
-    --color-card-foreground: var(
-        --card-foreground
-    );
+    --color-card-foreground: var(--card-foreground);
 
     --color-popover: var(--popover);
-    --color-popover-foreground: var(
-        --popover-foreground
-    );
+    --color-popover-foreground: var(--popover-foreground);
 
     --color-primary: #f97316;
     --color-primary-foreground: #fff;
 
     --color-secondary: var(--secondary);
-    --color-secondary-foreground: var(
-        --secondary-foreground
-    );
+    --color-secondary-foreground: var(--secondary-foreground);
 
     --color-muted: var(--muted);
-    --color-muted-foreground: var(
-        --muted-foreground
-    );
+    --color-muted-foreground: var(--muted-foreground);
 
     --color-accent: var(--accent);
-    --color-accent-foreground: var(
-        --accent-foreground
-    );
+    --color-accent-foreground: var(--accent-foreground);
 
-    --color-destructive: var(
-        --destructive
-    );
-    --color-destructive-foreground: var(
-        --destructive-foreground
-    );
+    --color-destructive: var(--destructive);
+    --color-destructive-foreground: var(--destructive-foreground);
 
     --color-border: var(--border);
     --color-input: var(--input);
@@ -76,30 +51,14 @@
     --color-chart-4: var(--chart-4);
     --color-chart-5: var(--chart-5);
 
-    --color-sidebar: var(
-        --sidebar-background
-    );
-    --color-sidebar-foreground: var(
-        --sidebar-foreground
-    );
-    --color-sidebar-primary: var(
-        --sidebar-primary
-    );
-    --color-sidebar-primary-foreground: var(
-        --sidebar-primary-foreground
-    );
-    --color-sidebar-accent: var(
-        --sidebar-accent
-    );
-    --color-sidebar-accent-foreground: var(
-        --sidebar-accent-foreground
-    );
-    --color-sidebar-border: var(
-        --sidebar-border
-    );
-    --color-sidebar-ring: var(
-        --sidebar-ring
-    );
+    --color-sidebar: var(--sidebar-background);
+    --color-sidebar-foreground: var(--sidebar-foreground);
+    --color-sidebar-primary: var(--sidebar-primary);
+    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    --color-sidebar-accent: var(--sidebar-accent);
+    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    --color-sidebar-border: var(--sidebar-border);
+    --color-sidebar-ring: var(--sidebar-ring);
 }
 
 /*
@@ -116,10 +75,7 @@
     ::before,
     ::backdrop,
     ::file-selector-button {
-        border-color: var(
-            --color-gray-200,
-            currentColor
-        );
+        border-color: var(--color-gray-200, currentColor);
     }
 }
 
@@ -127,12 +83,8 @@
     body,
     html {
         --font-sans:
-            'Instrument Sans',
-            ui-sans-serif, system-ui,
-            sans-serif,
-            'Apple Color Emoji',
-            'Segoe UI Emoji',
-            'Segoe UI Symbol',
+            'Instrument Sans', ui-sans-serif, system-ui, sans-serif,
+            'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
             'Noto Color Emoji';
     }
 }
@@ -144,9 +96,7 @@
     --card: #f8fafc;
     --card-foreground: hsl(0 0% 3.9%);
     --popover: #f8fafc;
-    --popover-foreground: hsl(
-        0 0% 3.9%
-    );
+    --popover-foreground: hsl(0 0% 3.9%);
     --primary: #0f172a;
     --primary-foreground: hsl(0 0% 98%);
     --secondary: hsl(0 0% 92.1%);
@@ -156,9 +106,7 @@
     --accent: hsl(0 0% 96.1%);
     --accent-foreground: #0f172a;
     --destructive: hsl(0 84.2% 60.2%);
-    --destructive-foreground: hsl(
-        0 0% 98%
-    );
+    --destructive-foreground: hsl(0 0% 98%);
     --border: hsl(0 0% 92.8%);
     --input: hsl(0 0% 89.8%);
     --ring: hsl(0 0% 3.9%);
@@ -169,21 +117,13 @@
     --chart-5: hsl(27 87% 67%);
     --radius: 0.5rem;
     --sidebar-background: hsl(0 0% 98%);
-    --sidebar-foreground: hsl(
-        240 5.3% 26.1%
-    );
+    --sidebar-foreground: hsl(240 5.3% 26.1%);
     --sidebar-primary: hsl(0 0% 10%);
-    --sidebar-primary-foreground: hsl(
-        0 0% 98%
-    );
+    --sidebar-primary-foreground: hsl(0 0% 98%);
     --sidebar-accent: hsl(0 0% 94%);
-    --sidebar-accent-foreground: hsl(
-        0 0% 30%
-    );
+    --sidebar-accent-foreground: hsl(0 0% 30%);
     --sidebar-border: hsl(0 0% 91%);
-    --sidebar-ring: hsl(
-        217.2 91.2% 59.8%
-    );
+    --sidebar-ring: hsl(217.2 91.2% 59.8%);
     --sidebar: hsl(0 0% 98%);
 }
 
@@ -213,26 +153,35 @@
     --chart-4: hsl(280 65% 60%);
     --chart-5: hsl(340 75% 55%);
     --sidebar-background: hsl(0 0% 7%);
-    --sidebar-foreground: hsl(
-        0 0% 95.9%
-    );
-    --sidebar-primary: hsl(
-        360,
-        100%,
-        100%
-    );
-    --sidebar-primary-foreground: hsl(
-        0 0% 100%
-    );
+    --sidebar-foreground: hsl(0 0% 95.9%);
+    --sidebar-primary: hsl(360, 100%, 100%);
+    --sidebar-primary-foreground: hsl(0 0% 100%);
     --sidebar-accent: hsl(0 0% 15.9%);
-    --sidebar-accent-foreground: hsl(
-        240 4.8% 95.9%
-    );
+    --sidebar-accent-foreground: hsl(240 4.8% 95.9%);
     --sidebar-border: hsl(0 0% 15.9%);
-    --sidebar-ring: hsl(
-        217.2 91.2% 59.8%
-    );
+    --sidebar-ring: hsl(217.2 91.2% 59.8%);
     --sidebar: hsl(240 5.9% 10%);
+}
+@keyframes cart-bounce {
+    0%,
+    100% {
+        transform: scale(1);
+    }
+    30% {
+        transform: scale(1.2);
+    }
+    50% {
+        transform: scale(0.95);
+    }
+    70% {
+        transform: scale(1.08);
+    }
+}
+
+@layer utilities {
+    .animate-cart-bounce {
+        animation: cart-bounce 0.5s ease-out 1;
+    }
 }
 
 @layer base {
