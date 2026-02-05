@@ -78,7 +78,7 @@ class DatabaseSeeder extends Seeder
                 'slug' => Str::slug($product['title']),
                 'description' => $product['description'],
                 'price' => $product['price'],
-                'discount_price' => $product['price']-100,
+                'discount_price' => $product['price']-5,
                 'stock' => rand(10, 100),
             ]);
             $product->categories()->sync(Category::inRandomOrder()->limit(rand(1,3))->pluck('id'));

@@ -1,21 +1,21 @@
 <script setup>
+import CategoryList from '@/components/main/CategoryList.vue';
+import Pagination from '@/components/main/Pagination.vue';
 import ProductCard from '@/components/main/ProductCard.vue';
+import { useFilter } from '@/composables/useFilter';
 import { Head, Link } from '@inertiajs/vue3';
 import { ChevronRight, Star } from 'lucide-vue-next';
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 
-const activeCategory = ref('All');
-const priceMax = ref(300);
 const selectedRating = ref(4);
-const sortBy = ref('default');
 
 const starOptions = [4, 3, 2, 1];
 
-const { products, categories } = defineProps({
-    products: Array,
+const { products, categories, brands } = defineProps({
+    products: Object,
     categories: Array,
+    brands: Array,
 });
-
 const sortOptions = [
     {
         value: 'default',
@@ -26,38 +26,17 @@ const sortOptions = [
         label: 'Oldest',
     },
     {
-        value: 'price-asc',
+        value: 'price_asc',
         label: 'Price: Low to High',
     },
     {
-        value: 'price-desc',
+        value: 'price_desc',
         label: 'Price: High to Low',
     },
 ];
+const url = window.location.pathname;
 
-const sortedProducts = computed(() => {
-    const list = [...products];
-    if (sortBy.value === 'price-asc') {
-        return list.sort((a, b) => a.price - b.price);
-    }
-    if (sortBy.value === 'price-desc') {
-        return list.sort((a, b) => b.price - a.price);
-    }
-    if (sortBy.value === 'default') {
-        return list.sort((a, b) => b.id - a.id);
-    }
-    if (sortBy.value === 'oldest') {
-        return list.sort((a, b) => a.id - b.id);
-    }
-    return list;
-});
-function formatPrice(value) {
-    return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD',
-        minimumFractionDigits: 2,
-    }).format(value);
-}
+const { activeCategory, filterBy, sortBy, priceMax, brand } = useFilter();
 </script>
 
 <template>
@@ -95,39 +74,10 @@ function formatPrice(value) {
                 All Products
             </h1>
 
-            <!-- Category Pills -->
-            <div class="mb-8 overflow-x-auto pb-2">
-                <div
-                    class="flex w-max shrink-0 gap-2 sm:w-auto sm:flex-wrap sm:gap-3"
-                >
-                    <button
-                        type="button"
-                        :class="[
-                            'rounded-full px-4 py-2 text-sm font-medium transition-all duration-200',
-                            activeCategory == 'all'
-                                ? 'bg-primary text-white shadow-md dark:bg-primary dark:text-white'
-                                : 'bg-muted/80 text-muted-foreground hover:bg-muted hover:text-foreground dark:bg-slate-800/80 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100',
-                        ]"
-                        @click="activeCategory = 'all'"
-                    >
-                        All
-                    </button>
-                    <button
-                        v-for="cat in categories"
-                        :key="cat.id"
-                        type="button"
-                        :class="[
-                            'rounded-full px-4 py-2 text-sm font-medium transition-all duration-200',
-                            activeCategory === cat.id
-                                ? 'bg-primary text-white shadow-md dark:bg-primary dark:text-white'
-                                : 'bg-muted/80 text-muted-foreground hover:bg-muted hover:text-foreground dark:bg-slate-800/80 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100',
-                        ]"
-                        @click="activeCategory = cat.id"
-                    >
-                        {{ cat.name }}
-                    </button>
-                </div>
-            </div>
+            <CategoryList
+                :categories="categories"
+                :url="url"
+            />
 
             <!-- Split Layout: Sidebar + Grid -->
             <div class="flex flex-col gap-8 lg:flex-row">
@@ -145,6 +95,36 @@ function formatPrice(value) {
                             Filters
                         </h2>
 
+                        <!-- Brand -->
+                        <div class="mb-6">
+                            <label
+                                for="filter-brand"
+                                class="mb-2 block text-sm font-medium text-muted-foreground dark:text-slate-400"
+                            >
+                                Brand
+                            </label>
+                            <select
+                                id="filter-brand"
+                                v-model="brand"
+                                @change="filterBy(url, 'brand', brand)"
+                                class="w-full cursor-pointer appearance-none rounded-lg border border-border bg-background px-3 py-2 pr-9 text-sm text-foreground transition-colors focus:border-primary focus:outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:border-primary"
+                            >
+                                <option
+                                    :value="null"
+                                    selected
+                                >
+                                    All brands
+                                </option>
+                                <option
+                                    v-for="brand in brands"
+                                    :key="brand.id"
+                                    :value="brand.slug"
+                                >
+                                    {{ brand.name }}
+                                </option>
+                            </select>
+                        </div>
+
                         <!-- Price Slider -->
                         <div class="mb-6">
                             <label
@@ -157,17 +137,20 @@ function formatPrice(value) {
                                 <input
                                     id="price-range"
                                     v-model.number="priceMax"
+                                    @change="filterBy(url, 'price', priceMax)"
                                     type="range"
                                     min="0"
-                                    max="500"
+                                    max="2000"
                                     step="10"
                                     class="price-slider h-2 w-full cursor-pointer appearance-none rounded-full bg-muted dark:bg-slate-800 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:bg-primary [&::-moz-range-thumb]:transition-transform [&::-moz-range-thumb]:duration-200 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:transition-all [&::-webkit-slider-thumb]:duration-200 [&::-webkit-slider-thumb]:hover:scale-110"
                                 />
-                                <span
-                                    class="min-w-16 text-right text-sm font-medium text-foreground tabular-nums dark:text-slate-200"
-                                >
-                                    {{ formatPrice(priceMax) }}
-                                </span>
+                                <input
+                                    type="number"
+                                    max="2000"
+                                    v-model.number="priceMax"
+                                    @input="filterBy(url, 'price', priceMax)"
+                                    class="w-12 text-right text-sm font-medium text-foreground tabular-nums focus-visible:ring-0 focus-visible:outline-none dark:text-slate-200"
+                                />
                             </div>
                         </div>
 
@@ -226,7 +209,7 @@ function formatPrice(value) {
                         <p
                             class="text-sm text-muted-foreground dark:text-slate-400"
                         >
-                            {{ products.length }}
+                            {{ products.total }}
                             products
                         </p>
                         <div class="flex items-center gap-2">
@@ -239,6 +222,9 @@ function formatPrice(value) {
                             <select
                                 id="sort-by"
                                 v-model="sortBy"
+                                @change="
+                                    filterBy(url, 'sortBy', $event.target.value)
+                                "
                                 class="min-w-44 cursor-pointer rounded-lg border border-border bg-background px-3 py-2 pr-9 text-sm text-foreground transition-colors focus:border-primary focus:outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:border-primary"
                             >
                                 <option
@@ -251,7 +237,8 @@ function formatPrice(value) {
                             </select>
                         </div>
                     </div>
-                    <ProductCard :products="sortedProducts" />
+                    <ProductCard :products="products.data" />
+                    <Pagination :meta="products" />
                 </div>
             </div>
         </div>

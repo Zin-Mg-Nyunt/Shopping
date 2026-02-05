@@ -11,6 +11,7 @@ import {
 } from "reka-ui"
 import { cn } from "@/lib/utils"
 import SheetOverlay from "./SheetOverlay.vue"
+import SheetDescription from "./SheetDescription.vue"
 
 interface SheetContentProps extends DialogContentProps {
   class?: HTMLAttributes["class"]
@@ -49,6 +50,9 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits)
         props.class)"
       v-bind="{ ...$attrs, ...forwarded }"
     >
+    <SheetDescription class="sr-only">
+      This dialog allows you to edit product details.
+    </SheetDescription>
       <slot />
 
       <DialogClose
