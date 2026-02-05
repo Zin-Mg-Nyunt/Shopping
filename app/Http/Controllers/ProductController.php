@@ -10,8 +10,13 @@ use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
+    public function home(Request $request){
+        $filter=['category'=>$request->category];
+        $categories=Category::all();
+        $latestProducts = Product::filter($filter)->latest()->take(4)->get();
+        return inertia('Home',compact('categories','filter','latestProducts'));
+    }
     public function index(Request $request) {
-        // dd($request->all());
         $filter=[
             'category' => $request->category,
             'search' => $request->search,

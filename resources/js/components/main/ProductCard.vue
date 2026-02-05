@@ -56,7 +56,10 @@ const { addToCart } = useAddToCart();
                 </div>
             </div>
             <div class="p-4">
-                <div @click="viewProduct(product.slug)">
+                <div
+                    @click="viewProduct(product.slug)"
+                    class="h-26"
+                >
                     <h3 class="mb-2 line-clamp-2 font-semibold">
                         {{ product.name }}
                     </h3>

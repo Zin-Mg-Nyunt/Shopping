@@ -4,8 +4,9 @@ import Contact from '@/components/main/Contact.vue';
 import Hero from '@/components/main/Hero.vue';
 import ProductList from '@/components/main/ProductList.vue';
 import { Head } from '@inertiajs/vue3';
-const { categories } = defineProps({
+const { categories, latestProducts } = defineProps({
     categories: Array,
+    latestProducts: Array,
 });
 const url = window.location.pathname;
 </script>
@@ -17,6 +18,6 @@ const url = window.location.pathname;
         :categories="categories"
         :url="url"
     />
-    <ProductList />
+    <ProductList :latestProducts="latestProducts" />
     <Contact />
 </template>
