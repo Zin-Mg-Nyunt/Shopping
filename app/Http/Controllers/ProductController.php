@@ -42,4 +42,8 @@ class ProductController extends Controller
         $products = $productService->getAllProducts($filter);
         return inertia('Admin/Products/index', $products);
     }
+    public function adminDeleteProduct(Product $product) {
+        $product->delete();
+        return back();
+    }
 }

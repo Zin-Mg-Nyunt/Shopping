@@ -1,4 +1,5 @@
 <script setup>
+import DeleteDialog from '@/components/main/DeleteDialog.vue';
 import Pagination from '@/components/main/Pagination.vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -13,7 +14,7 @@ import { useFilter } from '@/composables/useFilter';
 import AdminLayout from '@/layouts/AdminLayout.vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import { MoreHorizontal, Pencil, Plus, Search, Trash2 } from 'lucide-vue-next';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 
 const props = defineProps({
     products: Object,
@@ -49,17 +50,20 @@ function handleSearch() {
 }
 
 function handleEdit(product) {
-    // Placeholder: link to edit route when available
     router.visit(route('admin.products'));
 }
 
-function handleDelete(product) {
-    // Placeholder: implement delete when backend is ready
-    if (confirm(`Delete "${product.name}"?`)) {
-        // router.delete(route('admin.products.destroy', product.id));
-    }
-}
+const deleteDialogOpen = ref(false);
+const productToDelete = ref(null);
 
+function openDeleteDialog(product) {
+    productToDelete.value = product;
+    deleteDialogOpen.value = true;
+}
+const closeDeleteDialog = () => {
+    productToDelete.value = null;
+    deleteDialogOpen.value = false;
+};
 const productList = computed(() => props.products?.data ?? []);
 defineOptions({
     layout: AdminLayout,
@@ -226,7 +230,7 @@ defineOptions({
                             </DropdownMenuItem>
                             <DropdownMenuItem
                                 variant="destructive"
-                                @click="handleDelete(product)"
+                                @click="openDeleteDialog(product)"
                             >
                                 <Trash2 class="mr-2 h-4 w-4" />
                                 Delete
@@ -350,7 +354,7 @@ defineOptions({
                                         </DropdownMenuItem>
                                         <DropdownMenuItem
                                             variant="destructive"
-                                            @click="handleDelete(product)"
+                                            @click="openDeleteDialog(product)"
                                         >
                                             <Trash2 class="mr-2 h-4 w-4" />
                                             Delete
@@ -379,5 +383,12 @@ defineOptions({
                 <Pagination :meta="products" />
             </div>
         </div>
+
+        <!-- Delete product confirmation dialog -->
+        <DeleteDialog
+            v-if="deleteDialogOpen"
+            :deleteItem="productToDelete"
+            @closeDeleteDialog="closeDeleteDialog"
+        />
     </div>
 </template>

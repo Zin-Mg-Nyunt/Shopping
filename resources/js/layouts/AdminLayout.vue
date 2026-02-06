@@ -27,8 +27,10 @@ import {
     Sun,
     Tag,
     Users,
+    X,
 } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
+import { Toaster } from 'vue-sonner';
 
 const { resolvedAppearance, updateAppearance } = useAppearance();
 const isDark = computed(() => resolvedAppearance.value === 'dark');
@@ -62,6 +64,11 @@ function isActive(href) {
 </script>
 
 <template>
+    <Toaster
+        position="top-right"
+        :expand="true"
+        richColors
+    />
     <div class="min-h-screen bg-gray-50 dark:bg-gray-950">
         <!-- Sidebar: light mode = slate-50, dark mode = gray-900 -->
         <aside
@@ -84,7 +91,7 @@ function isActive(href) {
                     class="text-gray-500 hover:bg-gray-100 hover:text-gray-900 lg:hidden dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
                     @click="sidebarOpen = false"
                 >
-                    <Menu class="h-5 w-5" />
+                    <X class="h-5 w-5" />
                 </Button>
             </div>
 
