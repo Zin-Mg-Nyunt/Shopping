@@ -16,7 +16,7 @@ class ProductController extends Controller
         $latestProducts = Product::filter($filter)->latest()->take(4)->get();
         return inertia('Home',compact('categories','filter','latestProducts'));
     }
-    public function index(Request $request) {
+    public function index(Request $request,ProductService $productService) {
         $filter=[
             'category' => $request->category,
             'search' => $request->search,
@@ -24,17 +24,22 @@ class ProductController extends Controller
             'price' => $request->price,
             'brand' => $request->brand,
         ];
-        $products=Product::filter($filter)
-                        ->latest()
-                        ->paginate(8)
-                        ->withQueryString();
-        $categories=Category::all();
-        $brands=Brand::all();
-        return inertia('Products/index', compact('products', 'categories', 'brands', 'filter'));
+        $products=$productService->getAllProducts($filter);
+        return inertia('Products/index', $products);
     }
     public function show(Product $product, ProductService $productService) {
         return inertia('Products/show',[
             'product' => $productService->getProductDetail($product)
         ]);
+    }
+    public function adminProducts(Request $request,ProductService $productService) {
+        $filter=[
+            'category' => $request->category,
+            'search' => $request->search,
+            'sortBy' => $request->sortBy,
+            'brand' => $request->brand,
+        ];
+        $products = $productService->getAllProducts($filter);
+        return inertia('Admin/Products/index', $products);
     }
 }

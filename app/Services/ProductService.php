@@ -2,10 +2,21 @@
 
 namespace App\Services;
 
+use App\Models\Brand;
+use App\Models\Category;
 use App\Models\Product;
 
 class ProductService
 {
+    public function getAllProducts($filter){
+        $products=Product::filter($filter)
+                        ->latest()
+                        ->paginate(8)
+                        ->withQueryString();
+        $categories=Category::all();
+        $brands=Brand::all();
+        return compact('products', 'categories', 'brands', 'filter');
+    }
     public function getProductDetail($product){
         $product->load('brand');
         $product->setAttribute('related_products',$this->getRelatedProducts($product));

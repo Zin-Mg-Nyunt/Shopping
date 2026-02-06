@@ -14,6 +14,7 @@ Route::middleware(['auth'])->group(function(){
     Route::get('dashboard', DashboardController::class)->name('dashboard');
     Route::get('user/dashboard', [DashboardController::class,'user'])->name('user.dashboard');
     Route::get('admin/dashboard', [DashboardController::class,'admin'])->middleware('can:access-admin')->name('admin.dashboard');
+    Route::get('admin/products', [ProductController::class, 'adminProducts'])->middleware('can:access-admin')->name('admin.products');
 });
 
 require __DIR__.'/settings.php';

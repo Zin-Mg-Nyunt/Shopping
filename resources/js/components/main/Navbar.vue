@@ -22,11 +22,11 @@ import {
     Menu,
     Moon,
     Search,
+    Settings,
     Sun,
-    User,
     UserPlus,
 } from 'lucide-vue-next';
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 
 // Dark mode toggle
 const { resolvedAppearance, updateAppearance } = useAppearance();
@@ -58,25 +58,7 @@ watch(cartItemsCount, (newCount, oldCount) => {
 
 // Mobile menu state
 const isMobileMenuOpen = ref(false);
-const isOpen = ref(false);
 const user = computed(() => usePage().props.auth.user);
-const dropdownContainer = ref(null);
-const closeDropdown = (e) => {
-    if (
-        dropdownContainer.value &&
-        !dropdownContainer.value.contains(e.target)
-    ) {
-        isOpen.value = false;
-    }
-};
-
-onMounted(() => {
-    window.addEventListener('click', closeDropdown);
-});
-onUnmounted(() => {
-    window.removeEventListener('click', closeDropdown);
-});
-
 const { search, filterBy } = useFilter();
 </script>
 
@@ -190,6 +172,14 @@ const { search, filterBy } = useFilter();
                                     </label>
                                     <div class="relative">
                                         <input
+                                            v-model="search"
+                                            @input="
+                                                filterBy(
+                                                    '/products',
+                                                    'search',
+                                                    $event.target.value,
+                                                )
+                                            "
                                             id="mobile-search"
                                             type="search"
                                             placeholder="Search products..."
@@ -338,11 +328,11 @@ const { search, filterBy } = useFilter();
                                     </Link>
                                     <Link
                                         as="button"
-                                        href="/profile"
+                                        href="/settings/profile"
                                         class="flex cursor-pointer items-center gap-2 py-2 pr-4 text-sm font-medium text-foreground transition-colors hover:text-primary"
                                     >
-                                        <User class="size-4 shrink-0" />
-                                        Profile
+                                        <Settings class="size-4 shrink-0" />
+                                        Settings
                                     </Link>
                                     <Link
                                         as="button"
@@ -377,80 +367,6 @@ const { search, filterBy } = useFilter();
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
-                    <!-- <div
-                        ref="dropdownContainer"
-                        class="relative"
-                    >
-                        <button
-                            type="button"
-                            class="cursor-pointer rounded-lg p-2 transition-colors hover:text-primary"
-                            aria-label="Account menu"
-                            @click="isOpen = !isOpen"
-                        >
-                            <svg
-                                class="h-5 w-5"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                                aria-hidden="true"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                                />
-                            </svg>
-                        </button>
-                        <div
-                            v-show="isOpen"
-                            class="absolute right-0 mt-2 w-48 rounded-lg border border-border bg-background py-2 shadow-lg"
-                        >
-                            <template v-if="user">
-                                <Link
-                                    as="button"
-                                    href="/dashboard"
-                                    class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-foreground transition-colors hover:text-primary"
-                                >
-                                    <LayoutDashboard class="size-4 shrink-0" />
-                                    Dashboard
-                                </Link>
-                                <Link
-                                    as="button"
-                                    href="/profile"
-                                    class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-foreground transition-colors hover:text-primary"
-                                >
-                                    <User class="size-4 shrink-0" />
-                                    Profile
-                                </Link>
-                                <Link
-                                    as="button"
-                                    href="/logout"
-                                    method="post"
-                                    class="w-full cursor-pointer px-4 py-2 text-left text-sm font-medium text-destructive transition-colors hover:text-destructive/80"
-                                    >Logout</Link
-                                >
-                            </template>
-                            <template v-else>
-                                <Link
-                                    as="button"
-                                    href="/login"
-                                    class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-foreground transition-colors hover:text-primary"
-                                >
-                                    <LogIn class="size-4 shrink-0" />
-                                    Login
-                                </Link>
-                                <Link
-                                    as="button"
-                                    href="/register"
-                                    class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-foreground transition-colors hover:text-primary"
-                                >
-                                    <UserPlus class="size-4 shrink-0" />
-                                    Register
-                                </Link>
-                            </template>
-                        </div>
-                    </div> -->
                 </div>
             </div>
         </div>

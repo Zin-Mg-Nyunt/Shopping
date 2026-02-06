@@ -43,7 +43,7 @@ const sidebarOpen = ref(false);
 
 const navItems = [
     { title: 'Dashboard', href: adminDashboard(), icon: LayoutDashboard },
-    { title: 'Products', href: '#', icon: Package },
+    { title: 'Products', href: route('admin.products'), icon: Package },
     { title: 'Orders', href: '#', icon: ShoppingCart },
     { title: 'Customers', href: '#', icon: Users },
     { title: 'Categories', href: '#', icon: FolderTree },
@@ -73,7 +73,7 @@ function isActive(href) {
                 class="flex h-16 items-center justify-between border-b border-gray-200/80 px-4 dark:border-gray-700/50"
             >
                 <Link
-                    :href="adminDashboard()"
+                    :href="route('home')"
                     class="flex items-center gap-2 [&_span]:text-gray-900 dark:[&_span]:text-white"
                 >
                     <AppLogo />
