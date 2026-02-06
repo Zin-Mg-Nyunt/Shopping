@@ -27,7 +27,7 @@ const { addToCart } = useAddToCart();
                     class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
                 />
                 <div
-                    v-if="product.originalPrice"
+                    v-if="product.discount_price"
                     class="absolute top-3 left-3"
                 >
                     <Badge
@@ -36,8 +36,8 @@ const { addToCart } = useAddToCart();
                     >
                         {{
                             Math.round(
-                                ((product.originalPrice - product.price) /
-                                    product.originalPrice) *
+                                ((product.price - product.discount_price) /
+                                    product.price) *
                                     100,
                             )
                         }}% OFF
@@ -90,13 +90,13 @@ const { addToCart } = useAddToCart();
                     <div class="flex items-center justify-between">
                         <div>
                             <span class="text-xl font-bold text-primary">
-                                ${{ Number(product.price).toFixed(2) }}
+                                ${{ Number(product.discount_price).toFixed(2) }}
                             </span>
                             <span
-                                v-if="product.originalPrice"
+                                v-if="product.discount_price"
                                 class="ml-2 text-sm text-muted-foreground line-through"
                             >
-                                ${{ product.originalPrice.toFixed(2) }}
+                                ${{ Number(product.price).toFixed(2) }}
                             </span>
                         </div>
                     </div>

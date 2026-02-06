@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import InputError from '@/components/InputError.vue';
 import TextLink from '@/components/TextLink.vue';
 import { Button } from '@/components/ui/button';
@@ -7,11 +7,21 @@ import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import AuthBase from '@/layouts/AuthLayout.vue';
 import { login } from '@/routes';
-import { store } from '@/routes/register';
-import {
-    Form,
-    Head,
-} from '@inertiajs/vue3';
+import { Head, useForm } from '@inertiajs/vue3';
+
+const form = useForm({
+    name: '',
+    email: '',
+    password: '',
+    password_confirmation: '',
+});
+const submit = () => {
+    form.post(route('register.store'), {
+        onSuccess: () => {
+            form.reset('password', 'password_confirmation');
+        },
+    });
+};
 
 defineOptions({
     layout: null,
@@ -25,24 +35,15 @@ defineOptions({
     >
         <Head title="Register" />
 
-        <Form
-            v-bind="store.form()"
-            :reset-on-success="[
-                'password',
-                'password_confirmation',
-            ]"
-            v-slot="{
-                errors,
-                processing,
-            }"
+        <form
+            @submit.prevent="submit"
             class="flex flex-col gap-6"
         >
             <div class="grid gap-6">
                 <div class="grid gap-2">
-                    <Label for="name">
-                        Name
-                    </Label>
+                    <Label for="name"> Name </Label>
                     <Input
+                        v-model="form.name"
                         id="name"
                         type="text"
                         required
@@ -52,18 +53,13 @@ defineOptions({
                         name="name"
                         placeholder="Full name"
                     />
-                    <InputError
-                        :message="
-                            errors.name
-                        "
-                    />
+                    <InputError :message="form.errors.name" />
                 </div>
 
                 <div class="grid gap-2">
-                    <Label for="email">
-                        Email address
-                    </Label>
+                    <Label for="email"> Email address </Label>
                     <Input
+                        v-model="form.email"
                         id="email"
                         type="email"
                         required
@@ -72,20 +68,13 @@ defineOptions({
                         name="email"
                         placeholder="email@example.com"
                     />
-                    <InputError
-                        :message="
-                            errors.email
-                        "
-                    />
+                    <InputError :message="form.errors.email" />
                 </div>
 
                 <div class="grid gap-2">
-                    <Label
-                        for="password"
-                    >
-                        Password
-                    </Label>
+                    <Label for="password"> Password </Label>
                     <Input
+                        v-model="form.password"
                         id="password"
                         type="password"
                         required
@@ -94,20 +83,15 @@ defineOptions({
                         name="password"
                         placeholder="Password"
                     />
-                    <InputError
-                        :message="
-                            errors.password
-                        "
-                    />
+                    <InputError :message="form.errors.password" />
                 </div>
 
                 <div class="grid gap-2">
-                    <Label
-                        for="password_confirmation"
-                    >
+                    <Label for="password_confirmation">
                         Confirm password
                     </Label>
                     <Input
+                        v-model="form.password_confirmation"
                         id="password_confirmation"
                         type="password"
                         required
@@ -116,34 +100,22 @@ defineOptions({
                         name="password_confirmation"
                         placeholder="Confirm password"
                     />
-                    <InputError
-                        :message="
-                            errors.password_confirmation
-                        "
-                    />
+                    <InputError :message="form.errors.password_confirmation" />
                 </div>
 
                 <Button
                     type="submit"
                     class="mt-2 w-full"
                     tabindex="5"
-                    :disabled="
-                        processing
-                    "
+                    :disabled="form.processing"
                     data-test="register-user-button"
                 >
-                    <Spinner
-                        v-if="
-                            processing
-                        "
-                    />
+                    <Spinner v-if="form.processing" />
                     Create account
                 </Button>
             </div>
 
-            <div
-                class="text-muted-foreground text-center text-sm"
-            >
+            <div class="text-center text-sm text-muted-foreground">
                 Already have an account?
                 <TextLink
                     :href="login()"
@@ -153,6 +125,6 @@ defineOptions({
                     Log in
                 </TextLink>
             </div>
-        </Form>
+        </form>
     </AuthBase>
 </template>
