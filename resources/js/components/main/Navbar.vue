@@ -1,6 +1,12 @@
 <script setup>
 import AppLogoIcon from '@/components/AppLogoIcon.vue';
 import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
     Sheet,
     SheetContent,
     SheetHeader,
@@ -14,7 +20,9 @@ import {
     LayoutDashboard,
     LogIn,
     Menu,
+    Moon,
     Search,
+    Sun,
     User,
     UserPlus,
 } from 'lucide-vue-next';
@@ -244,36 +252,14 @@ const { search, filterBy } = useFilter();
                                 : 'Switch to dark mode'
                         "
                     >
-                        <svg
+                        <Sun
                             v-if="isDark"
                             class="h-5 w-5"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                            aria-hidden="true"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
-                            />
-                        </svg>
-                        <svg
+                        />
+                        <Moon
                             v-else
                             class="h-5 w-5"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                            aria-hidden="true"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
-                            />
-                        </svg>
+                        />
                     </button>
 
                     <!-- Cart -->
@@ -312,7 +298,86 @@ const { search, filterBy } = useFilter();
                     </button>
 
                     <!-- Account -->
-                    <div
+                    <DropdownMenu>
+                        <DropdownMenuTrigger as-child>
+                            <button
+                                type="button"
+                                class="cursor-pointer rounded-lg p-2 transition-colors hover:text-primary"
+                                aria-label="Account menu"
+                            >
+                                <svg
+                                    class="h-5 w-5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                    aria-hidden="true"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                                    />
+                                </svg>
+                            </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                            <DropdownMenuItem v-if="user">
+                                <div
+                                    class="flex flex-col items-start gap-2 py-2 text-sm font-medium text-foreground transition-colors hover:text-primary"
+                                >
+                                    <Link
+                                        as="button"
+                                        href="/dashboard"
+                                        class="flex cursor-pointer items-center gap-2 py-2 pr-4 text-sm font-medium text-foreground transition-colors hover:text-primary"
+                                    >
+                                        <LayoutDashboard
+                                            class="size-4 shrink-0"
+                                        />
+                                        Dashboard
+                                    </Link>
+                                    <Link
+                                        as="button"
+                                        href="/profile"
+                                        class="flex cursor-pointer items-center gap-2 py-2 pr-4 text-sm font-medium text-foreground transition-colors hover:text-primary"
+                                    >
+                                        <User class="size-4 shrink-0" />
+                                        Profile
+                                    </Link>
+                                    <Link
+                                        as="button"
+                                        href="/logout"
+                                        method="post"
+                                        class="w-full cursor-pointer py-2 pr-4 text-left text-sm font-medium text-destructive transition-colors hover:text-destructive/80"
+                                        >Logout</Link
+                                    >
+                                </div>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem v-else>
+                                <div
+                                    class="flex flex-col items-start gap-2 py-2 text-sm font-medium text-foreground transition-colors hover:text-primary"
+                                >
+                                    <Link
+                                        as="button"
+                                        href="/login"
+                                        class="flex cursor-pointer items-center gap-2 py-2 pr-4 text-sm font-medium text-foreground transition-colors hover:text-primary"
+                                    >
+                                        <LogIn class="size-4 shrink-0" />
+                                        Login
+                                    </Link>
+                                    <Link
+                                        as="button"
+                                        href="/register"
+                                        class="flex cursor-pointer items-center gap-2 py-2 pr-4 text-sm font-medium text-foreground transition-colors hover:text-primary"
+                                    >
+                                        <UserPlus class="size-4 shrink-0" />
+                                        Register
+                                    </Link>
+                                </div>
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                    <!-- <div
                         ref="dropdownContainer"
                         class="relative"
                     >
@@ -385,7 +450,7 @@ const { search, filterBy } = useFilter();
                                 </Link>
                             </template>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
             </div>
         </div>

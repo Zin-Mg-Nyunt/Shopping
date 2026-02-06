@@ -14,7 +14,7 @@ class DashboardController extends Controller
         }
     }
     public function admin(Request $request) {
-        dd('admin dashboard');
+        return inertia('Admin/Dashboard');
     }
     public function user(Request $request) {
         dd('user dashboard');
