@@ -86,7 +86,7 @@ defineOptions({
                 as-child
                 class="w-fit shrink-0"
             >
-                <Link :href="route('admin.products')">
+                <Link :href="route('admin.products.create')">
                     <Plus class="mr-2 h-4 w-4" />
                     Add Product
                 </Link>

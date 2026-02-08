@@ -24,4 +24,16 @@ export default defineConfig({
             },
         }),
     ],
+    build: {
+        chunkSizeWarningLimit: 2000, // Limit ကို 500 ကနေ 2000 (2MB) အထိ တိုးလိုက်တာပါ
+        rollupOptions: {
+            output: {
+                manualChunks(id) {
+                    if (id.includes('node_modules')) {
+                        return 'vendor';
+                    }
+                },
+            },
+        },
+    },
 });
