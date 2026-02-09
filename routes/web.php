@@ -19,7 +19,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('admin/products', [ProductController::class, 'adminProducts'])->name('admin.products');
         Route::delete('admin/products/{product:slug}/delete', [ProductController::class, 'adminDeleteProduct'])->name('admin.products.delete');
         Route::get('admin/products/create', [ProductController::class, 'adminCreateProduct'])->name('admin.products.create');
-        Route::post('admin/brands', [BrandController::class, 'store'])->name('admin.brands.store');
+        Route::post('admin/product/store', [ProductController::class, 'adminStoreProduct'])->name('admin.product.store');
     });
 });
 

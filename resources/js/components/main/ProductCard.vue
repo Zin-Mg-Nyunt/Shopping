@@ -27,20 +27,14 @@ const { addToCart } = useAddToCart();
                     class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
                 />
                 <div
-                    v-if="product.discount_price"
+                    v-if="product.discount_percentage"
                     class="absolute top-3 left-3"
                 >
                     <Badge
                         variant="destructive"
                         class="bg-primary text-primary-foreground"
                     >
-                        {{
-                            Math.round(
-                                ((product.price - product.discount_price) /
-                                    product.price) *
-                                    100,
-                            )
-                        }}% OFF
+                        {{ Number(product.discount_percentage) }}% OFF
                     </Badge>
                 </div>
                 <div

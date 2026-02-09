@@ -70,4 +70,23 @@ class ProductController extends Controller
             'categories' => $categories,
         ]);
     }
+
+    public function adminStoreProduct(Request $request, ProductService $productService){
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'slug' => 'required|string|max:255|unique:products,slug',
+            'description' => 'required|string',
+            'price' => 'required|numeric|min:0',
+            'discount_price' => 'nullable|numeric|min:0',
+            'discount_percentage' => 'nullable|numeric|min:0',
+            'stock' => 'required|integer|min:0',
+            'categories' => 'required|array',
+            'brand_id' => 'nullable',
+            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        ]);
+        $validated['user_id'] = $request->user()->id;
+
+        $productService->createProduct($validated);
+        return redirect()->route('admin.products');
+    }
 }

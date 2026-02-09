@@ -70,6 +70,7 @@ class DatabaseSeeder extends Seeder
 
         $response=Http::get('https://fakestoreapi.com/products?limit=10')->json();
         foreach($response as $product){
+            $discount_percentage = rand(1, 20);
             $product=Product::create([
                 'user_id' => $admin->id,
                 'brand_id' => Brand::inRandomOrder()->first()->id,
@@ -78,7 +79,8 @@ class DatabaseSeeder extends Seeder
                 'slug' => Str::slug($product['title']),
                 'description' => $product['description'],
                 'price' => $product['price'],
-                'discount_price' => $product['price']-5,
+                'discount_percentage' => $discount_percentage,
+                'discount_price' => $product['price']-($product['price']*($discount_percentage/100)),
                 'stock' => rand(10, 100),
             ]);
             $product->categories()->sync(Category::inRandomOrder()->limit(rand(1,3))->pluck('id'));

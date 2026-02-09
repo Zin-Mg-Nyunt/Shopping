@@ -14,9 +14,11 @@ import { Label } from '@/components/ui/label';
 import { useGenerateName } from '@/composables/useGenerateName';
 import { useGenerateSlug } from '@/composables/useGenerateSlug';
 import AdminLayout from '@/layouts/AdminLayout.vue';
-import { Head, router, useForm } from '@inertiajs/vue3';
+import { Head, useForm } from '@inertiajs/vue3';
+import { debounce } from 'lodash';
 import { ImagePlus, Search, X } from 'lucide-vue-next';
 import { ref, watch } from 'vue';
+import { toast } from 'vue-sonner';
 
 const generateName = useGenerateName();
 const generateSlug = useGenerateSlug();
@@ -26,15 +28,15 @@ const props = defineProps({
 });
 
 const form = useForm({
-    brand: null,
+    brand_id: null,
     categories: [],
     thumbnail: null,
     name: '',
     slug: '',
     description: '',
-    price: '',
+    price: null,
     discount_price: null,
-    stock: '',
+    stock: null,
     discount_percentage: null,
 });
 
@@ -55,51 +57,35 @@ watch(
     },
 );
 
-const addBrand = (brandName) => {
-    const name = brandName;
+const createNewBrand = (e) => {
+    const name = generateName(e.target.value);
     const slug = generateSlug(name);
-    form.brand = {
-        name,
-        slug,
-        isNew: true,
-    };
-};
-const manualBrandCreate = (e) => {
-    const brandName = generateName(e.target.value);
-    const existingBrand = props.brands.find(
-        (b) => b.slug == generateSlug(brandName),
-    );
 
-    if (existingBrand) {
-        form.brand = existingBrand;
+    const dbBrand = props.brands.find((b) => b.slug == slug);
+
+    if (dbBrand) {
+        form.brand_id = dbBrand.id;
     } else {
-        addBrand(brandName);
+        form.brand_id = { name, slug, isNew: true };
     }
     e.target.value = '';
 };
 
 const addCategory = (categoryName) => {
     const name = generateName(categoryName);
-    const existingCategory = form.categories.find(
-        (c) => c.slug == generateSlug(name),
-    );
-    const oldCategory = props.categories.find((c) => {
-        return c.slug == generateSlug(name);
-    });
-    if (existingCategory) {
-        return;
-    } else if (!existingCategory && oldCategory) {
-        form.categories.push(oldCategory);
+    const slug = generateSlug(name);
+
+    const isAlreadySelected = form.categories.some((c) => c.slug == slug);
+    if (isAlreadySelected) return;
+
+    const dbCategory = props.categories.find((c) => c.slug == slug);
+    if (dbCategory) {
+        form.categories.push(dbCategory);
     } else {
-        const slug = generateSlug(name);
-        form.categories.push({
-            name,
-            slug,
-            isNew: true,
-        });
+        form.categories.push({ name, slug, isNew: true });
     }
 };
-const manualCategoryCreate = (e) => {
+const createNewCategory = (e) => {
     const categoryName = generateName(e.target.value);
     addCategory(categoryName);
     e.target.value = '';
@@ -108,35 +94,70 @@ const removeCategory = (category) => {
     form.categories = form.categories.filter((c) => c.slug !== category.slug);
 };
 
+const thumbnailPreview = ref(null);
 watch(
-    () => form.discount_percentage,
+    () => form.thumbnail,
     (newValue) => {
-        if (newValue) {
-            form.discount_price = form.price - form.price * (newValue / 100);
-        } else {
-            form.discount_price = null;
-            form.discount_percentage = null;
-        }
+        if (!newValue) return;
+        if (thumbnailPreview.value) URL.revokeObjectURL(thumbnailPreview.value);
+        thumbnailPreview.value = URL.createObjectURL(newValue);
     },
-    { immediate: true },
 );
 
+const handleDiscountPercentageInput = (e) => {
+    const value = e.target.value;
+    if (value) {
+        const result = form.price - form.price * (value / 100);
+        form.discount_price = Number(result.toFixed(2));
+    } else {
+        form.discount_price = null;
+        form.discount_percentage = null;
+    }
+};
+
+const handleDiscountPriceInput = debounce((e) => {
+    const value = e.target.value;
+    if (value) {
+        const result = 100 - (value / form.price) * 100;
+        form.discount_percentage = Number(result.toFixed(2));
+    } else {
+        form.discount_percentage = null;
+        form.discount_price = null;
+    }
+}, 500);
+
 watch(
-    () => form.discount_price,
-    (newValue) => {
-        if (newValue) {
-            form.discount_percentage = 100 - (newValue / form.price) * 100;
+    () => form.price,
+    () => {
+        if (form.discount_percentage) {
+            const result =
+                form.price - form.price * (form.discount_percentage / 100);
+            form.discount_price = Number(result.toFixed(2));
         } else {
-            form.discount_percentage = null;
             form.discount_price = null;
+            form.discount_percentage = null;
         }
     },
     { immediate: true },
 );
 
 const addProduct = () => {
-    alert('addProduct');
+    form.transform((data) => ({
+        ...data,
+        categories: data.categories.map(({ isNew, ...rest }) => rest),
+        brand_id: data.brand_id.isNew
+            ? { name: data.brand_id.name, slug: data.brand_id.slug }
+            : data.brand_id,
+    })).post(route('admin.product.store'), {
+        onSuccess: () => {
+            toast.success('Product added successfully');
+        },
+        onError: () => {
+            toast.error('Please fix the validation errors');
+        },
+    });
 };
+
 defineOptions({
     layout: AdminLayout,
 });
@@ -192,18 +213,27 @@ defineOptions({
                     </CardHeader>
                     <CardContent class="space-y-4">
                         <div class="grid gap-2">
-                            <Label for="name">Product Name</Label>
+                            <Label
+                                for="name"
+                                required
+                                >Product Name</Label
+                            >
                             <Input
                                 id="name"
                                 v-model="form.name"
                                 type="text"
                                 placeholder="Product name"
                                 class="w-full"
+                                required
                             />
                             <InputError :message="form.errors.name" />
                         </div>
                         <div class="grid gap-2">
-                            <Label for="slug">Slug</Label>
+                            <Label
+                                for="slug"
+                                required
+                                >Slug</Label
+                            >
                             <Input
                                 id="slug"
                                 v-model="form.slug"
@@ -211,17 +241,23 @@ defineOptions({
                                 placeholder="product-slug"
                                 @input="manualSlugCreate"
                                 class="w-full"
+                                required
                             />
                             <InputError :message="form.errors.slug" />
                         </div>
                         <div class="grid gap-2">
-                            <Label for="description">Description</Label>
+                            <Label
+                                for="description"
+                                required
+                                >Description</Label
+                            >
                             <textarea
                                 id="description"
                                 v-model="form.description"
                                 rows="4"
                                 placeholder="Product description..."
                                 class="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-xs transition-[color,box-shadow] outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50"
+                                required
                             />
                             <InputError :message="form.errors.description" />
                         </div>
@@ -241,14 +277,26 @@ defineOptions({
                             class="flex flex-wrap items-end gap-4 rounded-lg border border-gray-200 bg-gray-50/50 p-4 dark:border-gray-700 dark:bg-gray-800/30"
                         >
                             <div class="grid min-w-[140px] flex-1 gap-2">
-                                <Label for="price">Base Price</Label>
+                                <Label
+                                    for="price"
+                                    required
+                                    >Base Price</Label
+                                >
                                 <Input
                                     id="price"
-                                    v-model="form.price"
-                                    type="text"
+                                    v-model.number="form.price"
+                                    type="number"
+                                    step="any"
                                     placeholder="0.00"
                                     class="w-full"
+                                    required
                                 />
+                                <p
+                                    v-if="form.errors.price"
+                                    class="text-red-500"
+                                >
+                                    {{ form.errors.price }}
+                                </p>
                                 <InputError :message="form.errors.price" />
                             </div>
                             <div
@@ -263,8 +311,10 @@ defineOptions({
                                 >
                                 <Input
                                     id="discount_percentage"
-                                    v-model="form.discount_percentage"
-                                    type="text"
+                                    v-model.number="form.discount_percentage"
+                                    @input="handleDiscountPercentageInput"
+                                    type="number"
+                                    step="any"
                                     placeholder="0"
                                     class="w-full text-center"
                                 />
@@ -284,8 +334,10 @@ defineOptions({
                                 >
                                 <Input
                                     id="discount_price"
-                                    v-model="form.discount_price"
-                                    type="text"
+                                    v-model.number="form.discount_price"
+                                    @input="handleDiscountPriceInput"
+                                    type="number"
+                                    step="any"
                                     placeholder="0.00"
                                     class="w-full"
                                 />
@@ -308,25 +360,30 @@ defineOptions({
                         <div class="space-y-3">
                             <Label>Brand</Label>
                             <div
-                                v-if="form.brand"
+                                v-if="form.brand_id"
                                 class="flex flex-wrap items-center gap-2"
                             >
                                 <Badge
                                     class="relative gap-1.5 overflow-visible rounded-md bg-secondary py-1.5 pr-1 pl-2.5"
                                 >
                                     <span
-                                        v-if="form.brand.isNew"
+                                        v-if="form.brand_id.isNew"
                                         class="absolute -top-1 -right-1 rounded-full bg-primary px-1 py-1"
                                     >
                                     </span>
-                                    {{ form.brand.name }}
+                                    {{
+                                        form.brand_id.name ??
+                                        brands.find(
+                                            (b) => b.id == form.brand_id,
+                                        )?.name
+                                    }}
                                     <Button
                                         type="button"
                                         variant="ghost"
                                         size="icon"
                                         class="h-5 w-5 shrink-0 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600"
                                         aria-label="Remove brand"
-                                        @click="form.brand = null"
+                                        @click="form.brand_id = null"
                                     >
                                         <X class="h-3.5 w-3.5" />
                                     </Button>
@@ -340,7 +397,7 @@ defineOptions({
                                     type="text"
                                     placeholder="Search or add brand..."
                                     class="pl-9"
-                                    @keydown.enter.prevent="manualBrandCreate"
+                                    @keydown.enter.prevent="createNewBrand"
                                 />
                             </div>
                             <div class="flex flex-wrap gap-2">
@@ -351,20 +408,20 @@ defineOptions({
                                     variant="outline"
                                     size="sm"
                                     class="rounded-full"
-                                    @click="form.brand = b"
+                                    @click="form.brand_id = b.id"
                                     :disabled="
-                                        form.brand && form.brand.slug == b.slug
+                                        form.brand_id && form.brand_id == b.id
                                     "
                                 >
                                     {{ b.name }}
                                 </Button>
                             </div>
-                            <InputError :message="form.errors.brand" />
+                            <InputError :message="form.errors.brand_id" />
                         </div>
 
                         <!-- Category -->
                         <div class="space-y-3">
-                            <Label>Category</Label>
+                            <Label required>Category</Label>
                             <div
                                 v-if="form.categories.length > 0"
                                 class="flex flex-wrap items-center gap-2"
@@ -398,12 +455,10 @@ defineOptions({
                                     class="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400"
                                 />
                                 <Input
-                                    @keydown.enter.prevent="
-                                        manualCategoryCreate
-                                    "
                                     type="text"
                                     placeholder="Search or add category..."
                                     class="pl-9"
+                                    @keydown.enter.prevent="createNewCategory"
                                 />
                             </div>
                             <div class="flex flex-wrap gap-2">
@@ -443,29 +498,39 @@ defineOptions({
                             for="thumbnail"
                             class="flex cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-gray-300 bg-gray-50/50 px-6 py-10 transition-colors hover:border-gray-400 hover:bg-gray-100/50 dark:border-gray-600 dark:bg-gray-800/30 dark:hover:border-gray-500 dark:hover:bg-gray-800/50"
                         >
-                            <ImagePlus
-                                class="h-12 w-12 text-gray-400 dark:text-gray-500"
-                            />
-                            <div class="text-center">
-                                <p
-                                    class="text-sm font-medium text-gray-600 dark:text-gray-300"
-                                >
-                                    Drop image or click to upload
-                                </p>
-                                <p
-                                    class="text-xs text-gray-500 dark:text-gray-400"
-                                >
-                                    PNG, JPG up to 4MB
-                                </p>
+                            <div
+                                v-if="!thumbnailPreview"
+                                class="flex flex-col items-center justify-center gap-3"
+                            >
+                                <ImagePlus
+                                    class="h-12 w-12 text-gray-400 dark:text-gray-500"
+                                />
+                                <div class="text-center">
+                                    <p
+                                        class="text-sm font-medium text-gray-600 dark:text-gray-300"
+                                    >
+                                        Drop image or click to upload
+                                    </p>
+                                    <p
+                                        class="text-xs text-gray-500 dark:text-gray-400"
+                                    >
+                                        PNG, JPG up to 2MB
+                                    </p>
+                                </div>
                             </div>
+                            <img
+                                v-else
+                                :src="thumbnailPreview"
+                                alt="Thumbnail"
+                                class="h-full w-full object-cover"
+                            />
                             <input
                                 id="thumbnail"
                                 type="file"
                                 accept="image/*"
                                 class="sr-only"
                                 @change="
-                                    form.thumbnail =
-                                        $event.target.files?.[0] ?? null
+                                    form.thumbnail = $event.target.files?.[0]
                                 "
                             />
                         </label>
@@ -481,11 +546,15 @@ defineOptions({
                     </CardHeader>
                     <CardContent>
                         <div class="grid gap-2">
-                            <Label for="stock">Quantity</Label>
+                            <Label
+                                for="stock"
+                                required
+                                >Quantity</Label
+                            >
                             <Input
                                 id="stock"
-                                v-model="form.stock"
-                                type="text"
+                                v-model.number="form.stock"
+                                type="number"
                                 placeholder="0"
                                 class="w-full"
                             />

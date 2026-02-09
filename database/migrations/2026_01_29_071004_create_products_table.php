@@ -15,12 +15,13 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('brand_id');
-            $table->string('thumbnail');
+            $table->string('thumbnail')->nullable();
             $table->string('name');
             $table->string('slug');
             $table->text('description');
             $table->decimal('price', 10, 2);
             $table->decimal('discount_price', 10, 2)->nullable();
+            $table->decimal('discount_percentage', 10, 2)->nullable();
             $table->integer('stock');
             $table->timestamps();
         });

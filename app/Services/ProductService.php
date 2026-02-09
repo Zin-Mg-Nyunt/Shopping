@@ -66,4 +66,33 @@ class ProductService
 
         return $relatedProducts;
     }
+
+    public function createProduct($validated){
+        [$categories_id,$validated]= $this->getNewCategoriesAndBrandIds($validated);
+        $product = Product::create($validated);
+        $product->categories()->sync($categories_id);
+        return $product;
+    }
+
+    private function getNewCategoriesAndBrandIds($validated){
+        $categories=$validated['categories'];
+        $brand = $validated['brand_id'];
+
+        $categories_id=collect($categories)->map(function($category){
+            return Category::firstOrCreate(
+                ['slug' => $category['slug']],
+                ['name' => $category['name']]
+            );
+        })->pluck('id')->toArray();
+
+        if(is_array($brand)){
+            $newBrand = Brand::firstOrCreate(
+                ['slug' => $brand['slug']],
+                ['name' => $brand['name']]
+            );
+            $validated['brand_id'] = $newBrand->id;
+        }
+        $validated=collect($validated)->except('categories')->toArray();
+        return [$categories_id,$validated];
+    }
 }
