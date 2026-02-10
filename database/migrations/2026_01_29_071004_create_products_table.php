@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('brand_id');
-            $table->string('thumbnail')->nullable();
+            $table->string('thumbnail');
             $table->string('name');
             $table->string('slug');
             $table->text('description');

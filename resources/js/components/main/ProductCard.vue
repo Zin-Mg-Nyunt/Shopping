@@ -12,6 +12,11 @@ const viewProduct = (slug) => {
     router.get(route('product.show', slug));
 };
 const { addToCart } = useAddToCart();
+
+function displayPrice(product) {
+    const p = product.discount_price ?? product.price;
+    return p != null ? `$${Number(p).toFixed(2)}` : '—';
+}
 </script>
 <template>
     <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -84,7 +89,7 @@ const { addToCart } = useAddToCart();
                     <div class="flex items-center justify-between">
                         <div>
                             <span class="text-xl font-bold text-primary">
-                                ${{ Number(product.discount_price).toFixed(2) }}
+                                {{ displayPrice(product) }}
                             </span>
                             <span
                                 v-if="product.discount_price"

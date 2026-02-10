@@ -68,6 +68,10 @@ class ProductService
     }
 
     public function createProduct($validated){
+        if($validated['thumbnail']){
+            $path = $validated['thumbnail']->store('products','s3');
+            $validated['thumbnail'] = $path;
+        }
         [$categories_id,$validated]= $this->getNewCategoriesAndBrandIds($validated);
         $product = Product::create($validated);
         $product->categories()->sync($categories_id);

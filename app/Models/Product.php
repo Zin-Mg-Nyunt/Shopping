@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Product extends Model
 {
@@ -49,5 +50,11 @@ class Product extends Model
         })->when($filter['price']??false,function($query,$price){
             $query->whereRaw('COALESCE(discount_price,price) <= ?',[$price]);
         });
+    }
+    public function getThumbnailAttribute($value){
+        if(!$value){
+            return null;
+        }
+        return str_starts_with($value,'http') ? $value : Storage::disk('s3')->url($value);
     }
 }

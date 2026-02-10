@@ -82,7 +82,7 @@ class ProductController extends Controller
             'stock' => 'required|integer|min:0',
             'categories' => 'required|array',
             'brand_id' => 'nullable',
-            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'thumbnail' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
         $validated['user_id'] = $request->user()->id;
 
