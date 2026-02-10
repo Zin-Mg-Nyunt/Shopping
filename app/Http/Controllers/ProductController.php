@@ -60,15 +60,12 @@ class ProductController extends Controller
         return back();
     }
 
-    public function adminCreateProduct()
+    public function adminCreateProduct(?Product $product = null)
     {
         $brands = Brand::query()->orderBy('name')->get();
         $categories = Category::query()->orderBy('name')->get();
-
-        return inertia('Admin/Products/create', [
-            'brands' => $brands,
-            'categories' => $categories,
-        ]);
+        $product = $product?->load('categories');
+        return inertia('Admin/Products/create', compact('brands', 'categories', 'product'));
     }
 
     public function adminStoreProduct(Request $request, ProductService $productService){
@@ -82,11 +79,29 @@ class ProductController extends Controller
             'stock' => 'required|integer|min:0',
             'categories' => 'required|array',
             'brand_id' => 'nullable',
-            'thumbnail' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'thumbnail' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
         $validated['user_id'] = $request->user()->id;
 
         $productService->createProduct($validated);
+        return redirect()->route('admin.products');
+    }
+
+    public function adminUpdateProduct(Request $request, Product $product, ProductService $productService){
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'slug' => 'required|string|max:255|unique:products,slug,'. $product->id,
+            'description' => 'required|string',
+            'price' => 'required|numeric|min:0',
+            'discount_price' => 'nullable|numeric|min:0',
+            'discount_percentage' => 'nullable|numeric|min:0',
+            'stock' => 'required|integer|min:0',
+            'categories' => 'required|array',
+            'brand_id' => 'nullable',
+            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        ]);
+        $validated['user_id'] = $request->user()->id;
+        $productService->updateProduct($product, $validated);
         return redirect()->route('admin.products');
     }
 }

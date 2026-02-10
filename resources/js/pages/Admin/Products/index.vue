@@ -50,7 +50,7 @@ function handleSearch() {
 }
 
 function handleEdit(product) {
-    router.visit(route('admin.products'));
+    router.get(route('admin.products.edit', product.slug));
 }
 
 const deleteDialogOpen = ref(false);
@@ -164,7 +164,11 @@ defineOptions({
                 </div>
             </div>
         </div>
-
+        <div class="flex items-center justify-between">
+            <span class="text-sm font-medium text-gray-500 dark:text-gray-400"
+                >{{ products.total }} products</span
+            >
+        </div>
         <!-- Table card -->
         <div
             class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-900"

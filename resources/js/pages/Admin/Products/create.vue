@@ -14,7 +14,7 @@ import { Label } from '@/components/ui/label';
 import { useGenerateName } from '@/composables/useGenerateName';
 import { useGenerateSlug } from '@/composables/useGenerateSlug';
 import AdminLayout from '@/layouts/AdminLayout.vue';
-import { Head, useForm } from '@inertiajs/vue3';
+import { Head, router, useForm } from '@inertiajs/vue3';
 import { debounce } from 'lodash';
 import { ImagePlus, Search, X } from 'lucide-vue-next';
 import { ref, watch } from 'vue';
@@ -25,19 +25,20 @@ const generateSlug = useGenerateSlug();
 const props = defineProps({
     brands: { type: Array, default: () => [] },
     categories: { type: Array, default: () => [] },
+    product: { type: Object, default: () => null },
 });
 
 const form = useForm({
-    brand_id: null,
-    categories: [],
+    brand_id: props.product?.brand_id ?? null,
+    categories: props.product?.categories ?? [],
     thumbnail: null,
-    name: '',
-    slug: '',
-    description: '',
-    price: null,
-    discount_price: null,
-    stock: null,
-    discount_percentage: null,
+    name: props.product?.name ?? '',
+    slug: props.product?.slug ?? '',
+    description: props.product?.description ?? '',
+    price: props.product?.price ?? null,
+    discount_price: props.product?.discount_price ?? null,
+    stock: props.product?.stock ?? 0,
+    discount_percentage: props.product?.discount_percentage ?? null,
 });
 
 const isEditingSlug = ref(false);
@@ -94,7 +95,7 @@ const removeCategory = (category) => {
     form.categories = form.categories.filter((c) => c.slug !== category.slug);
 };
 
-const thumbnailPreview = ref(null);
+const thumbnailPreview = ref(props.product?.thumbnail ?? null);
 watch(
     () => form.thumbnail,
     (newValue) => {
@@ -141,16 +142,22 @@ watch(
     { immediate: true },
 );
 
+const url = props.product ? 'admin.product.update' : 'admin.product.store';
 const addProduct = () => {
     form.transform((data) => ({
         ...data,
+        _method: props.product ? 'PUT' : 'POST',
         categories: data.categories.map(({ isNew, ...rest }) => rest),
-        brand_id: data.brand_id.isNew
+        brand_id: data.brand_id?.isNew
             ? { name: data.brand_id.name, slug: data.brand_id.slug }
             : data.brand_id,
-    })).post(route('admin.product.store'), {
+    })).post(route(url, props.product ? props.product.id : null), {
         onSuccess: () => {
-            toast.success('Product added successfully');
+            toast.success(
+                props.product
+                    ? 'Product updated successfully'
+                    : 'Product added successfully',
+            );
         },
         onError: () => {
             toast.error('Please fix the validation errors');
@@ -175,10 +182,14 @@ defineOptions({
                 <h1
                     class="text-2xl font-semibold tracking-tight text-gray-900 dark:text-white"
                 >
-                    Create Product
+                    {{ product ? 'Edit Product' : 'Create Product' }}
                 </h1>
                 <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                    Add a new product to your catalog
+                    {{
+                        product
+                            ? 'Edit the product details'
+                            : 'Add a new product to your catalog'
+                    }}
                 </p>
             </div>
             <div class="flex items-center gap-2">
@@ -186,7 +197,7 @@ defineOptions({
                     type="button"
                     class="cursor-pointer"
                     variant="outline"
-                    @click="router.visit(route('admin.products'))"
+                    @click="router.get(route('admin.products'))"
                 >
                     Cancel
                 </Button>
@@ -194,7 +205,7 @@ defineOptions({
                     type="submit"
                     class="cursor-pointer"
                 >
-                    Save
+                    {{ product ? 'Update Product' : 'Create Product' }}
                 </Button>
             </div>
         </div>
