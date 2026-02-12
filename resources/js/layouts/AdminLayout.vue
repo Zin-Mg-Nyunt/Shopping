@@ -12,7 +12,6 @@ import UserMenuContent from '@/components/UserMenuContent.vue';
 import { useAppearance } from '@/composables/useAppearance';
 import { getInitials } from '@/composables/useInitials';
 import { toUrl } from '@/lib/utils';
-import { dashboard as adminDashboard } from '@/routes/admin';
 import { Link, usePage } from '@inertiajs/vue3';
 import {
     Bell,
@@ -44,9 +43,13 @@ const auth = computed(() => page.props.auth);
 const sidebarOpen = ref(false);
 
 const navItems = [
-    { title: 'Dashboard', href: adminDashboard(), icon: LayoutDashboard },
+    {
+        title: 'Dashboard',
+        href: route('admin.dashboard'),
+        icon: LayoutDashboard,
+    },
     { title: 'Products', href: route('admin.products'), icon: Package },
-    { title: 'Orders', href: '#', icon: ShoppingCart },
+    { title: 'Orders', href: route('admin.orders'), icon: ShoppingCart },
     { title: 'Customers', href: '#', icon: Users },
     { title: 'Categories', href: '#', icon: FolderTree },
     { title: 'Coupons', href: '#', icon: Tag },

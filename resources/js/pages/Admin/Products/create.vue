@@ -147,6 +147,7 @@ const addProduct = () => {
     form.transform((data) => ({
         ...data,
         _method: props.product ? 'PUT' : 'POST',
+        name: generateName(data.name),
         categories: data.categories.map(({ isNew, ...rest }) => rest),
         brand_id: data.brand_id?.isNew
             ? { name: data.brand_id.name, slug: data.brand_id.slug }

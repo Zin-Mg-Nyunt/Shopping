@@ -1,0 +1,142 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Inertia\Response;
+use Symfony\Component\HttpFoundation\Response as HttpResponse;
+
+class OrderController extends Controller
+{
+    /**
+     * Example orders for UI demo. Replace with Order::query()->... when DB is ready.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function exampleOrders(): array
+    {
+        $base = now()->subDays(2);
+
+        return [
+            [
+                'id' => 1,
+                'order_number' => 'ORD-5501',
+                'customer_name' => 'Alice Johnson',
+                'customer_email' => 'alice@example.com',
+                'created_at' => $base->copy()->format('Y-m-d\TH:i:s.v\Z'),
+                'total' => 149.97,
+                'payment_method' => 'kpay',
+                'status' => 'delivered',
+                'shipping_address' => '123 Main St, Yangon',
+                'items' => [
+                    ['product_name' => 'Wireless Earbuds Pro', 'quantity' => 1, 'unit_price' => 79.99, 'line_total' => 79.99],
+                    ['product_name' => 'Phone Stand', 'quantity' => 2, 'unit_price' => 34.99, 'line_total' => 69.98],
+                ],
+            ],
+            [
+                'id' => 2,
+                'order_number' => 'ORD-5502',
+                'customer_name' => 'Bob Smith',
+                'customer_email' => 'bob@example.com',
+                'created_at' => $base->copy()->addDay()->format('Y-m-d\TH:i:s.v\Z'),
+                'total' => 299.50,
+                'payment_method' => 'wave',
+                'status' => 'processing',
+                'shipping_address' => '456 Oak Ave, Mandalay',
+                'items' => [
+                    ['product_name' => 'Laptop Sleeve', 'variant' => 'Grey', 'quantity' => 1, 'unit_price' => 45.00, 'line_total' => 45.00],
+                    ['product_name' => 'USB-C Hub', 'variant' => '7-in-1', 'quantity' => 1, 'unit_price' => 89.50, 'line_total' => 89.50],
+                    ['product_name' => 'Monitor Arm', 'quantity' => 1, 'unit_price' => 165.00, 'line_total' => 165.00],
+                ],
+            ],
+            [
+                'id' => 3,
+                'order_number' => 'ORD-5503',
+                'customer_name' => 'Carol Davis',
+                'customer_email' => 'carol@example.com',
+                'created_at' => $base->copy()->addDays(2)->format('Y-m-d\TH:i:s.v\Z'),
+                'total' => 67.98,
+                'payment_method' => 'card',
+                'status' => 'pending',
+                'shipping_address' => '789 Pine Rd, Naypyidaw',
+                'items' => [
+                    ['product_name' => 'Screen Cleaner Kit', 'quantity' => 2, 'unit_price' => 19.99, 'line_total' => 39.98],
+                    ['product_name' => 'Cable Organizer', 'quantity' => 1, 'unit_price' => 28.00, 'line_total' => 28.00],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * Admin orders list page.
+     *
+     * Backend logic to implement:
+     * - Stats: totalRevenue, newOrdersCount, pendingOrdersCount (and optional trend %).
+     * - Query orders from $request->only('search', 'status', 'dateFrom', 'dateTo').
+     * - Paginate (e.g. Order::query()->...->paginate(15)).
+     * - Each order: id, order_number, customer_name, created_at, total, payment_method, status.
+     * - Pass to Inertia: orders, filter, stats.
+     */
+    public function adminOrders(Request $request): Response
+    {
+        // TODO: Replace with Order::query()->...->paginate(15) and real stats.
+        $exampleList = $this->exampleOrders();
+        $totalRevenue = array_sum(array_column($exampleList, 'total'));
+        $pendingCount = (int) collect($exampleList)->where('status', 'pending')->count();
+
+        return Inertia::render('Admin/Products/orders', [
+            'orders' => [
+                'data' => $exampleList,
+                'total' => count($exampleList),
+                'current_page' => 1,
+                'last_page' => 1,
+                'links' => [],
+            ],
+            'filter' => [
+                'search' => $request->input('search'),
+                'status' => $request->input('status'),
+                'dateFrom' => $request->input('dateFrom'),
+                'dateTo' => $request->input('dateTo'),
+            ],
+            'stats' => [
+                'totalRevenue' => $totalRevenue,
+                'newOrdersCount' => count($exampleList),
+                'pendingOrdersCount' => $pendingCount,
+            ],
+        ]);
+    }
+
+    /**
+     * Admin order detail page.
+     *
+     * Backend: load Order by $id with items (product relation for thumbnail, variant),
+     * activity_log, return 404 if not found. Pass to Inertia: 'order' with:
+     * - id, order_number, customer_name, customer_email, customer_phone, created_at,
+     * - total, payment_method, status, shipping_address,
+     * - bank_slip_url (or bank_slip_path), transaction_id, admin_notes,
+     * - items[] (product_name, variant, thumbnail_url, quantity, unit_price, line_total),
+     * - activity_log[] (user_name, action, created_at).
+     */
+    public function show(Request $request, int $id): Response|HttpResponse
+    {
+        // TODO: $order = Order::with('items.product')->findOrFail($id); transform for Inertia.
+        $orders = $this->exampleOrders();
+        $order = collect($orders)->firstWhere('id', $id);
+        if (! $order) {
+            abort(404);
+        }
+
+        $order['customer_phone'] = $order['customer_phone'] ?? '+95 9 123 456 789';
+        $order['transaction_id'] = $order['transaction_id'] ?? 'TXN-'.str_pad((string) $id, 6, '0', STR_PAD_LEFT);
+        $order['admin_notes'] = $order['admin_notes'] ?? '';
+        $order['activity_log'] = [
+            ['user_name' => 'Admin User', 'action' => 'Status set to '.ucfirst($order['status']), 'created_at' => $order['created_at']],
+        ];
+        // Optional: order.bank_slip_url for payment verification thumbnail (expand on click).
+
+        return Inertia::render('Admin/Products/order_detail', [
+            'order' => $order,
+        ]);
+    }
+}

@@ -1,8 +1,8 @@
 <?php
 
 use App\Http\Controllers\AddToCartController;
-use App\Http\Controllers\BrandController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
 
@@ -22,6 +22,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('admin/products/{product:slug}/edit', [ProductController::class, 'adminCreateProduct'])->name('admin.products.edit');
         Route::post('admin/product/store', [ProductController::class, 'adminStoreProduct'])->name('admin.product.store');
         Route::put('admin/products/{product}/update', [ProductController::class, 'adminUpdateProduct'])->name('admin.product.update');
+        Route::get('admin/orders', [OrderController::class, 'adminOrders'])->name('admin.orders');
+        Route::get('admin/orders/{id}', [OrderController::class, 'show'])->name('admin.orders.show');
     });
 });
 
