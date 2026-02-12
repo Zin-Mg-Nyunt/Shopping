@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AddToCartController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OrderController;
@@ -28,6 +29,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('admin/orders', [OrderController::class, 'adminOrders'])->name('admin.orders');
         Route::get('admin/orders/{id}', [OrderController::class, 'show'])->name('admin.orders.show');
         Route::get('admin/customers', [CustomerController::class, 'index'])->name('admin.customers');
+        Route::get('admin/categories', [CategoryController::class, 'index'])->name('admin.categories');
     });
 });
 

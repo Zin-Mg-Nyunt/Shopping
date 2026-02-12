@@ -57,7 +57,7 @@ const navItems = [
     { title: 'Products', href: route('admin.products'), icon: Package },
     { title: 'Orders', href: route('admin.orders'), icon: ShoppingCart },
     { title: 'Customers', href: route('admin.customers'), icon: Users },
-    { title: 'Categories', href: '#', icon: FolderTree },
+    { title: 'Categories', href: route('admin.categories'), icon: FolderTree },
     { title: 'Coupons', href: '#', icon: Tag },
     { title: 'Settings', href: '#', icon: Settings },
 ];
