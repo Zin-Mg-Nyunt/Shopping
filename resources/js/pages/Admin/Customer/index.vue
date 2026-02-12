@@ -12,6 +12,7 @@ import { Input } from '@/components/ui/input';
 import AdminLayout from '@/layouts/AdminLayout.vue';
 import { Head } from '@inertiajs/vue3';
 import {
+    Check,
     Download,
     ExternalLink,
     Filter,
@@ -70,6 +71,7 @@ const customers = [
         ordersCount: 12,
         totalSpent: 1240.0,
         joined: 'Oct 24, 2023',
+        hasUnrepliedReview: true,
     },
     {
         id: 2,
@@ -80,6 +82,7 @@ const customers = [
         ordersCount: 8,
         totalSpent: 890.5,
         joined: 'Nov 15, 2023',
+        hasUnrepliedReview: false,
     },
     {
         id: 3,
@@ -90,6 +93,7 @@ const customers = [
         ordersCount: 3,
         totalSpent: 245.0,
         joined: 'Jan 8, 2024',
+        hasUnrepliedReview: true,
     },
     {
         id: 4,
@@ -100,6 +104,7 @@ const customers = [
         ordersCount: 0,
         totalSpent: 0,
         joined: 'Sep 12, 2022',
+        hasUnrepliedReview: false,
     },
     {
         id: 5,
@@ -110,6 +115,7 @@ const customers = [
         ordersCount: 24,
         totalSpent: 2890.75,
         joined: 'Mar 3, 2023',
+        hasUnrepliedReview: false,
     },
 ];
 
@@ -117,6 +123,7 @@ const searchQuery = ref('');
 const statusFilter = ref('all');
 const detailPanelOpen = ref(false);
 const selectedCustomer = ref(null);
+const detailPanelInitialTab = ref('orders');
 
 function getStatusBadgeClass(status) {
     switch (status) {
@@ -156,9 +163,14 @@ function handleExport() {
     // TODO: Trigger CSV/Excel export from backend
 }
 
-function handleViewCustomer(customer) {
+function handleViewCustomer(customer, initialTab = 'orders') {
     selectedCustomer.value = customer;
+    detailPanelInitialTab.value = initialTab;
     detailPanelOpen.value = true;
+}
+
+function handleOpenFeedbacks(customer) {
+    handleViewCustomer(customer, 'feedbacks');
 }
 
 function getInitials(name) {
@@ -301,7 +313,7 @@ defineOptions({
         >
             <div class="overflow-x-auto">
                 <table
-                    class="w-full min-w-[800px] border-collapse text-left text-sm"
+                    class="w-full min-w-[900px] border-collapse text-left text-sm"
                     role="table"
                 >
                     <thead>
@@ -332,6 +344,11 @@ defineOptions({
                                 class="px-4 py-3.5 font-medium text-gray-700 dark:text-gray-300"
                             >
                                 Joined
+                            </th>
+                            <th
+                                class="px-4 py-3.5 font-medium text-gray-700 dark:text-gray-300"
+                            >
+                                Support Needs
                             </th>
                             <th
                                 class="w-32 px-4 py-3.5 text-right font-medium text-gray-700 dark:text-gray-300"
@@ -398,6 +415,35 @@ defineOptions({
                             <!-- Joined -->
                             <td class="px-4 py-3.5 text-gray-600 dark:text-gray-400">
                                 {{ customer.joined }}
+                            </td>
+                            <!-- Support Needs -->
+                            <td class="px-4 py-3.5">
+                                <button
+                                    v-if="customer.hasUnrepliedReview"
+                                    type="button"
+                                    class="inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-red-500/40 bg-red-500/15 px-2.5 py-1 text-xs font-medium text-red-400 transition-colors hover:bg-red-500/25"
+                                    @click="handleOpenFeedbacks(customer)"
+                                >
+                                    <span
+                                        class="relative flex h-2 w-2 shrink-0"
+                                        aria-hidden="true"
+                                    >
+                                        <span
+                                            class="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"
+                                        />
+                                        <span
+                                            class="relative inline-flex h-2 w-2 rounded-full bg-red-500"
+                                        />
+                                    </span>
+                                    Needs Reply
+                                </button>
+                                <span
+                                    v-else
+                                    class="inline-flex items-center justify-center text-emerald-500"
+                                    title="All reviews replied"
+                                >
+                                    <Check class="h-5 w-5" />
+                                </span>
                             </td>
                             <!-- Actions -->
                             <td class="px-4 py-3.5">
@@ -480,6 +526,7 @@ defineOptions({
         <CustomerDetailPanel
             v-model:open="detailPanelOpen"
             :customer="selectedCustomer"
+            :initial-tab="detailPanelInitialTab"
         />
     </div>
 </template>

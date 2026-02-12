@@ -8,6 +8,7 @@ import {
     KeyRound,
     Mail,
     MapPin,
+    MessageSquare,
     NotepadText,
     Phone,
     ShoppingCart,
@@ -23,6 +24,10 @@ const props = defineProps({
     customer: {
         type: Object,
         default: null,
+    },
+    initialTab: {
+        type: String,
+        default: 'orders',
     },
 });
 
@@ -47,6 +52,25 @@ const mockOrders = [
     { id: 'ORD-2692', date: 'Jan 15, 2025', total: 234.75, status: 'Completed' },
 ];
 
+const mockFeedbacks = [
+    {
+        id: 1,
+        productName: 'Wireless Earbuds Pro',
+        rating: 4,
+        comment: 'Great sound quality but the battery life could be better. Overall satisfied.',
+        date: 'Feb 8, 2025',
+        replied: false,
+    },
+    {
+        id: 2,
+        productName: 'Classic Leather Wallet',
+        rating: 5,
+        comment: 'Excellent craftsmanship. Very happy with this purchase!',
+        date: 'Jan 20, 2025',
+        replied: true,
+    },
+];
+
 const mockAddresses = [
     {
         type: 'Shipping',
@@ -68,6 +92,7 @@ const mockAddresses = [
 
 const orders = computed(() => mockOrders);
 const addresses = computed(() => mockAddresses);
+const feedbacks = computed(() => mockFeedbacks);
 
 const customerData = computed(() => {
     if (!props.customer) return null;
@@ -87,8 +112,17 @@ watch(
     () => props.customer,
     (c) => {
         if (c) {
-            activeTab.value = 'orders';
+            activeTab.value = props.initialTab;
             adminNotes.value = '';
+        }
+    },
+);
+
+watch(
+    () => [props.open, props.initialTab],
+    ([open, tab]) => {
+        if (open && props.customer) {
+            activeTab.value = tab;
         }
     },
 );
@@ -157,9 +191,14 @@ function handleSaveNote() {
     // TODO: Persist admin notes to backend
 }
 
+function handleReplyToFeedback(feedback) {
+    // TODO: Open reply form / submit reply via backend
+}
+
 const tabs = [
     { id: 'orders', label: 'Order History', icon: ShoppingCart },
     { id: 'addresses', label: 'Address Book', icon: MapPin },
+    { id: 'feedbacks', label: 'Feedbacks', icon: MessageSquare },
     { id: 'notes', label: 'Admin Notes', icon: NotepadText },
 ];
 </script>
@@ -364,7 +403,60 @@ const tabs = [
                                 </p>
                             </div>
 
-                            <!-- Tab 2: Address Book -->
+                            <!-- Tab 2: Feedbacks -->
+                            <div v-show="activeTab === 'feedbacks'" class="space-y-4">
+                                <div
+                                    v-for="feedback in feedbacks"
+                                    :key="feedback.id"
+                                    class="rounded-lg border p-4"
+                                    :class="
+                                        feedback.replied
+                                            ? 'border-gray-800 bg-gray-800/30 dark:border-gray-800'
+                                            : 'border-amber-500/30 bg-amber-500/5 dark:border-amber-500/30'
+                                    "
+                                >
+                                    <div class="flex items-start justify-between gap-3">
+                                        <div class="min-w-0 flex-1">
+                                            <p class="font-medium text-white">
+                                                {{ feedback.productName }}
+                                            </p>
+                                            <div class="mt-1 flex items-center gap-2">
+                                                <span class="text-xs text-amber-400">
+                                                    {{ feedback.rating }}/5
+                                                </span>
+                                                <span class="text-xs text-gray-500">
+                                                    {{ feedback.date }}
+                                                </span>
+                                                <span
+                                                    v-if="!feedback.replied"
+                                                    class="rounded-full bg-red-500/20 px-2 py-0.5 text-xs font-medium text-red-400"
+                                                >
+                                                    Needs Reply
+                                                </span>
+                                            </div>
+                                            <p class="mt-2 text-sm text-gray-400">
+                                                {{ feedback.comment }}
+                                            </p>
+                                        </div>
+                                        <Button
+                                            v-if="!feedback.replied"
+                                            size="sm"
+                                            class="h-8 shrink-0"
+                                            @click="handleReplyToFeedback(feedback)"
+                                        >
+                                            Reply
+                                        </Button>
+                                    </div>
+                                </div>
+                                <p
+                                    v-if="feedbacks.length === 0"
+                                    class="py-8 text-center text-sm text-gray-500"
+                                >
+                                    No product reviews yet
+                                </p>
+                            </div>
+
+                            <!-- Tab 3: Address Book -->
                             <div v-show="activeTab === 'addresses'" class="space-y-4">
                                 <div
                                     v-for="(addr, idx) in addresses"
@@ -395,7 +487,7 @@ const tabs = [
                                 </p>
                             </div>
 
-                            <!-- Tab 3: Admin Notes -->
+                            <!-- Tab 4: Admin Notes -->
                             <div v-show="activeTab === 'notes'" class="space-y-4">
                                 <textarea
                                     v-model="adminNotes"
