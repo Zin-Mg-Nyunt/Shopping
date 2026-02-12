@@ -7,6 +7,7 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\SettingController;
 use App\Http\Controllers\StaffController;
 use Illuminate\Support\Facades\Route;
 
@@ -32,6 +33,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('admin/customers', [CustomerController::class, 'index'])->name('admin.customers');
         Route::get('admin/categories', [CategoryController::class, 'index'])->name('admin.categories');
         Route::get('admin/coupons', [CouponController::class, 'index'])->name('admin.coupons');
+        Route::get('admin/settings', [SettingController::class, 'index'])->name('website.setting');
     });
 });
 

@@ -31,6 +31,7 @@ import {
 } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 import { Toaster } from 'vue-sonner';
+import { route } from 'ziggy-js';
 
 const { resolvedAppearance, updateAppearance } = useAppearance();
 const isDark = computed(() => resolvedAppearance.value === 'dark');
@@ -59,7 +60,7 @@ const navItems = [
     { title: 'Customers', href: route('admin.customers'), icon: Users },
     { title: 'Categories', href: route('admin.categories'), icon: FolderTree },
     { title: 'Coupons', href: route('admin.coupons'), icon: Tag },
-    { title: 'Settings', href: '#', icon: Settings },
+    { title: 'Settings', href: route('website.setting'), icon: Settings },
 ];
 
 function isActive(href) {
