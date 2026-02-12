@@ -58,7 +58,7 @@ function removeLogo() {
 
 <template>
     <Head title="System Settings - Admin" />
-    <div class="space-y-6 pb-24 font-[Inter,sans-serif]">
+    <div class="space-y-6 font-[Inter,sans-serif]">
         <!-- Page Header -->
         <div>
             <h1
@@ -614,7 +614,7 @@ function removeLogo() {
 
         <!-- Save All Changes (sticky at bottom of section) -->
         <div
-            class="sticky bottom-0 z-10 -mx-2 flex flex-col gap-3 border-t border-gray-200 bg-white/95 px-4 py-4 backdrop-blur supports-backdrop-filter:bg-white/80 sm:flex-row sm:items-center sm:justify-end dark:border-gray-800 dark:bg-gray-900/95 dark:supports-backdrop-filter:bg-gray-900/80"
+            class="sticky bottom-0 z-10 -mx-2 flex flex-col gap-3 rounded-xl border-t border-gray-200 bg-white/95 px-4 py-4 backdrop-blur supports-backdrop-filter:bg-white/80 sm:flex-row sm:items-center sm:justify-end dark:border-gray-800 dark:bg-gray-900/95 dark:supports-backdrop-filter:bg-gray-900/80"
         >
             <Button
                 size="lg"

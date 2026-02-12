@@ -7,6 +7,6 @@ use Illuminate\Http\Request;
 class StaffController extends Controller
 {
     public function staffManagement(Request $request){
-        dd('staff management');
+        return inertia('Admin/Staff/staffManagement');
     }
 }
