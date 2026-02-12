@@ -136,12 +136,12 @@ defineOptions({
 
 <template>
     <Head title="Orders - Admin" />
-    <div class="-m-4 min-h-[60vh] bg-zinc-950 text-zinc-100 sm:-m-6">
+    <div class="-m-4 min-h-[60vh] sm:-m-6 dark:text-white">
         <div class="space-y-8 p-6 sm:p-8">
             <!-- Page title -->
             <div class="flex items-center justify-between">
                 <h1
-                    class="text-2xl font-semibold tracking-tight text-white sm:text-3xl"
+                    class="text-2xl font-semibold tracking-tight sm:text-3xl dark:text-white"
                 >
                     Order Management
                 </h1>

@@ -13,7 +13,15 @@ import { Input } from '@/components/ui/input';
 import { useFilter } from '@/composables/useFilter';
 import AdminLayout from '@/layouts/AdminLayout.vue';
 import { Head, Link, router } from '@inertiajs/vue3';
-import { MoreHorizontal, Pencil, Plus, Search, Trash2 } from 'lucide-vue-next';
+import {
+    Activity,
+    MoreHorizontal,
+    Pencil,
+    Plus,
+    Search,
+    Trash2,
+    Trophy,
+} from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 
 const props = defineProps({
@@ -65,6 +73,83 @@ const closeDeleteDialog = () => {
     deleteDialogOpen.value = false;
 };
 const productList = computed(() => props.products?.data ?? []);
+
+// Mock activity log entries (UI only — no backend)
+const activityLogEntries = [
+    {
+        id: 1,
+        type: 'created',
+        icon: Plus,
+        message: 'Product "Wireless Earbuds Pro" was added',
+        user: 'Admin',
+        time: '2 min ago',
+        dotClass: 'bg-emerald-500',
+    },
+    {
+        id: 2,
+        type: 'updated',
+        icon: Pencil,
+        message: 'Product "Classic Leather Wallet" was updated',
+        user: 'Staff',
+        time: '15 min ago',
+        dotClass: 'bg-amber-500',
+    },
+    {
+        id: 3,
+        type: 'deleted',
+        icon: Trash2,
+        message: 'Product "Old Stock Item" was removed',
+        user: 'Admin',
+        time: '1 hour ago',
+        dotClass: 'bg-red-500',
+    },
+    {
+        id: 4,
+        type: 'updated',
+        icon: Pencil,
+        message: 'Stock level updated for "Running Shoes"',
+        user: 'Staff',
+        time: '2 hours ago',
+        dotClass: 'bg-amber-500',
+    },
+    {
+        id: 5,
+        type: 'created',
+        icon: Plus,
+        message: 'Product "USB-C Hub 7-in-1" was added',
+        user: 'Admin',
+        time: 'Yesterday',
+        dotClass: 'bg-emerald-500',
+    },
+];
+
+// Mock best sellers (UI only — no backend)
+const bestSellers = [
+    {
+        rank: 1,
+        name: 'Wireless Earbuds Pro',
+        sales: 152,
+        image: 'https://placehold.co/56x56/1f2937/9ca3af?text=1',
+        badgeClass: 'bg-amber-400 text-black',
+        label: '1st',
+    },
+    {
+        rank: 2,
+        name: 'Classic Leather Wallet',
+        sales: 128,
+        image: 'https://placehold.co/56x56/1f2937/9ca3af?text=2',
+        badgeClass: 'bg-slate-300 text-black',
+        label: '2nd',
+    },
+    {
+        rank: 3,
+        name: 'USB-C Hub 7-in-1',
+        sales: 94,
+        image: 'https://placehold.co/56x56/1f2937/9ca3af?text=3',
+        badgeClass: 'bg-orange-400 text-black',
+        label: '3rd',
+    },
+];
 defineOptions({
     layout: AdminLayout,
 });
@@ -74,9 +159,7 @@ defineOptions({
     <Head title="Products - Admin" />
     <div class="space-y-6">
         <!-- Header -->
-        <div
-            class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
-        >
+        <div class="flex items-center justify-between gap-4">
             <h1
                 class="text-2xl font-semibold tracking-tight text-gray-900 dark:text-white"
             >
@@ -91,6 +174,144 @@ defineOptions({
                     Add Product
                 </Link>
             </Button>
+        </div>
+
+        <!-- Activity Log + Best Sellers: responsive side-by-side -->
+        <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <!-- Best Sellers (Monthly) card -->
+            <div
+                class="rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-900"
+            >
+                <div
+                    class="flex items-center justify-between border-b border-gray-200 px-4 py-3 dark:border-gray-700"
+                >
+                    <div class="flex items-center gap-2">
+                        <Trophy
+                            class="h-5 w-5 text-amber-400"
+                            aria-hidden="true"
+                        />
+                        <h2
+                            class="text-base font-semibold text-gray-900 dark:text-white"
+                        >
+                            Best Sellers
+                        </h2>
+                    </div>
+                    <span
+                        class="rounded-md bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-300"
+                    >
+                        This Month
+                    </span>
+                </div>
+                <ul class="divide-y divide-gray-100 dark:divide-gray-800">
+                    <li
+                        v-for="item in bestSellers"
+                        :key="item.rank"
+                        class="flex items-center gap-4 px-4 py-3 transition-colors duration-200 hover:bg-gray-50 dark:hover:bg-gray-800/50"
+                    >
+                        <div
+                            class="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800"
+                        >
+                            <img
+                                :src="item.image"
+                                :alt="item.name"
+                                class="h-full w-full object-cover"
+                            />
+                            <span
+                                :class="[
+                                    'absolute top-0.5 right-0.5 flex h-5 min-w-5 items-center justify-center rounded px-1 text-[10px] font-bold',
+                                    item.badgeClass,
+                                ]"
+                            >
+                                {{ item.label }}
+                            </span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <p
+                                class="truncate text-sm font-medium text-gray-900 dark:text-white"
+                            >
+                                {{ item.name }}
+                            </p>
+                            <p
+                                class="mt-0.5 text-xs text-gray-500 dark:text-gray-400"
+                            >
+                                {{ item.sales }} Sales
+                            </p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <!-- Activity Log card -->
+            <div
+                class="rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-900"
+            >
+                <div
+                    class="flex items-center gap-2 border-b border-gray-200 px-4 py-3 dark:border-gray-700"
+                >
+                    <Activity
+                        class="h-5 w-5 text-gray-500 dark:text-gray-400"
+                        aria-hidden="true"
+                    />
+                    <h2
+                        class="text-base font-semibold text-gray-900 dark:text-white"
+                    >
+                        Activity Log
+                    </h2>
+                </div>
+                <div class="max-h-[280px] overflow-y-auto">
+                    <ul class="divide-y divide-gray-100 dark:divide-gray-800">
+                        <li
+                            v-for="(entry, index) in activityLogEntries"
+                            :key="entry.id"
+                            class="flex gap-4 px-4 py-3 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50"
+                        >
+                            <div
+                                class="relative flex shrink-0 items-center justify-center"
+                            >
+                                <span
+                                    :class="[
+                                        'flex h-8 w-8 items-center justify-center rounded-full',
+                                        entry.dotClass,
+                                        'text-white',
+                                    ]"
+                                >
+                                    <component
+                                        :is="entry.icon"
+                                        class="h-4 w-4"
+                                        aria-hidden="true"
+                                    />
+                                </span>
+                                <template
+                                    v-if="index < activityLogEntries.length - 1"
+                                >
+                                    <span
+                                        class="absolute top-10 left-1/2 h-[calc(100%+0.5rem)] w-px -translate-x-1/2 bg-gray-200 dark:bg-gray-700"
+                                        aria-hidden="true"
+                                    />
+                                </template>
+                            </div>
+                            <div class="min-w-0 flex-1 pt-0.5">
+                                <p
+                                    class="text-sm font-medium text-gray-900 dark:text-white"
+                                >
+                                    {{ entry.message }}
+                                </p>
+                                <p
+                                    class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-gray-500 dark:text-gray-400"
+                                >
+                                    <span>{{ entry.user }}</span>
+                                    <span
+                                        class="text-gray-300 dark:text-gray-600"
+                                        aria-hidden="true"
+                                    >
+                                        ·
+                                    </span>
+                                    <span>{{ entry.time }}</span>
+                                </p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
 
         <!-- Search & filters -->

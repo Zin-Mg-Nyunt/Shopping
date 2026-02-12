@@ -16,7 +16,15 @@ import { useGenerateSlug } from '@/composables/useGenerateSlug';
 import AdminLayout from '@/layouts/AdminLayout.vue';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import { debounce } from 'lodash';
-import { ImagePlus, Search, X } from 'lucide-vue-next';
+import {
+    Activity,
+    ImagePlus,
+    Pencil,
+    Plus,
+    Search,
+    Trash2,
+    X,
+} from 'lucide-vue-next';
 import { ref, watch } from 'vue';
 import { toast } from 'vue-sonner';
 
@@ -141,6 +149,59 @@ watch(
     },
     { immediate: true },
 );
+
+// Mock activity log for this product (UI only — shown on edit form)
+// Entries can include oldValue/newValue to show what changed (e.g. store manager price change)
+const productActivityLog = [
+    {
+        id: 1,
+        type: 'created',
+        icon: Plus,
+        message: 'Product created',
+        user: 'Admin',
+        time: '2 days ago',
+        dotClass: 'bg-emerald-500',
+        field: null,
+        oldValue: null,
+        newValue: null,
+    },
+    {
+        id: 2,
+        type: 'updated',
+        icon: Pencil,
+        message: 'Price updated',
+        user: 'Staff',
+        time: '1 day ago',
+        dotClass: 'bg-amber-500',
+        field: 'Price',
+        oldValue: '$29.99',
+        newValue: '$34.99',
+    },
+    {
+        id: 3,
+        type: 'updated',
+        icon: Pencil,
+        message: 'Stock updated',
+        user: 'Staff',
+        time: '1 day ago',
+        dotClass: 'bg-amber-500',
+        field: 'Stock',
+        oldValue: '10',
+        newValue: '25',
+    },
+    {
+        id: 4,
+        type: 'updated',
+        icon: Pencil,
+        message: 'Discount price updated',
+        user: 'Admin',
+        time: '5 hours ago',
+        dotClass: 'bg-amber-500',
+        field: 'Discount price',
+        oldValue: '—',
+        newValue: '$31.99',
+    },
+];
 
 const url = props.product ? 'admin.product.update' : 'admin.product.store';
 const addProduct = () => {
@@ -572,6 +633,98 @@ defineOptions({
                             />
                             <InputError :message="form.errors.stock" />
                         </div>
+                    </CardContent>
+                </Card>
+
+                <!-- Activity Log (edit only: this product's history) -->
+                <Card
+                    v-if="product"
+                    class="rounded-xl border-gray-200 dark:border-gray-700"
+                >
+                    <CardHeader>
+                        <div class="flex items-center gap-2">
+                            <Activity
+                                class="h-5 w-5 text-gray-500 dark:text-gray-400"
+                                aria-hidden="true"
+                            />
+                            <CardTitle class="text-base"
+                                >Activity Log</CardTitle
+                            >
+                        </div>
+                        <CardDescription>
+                            Changes for this product
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <ul class="divide-y divide-gray-100 dark:divide-gray-800">
+                            <li
+                                v-for="(entry, index) in productActivityLog"
+                                :key="entry.id"
+                                class="flex gap-3 py-3 first:pt-0 last:pb-0 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50 -mx-1 px-1 rounded-md"
+                            >
+                                <div
+                                    class="relative flex shrink-0 items-center justify-center"
+                                >
+                                    <span
+                                        :class="[
+                                            'flex h-7 w-7 items-center justify-center rounded-full text-white',
+                                            entry.dotClass,
+                                        ]"
+                                    >
+                                        <component
+                                            :is="entry.icon"
+                                            class="h-3.5 w-3.5"
+                                            aria-hidden="true"
+                                        />
+                                    </span>
+                                    <template
+                                        v-if="
+                                            index < productActivityLog.length - 1
+                                        "
+                                    >
+                                        <span
+                                            class="absolute top-8 left-1/2 h-[calc(100%+0.25rem)] w-px -translate-x-1/2 bg-gray-200 dark:bg-gray-700"
+                                            aria-hidden="true"
+                                        />
+                                    </template>
+                                </div>
+                                <div class="min-w-0 flex-1 pt-0.5">
+                                    <p
+                                        class="text-sm font-medium text-gray-900 dark:text-white"
+                                    >
+                                        {{ entry.message }}
+                                    </p>
+                                    <p
+                                        v-if="entry.field != null && entry.oldValue != null && entry.newValue != null"
+                                        class="mt-1.5 rounded-md bg-gray-100 px-2 py-1.5 text-xs dark:bg-gray-800/70"
+                                    >
+                                        <span class="font-medium text-gray-700 dark:text-gray-300">{{
+                                            entry.field
+                                        }}</span>
+                                        <span class="mx-1.5 text-gray-400 dark:text-gray-500">:</span>
+                                        <span class="text-gray-500 line-through dark:text-gray-400">{{
+                                            entry.oldValue
+                                        }}</span>
+                                        <span class="mx-1.5 text-gray-400 dark:text-gray-500">→</span>
+                                        <span class="font-medium text-gray-900 dark:text-gray-100">{{
+                                            entry.newValue
+                                        }}</span>
+                                    </p>
+                                    <p
+                                        class="mt-1 flex flex-wrap items-center gap-x-1.5 text-xs text-gray-500 dark:text-gray-400"
+                                    >
+                                        <span>{{ entry.user }}</span>
+                                        <span
+                                            class="text-gray-300 dark:text-gray-600"
+                                            aria-hidden="true"
+                                        >
+                                            ·
+                                        </span>
+                                        <span>{{ entry.time }}</span>
+                                    </p>
+                                </div>
+                            </li>
+                        </ul>
                     </CardContent>
                 </Card>
             </div>

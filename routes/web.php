@@ -1,9 +1,11 @@
 <?php
 
 use App\Http\Controllers\AddToCartController;
+use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\StaffController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [ProductController::class, 'home'])->name('home');
@@ -14,8 +16,9 @@ Route::post('/cart/add', AddToCartController::class)->name('cart.add');
 Route::middleware(['auth'])->group(function () {
     Route::get('dashboard', DashboardController::class)->name('dashboard');
     Route::get('user/dashboard', [DashboardController::class, 'user'])->name('user.dashboard');
-    Route::middleware(['can:access-admin'])->group(function () {
+    Route::middleware(['can:access-staff-management'])->group(function () {
         Route::get('admin/dashboard', [DashboardController::class, 'admin'])->name('admin.dashboard');
+        Route::get('admin/staff', [StaffController::class, 'staffManagement'])->name('admin.staff');
         Route::get('admin/products', [ProductController::class, 'adminProducts'])->name('admin.products');
         Route::delete('admin/products/{product:slug}/delete', [ProductController::class, 'adminDeleteProduct'])->name('admin.products.delete');
         Route::get('admin/products/create', [ProductController::class, 'adminCreateProduct'])->name('admin.products.create');
@@ -24,6 +27,7 @@ Route::middleware(['auth'])->group(function () {
         Route::put('admin/products/{product}/update', [ProductController::class, 'adminUpdateProduct'])->name('admin.product.update');
         Route::get('admin/orders', [OrderController::class, 'adminOrders'])->name('admin.orders');
         Route::get('admin/orders/{id}', [OrderController::class, 'show'])->name('admin.orders.show');
+        Route::get('admin/customers', [CustomerController::class, 'index'])->name('admin.customers');
     });
 });
 

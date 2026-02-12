@@ -614,7 +614,7 @@ defineOptions({
                             </div>
                             <div>
                                 <p
-                                    class="text-xs font-medium break-words text-foreground sm:text-sm"
+                                    class="text-xs font-medium wrap-break-word text-foreground sm:text-sm"
                                 >
                                     {{ entry.user_name ?? 'System' }} —
                                     {{ entry.action ?? 'Updated status' }}

@@ -25,6 +25,7 @@ import {
     ShoppingCart,
     Sun,
     Tag,
+    UserCog,
     Users,
     X,
 } from 'lucide-vue-next';
@@ -48,9 +49,14 @@ const navItems = [
         href: route('admin.dashboard'),
         icon: LayoutDashboard,
     },
+    {
+        title: 'Staff Management',
+        href: route('admin.staff'),
+        icon: UserCog,
+    },
     { title: 'Products', href: route('admin.products'), icon: Package },
     { title: 'Orders', href: route('admin.orders'), icon: ShoppingCart },
-    { title: 'Customers', href: '#', icon: Users },
+    { title: 'Customers', href: route('admin.customers'), icon: Users },
     { title: 'Categories', href: '#', icon: FolderTree },
     { title: 'Coupons', href: '#', icon: Tag },
     { title: 'Settings', href: '#', icon: Settings },

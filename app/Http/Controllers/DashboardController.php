@@ -3,11 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class DashboardController extends Controller
 {
     public function __invoke(Request $request) {
-        if($request->user()->role === 'admin'){
+        if(Gate::allows('access-staff-management')){
             return redirect()->route('admin.dashboard');
         } else {
             return redirect()->route('user.dashboard');
