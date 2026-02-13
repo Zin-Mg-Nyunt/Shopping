@@ -104,4 +104,8 @@ class ProductController extends Controller
         $productService->updateProduct($product, $validated);
         return redirect()->route('admin.products');
     }
+
+    public function userWishlist(Request $request){
+        return inertia('User/Wishlist');
+    }
 }

@@ -21,6 +21,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('user/dashboard', [DashboardController::class, 'user'])->name('user.dashboard');
     Route::get('user/orders', [OrderController::class, 'userOrders'])->name('user.orders');
     Route::get('user/orders/{id}', [OrderController::class, 'userOrderDetail'])->name('user.orders.show');
+    Route::get('user/wishlist', [ProductController::class, 'userWishlist'])->name('user.wishlist');
+    Route::get('user/address/book', [CustomerController::class, 'userAddressBook'])->name('user.address.book');
     Route::middleware(['can:access-staff-management'])->group(function () {
         Route::get('admin/dashboard', [DashboardController::class, 'admin'])->name('admin.dashboard');
         Route::get('admin/staff', [StaffController::class, 'staffManagement'])->name('admin.staff');

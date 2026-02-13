@@ -9,4 +9,7 @@ class CustomerController extends Controller
     public function index(Request $request){
         return inertia('Admin/Customer/index');
     }
+    public function userAddressBook(Request $request){
+        return inertia('User/AddressBook');
+    }
 }

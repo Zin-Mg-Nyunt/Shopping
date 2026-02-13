@@ -48,8 +48,8 @@ const navItems = [
         icon: LayoutDashboard,
     },
     { title: 'My Orders', href: route('user.orders'), icon: Package },
-    { title: 'Wishlist', href: '#', icon: Heart },
-    { title: 'Address Book', href: '#', icon: MapPin },
+    { title: 'Wishlist', href: route('user.wishlist'), icon: Heart },
+    { title: 'Address Book', href: route('user.address.book'), icon: MapPin },
     { title: 'Account Settings', href: route('profile.edit'), icon: Settings },
 ];
 
