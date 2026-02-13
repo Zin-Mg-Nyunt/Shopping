@@ -19,6 +19,8 @@ Route::post('/cart/add', AddToCartController::class)->name('cart.add');
 Route::middleware(['auth'])->group(function () {
     Route::get('dashboard', DashboardController::class)->name('dashboard');
     Route::get('user/dashboard', [DashboardController::class, 'user'])->name('user.dashboard');
+    Route::get('user/orders', [OrderController::class, 'userOrders'])->name('user.orders');
+    Route::get('user/orders/{id}', [OrderController::class, 'userOrderDetail'])->name('user.orders.show');
     Route::middleware(['can:access-staff-management'])->group(function () {
         Route::get('admin/dashboard', [DashboardController::class, 'admin'])->name('admin.dashboard');
         Route::get('admin/staff', [StaffController::class, 'staffManagement'])->name('admin.staff');

@@ -7,17 +7,22 @@ use Illuminate\Support\Facades\Gate;
 
 class DashboardController extends Controller
 {
-    public function __invoke(Request $request) {
-        if(Gate::allows('access-staff-management')){
+    public function __invoke(Request $request)
+    {
+        if (Gate::allows('access-staff-management')) {
             return redirect()->route('admin.dashboard');
         } else {
             return redirect()->route('user.dashboard');
         }
     }
-    public function admin(Request $request) {
+
+    public function admin(Request $request)
+    {
         return inertia('Admin/Dashboard');
     }
-    public function user(Request $request) {
-        dd('user dashboard');
+
+    public function user(Request $request)
+    {
+        return inertia('User/Dashboard');
     }
 }

@@ -139,4 +139,88 @@ class OrderController extends Controller
             'order' => $order,
         ]);
     }
+
+    /**
+     * User orders list page. Pass orders for card layout; filter by status on frontend or via query.
+     */
+    public function userOrders(Request $request): Response
+    {
+        $orders = $this->userOrdersList();
+
+        return Inertia::render('User/Orders', [
+            'orders' => $orders,
+        ]);
+    }
+
+    /**
+     * Orders list for user UI. Each: id, order_number, created_at, status, total, items (name, image_url).
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function userOrdersList(): array
+    {
+        $base = now();
+
+        return [
+            [
+                'id' => 1,
+                'order_number' => 'ORD-7721',
+                'created_at' => $base->copy()->subDays(2)->format('Y-m-d\TH:i:s.v\Z'),
+                'status' => 'shipped',
+                'total' => 268.62,
+                'items' => [
+                    ['name' => 'Wireless Earbuds Pro', 'image_url' => null],
+                    ['name' => 'Phone Stand', 'image_url' => null],
+                    ['name' => 'USB-C Hub 7-in-1', 'image_url' => null],
+                ],
+            ],
+            [
+                'id' => 2,
+                'order_number' => 'ORD-7722',
+                'created_at' => $base->copy()->subDays(5)->format('Y-m-d\TH:i:s.v\Z'),
+                'status' => 'delivered',
+                'total' => 239.76,
+                'items' => [
+                    ['name' => 'Laptop Sleeve', 'image_url' => null],
+                    ['name' => 'Monitor Arm', 'image_url' => null],
+                ],
+            ],
+            [
+                'id' => 3,
+                'order_number' => 'ORD-7723',
+                'created_at' => $base->copy()->subDay()->format('Y-m-d\TH:i:s.v\Z'),
+                'status' => 'processing',
+                'total' => 49.65,
+                'items' => [
+                    ['name' => 'Screen Cleaner Kit', 'image_url' => null],
+                ],
+            ],
+            [
+                'id' => 4,
+                'order_number' => 'ORD-7724',
+                'created_at' => $base->copy()->subDays(10)->format('Y-m-d\TH:i:s.v\Z'),
+                'status' => 'cancelled',
+                'total' => 89.50,
+                'items' => [
+                    ['name' => 'USB-C Hub', 'image_url' => null],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * User order detail page. UI demo with sample orders; replace with Order::findOrFail($id) when ready.
+     */
+    public function userOrderDetail(Request $request, int $id): Response|HttpResponse
+    {
+        $samples = $this->userOrdersList();
+        $order = collect($samples)->firstWhere('id', $id);
+        if (! $order) {
+            abort(404);
+        }
+
+        return Inertia::render('User/OrderDetail', [
+            'order' => $order,
+        ]);
+    }
 }
