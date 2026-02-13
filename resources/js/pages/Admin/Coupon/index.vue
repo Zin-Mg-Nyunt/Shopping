@@ -222,7 +222,7 @@ function handleSubmitEdit() {
 
         <!-- Coupons Table -->
         <div
-            class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900/80"
+            class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900/50"
         >
             <div class="overflow-x-auto">
                 <table
@@ -309,9 +309,7 @@ function handleSubmitEdit() {
                             <td
                                 class="px-4 py-3.5 text-gray-700 dark:text-gray-300"
                             >
-                                {{ coupon.usedCount }}/{{
-                                    coupon.usageLimit
-                                }}
+                                {{ coupon.usedCount }}/{{ coupon.usageLimit }}
                                 uses
                             </td>
                             <td

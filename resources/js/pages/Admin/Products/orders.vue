@@ -154,15 +154,17 @@ defineOptions({
             >
                 <!-- Backend: pass stats.totalRevenue -->
                 <div
-                    class="relative overflow-hidden rounded-2xl border border-white/5 bg-zinc-900/80 p-6 shadow-xl shadow-black/20 backdrop-blur-sm"
+                    class="relative overflow-hidden rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900/50"
                 >
                     <div class="flex items-start justify-between">
                         <div>
-                            <p class="text-sm font-medium text-zinc-400">
+                            <p
+                                class="text-sm font-medium text-gray-400 dark:text-gray-500"
+                            >
                                 Total Revenue
                             </p>
                             <p
-                                class="mt-2 text-2xl font-semibold tracking-tight text-white sm:text-3xl"
+                                class="mt-2 text-2xl font-semibold tracking-tight text-gray-900 sm:text-3xl dark:text-gray-100"
                             >
                                 {{ formatMoney(totalRevenue) }}
                             </p>
@@ -182,15 +184,17 @@ defineOptions({
                 </div>
                 <!-- Backend: pass stats.newOrdersCount -->
                 <div
-                    class="relative overflow-hidden rounded-2xl border border-white/5 bg-zinc-900/80 p-6 shadow-xl shadow-black/20 backdrop-blur-sm"
+                    class="relative overflow-hidden rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900/50"
                 >
                     <div class="flex items-start justify-between">
                         <div>
-                            <p class="text-sm font-medium text-zinc-400">
+                            <p
+                                class="text-sm font-medium text-gray-400 dark:text-gray-500"
+                            >
                                 New Orders
                             </p>
                             <p
-                                class="mt-2 text-2xl font-semibold tracking-tight text-white sm:text-3xl"
+                                class="mt-2 text-2xl font-semibold tracking-tight text-gray-900 sm:text-3xl dark:text-gray-100"
                             >
                                 {{ newOrdersCount }}
                             </p>
@@ -210,15 +214,17 @@ defineOptions({
                 </div>
                 <!-- Backend: pass stats.pendingOrdersCount -->
                 <div
-                    class="relative overflow-hidden rounded-2xl border border-white/5 bg-zinc-900/80 p-6 shadow-xl shadow-black/20 backdrop-blur-sm"
+                    class="relative overflow-hidden rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900/50"
                 >
                     <div class="flex items-start justify-between">
                         <div>
-                            <p class="text-sm font-medium text-zinc-400">
+                            <p
+                                class="text-sm font-medium text-gray-400 dark:text-gray-500"
+                            >
                                 Pending Orders
                             </p>
                             <p
-                                class="mt-2 text-2xl font-semibold tracking-tight text-white sm:text-3xl"
+                                class="mt-2 text-2xl font-semibold tracking-tight text-gray-900 sm:text-3xl dark:text-gray-100"
                             >
                                 {{ pendingOrdersCount }}
                             </p>
@@ -240,7 +246,7 @@ defineOptions({
 
             <!-- Filter bar -->
             <section
-                class="rounded-2xl border border-white/5 bg-zinc-900/80 p-4 shadow-lg shadow-black/10 sm:p-5"
+                class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900/50"
                 aria-label="Filter orders"
             >
                 <div
@@ -248,13 +254,13 @@ defineOptions({
                 >
                     <div class="relative flex-1">
                         <Search
-                            class="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-zinc-500"
+                            class="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-500 dark:text-gray-400"
                         />
                         <Input
                             v-model="searchQuery"
                             type="search"
                             placeholder="Order ID / Customer"
-                            class="h-11 w-full rounded-xl border-white/10 bg-zinc-800/80 pl-10 text-zinc-100 placeholder:text-zinc-500 focus-visible:border-blue-500/50 focus-visible:ring-2 focus-visible:ring-blue-500/20"
+                            class="h-11 w-full rounded-lg border-gray-300 bg-white pr-4 pl-10 text-sm focus:border-primary focus:ring-1 focus:ring-primary dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200"
                             aria-label="Search by Order ID or Customer"
                             @keydown.enter="applyFilters"
                         />
@@ -267,7 +273,7 @@ defineOptions({
                     <select
                         id="admin-order-status"
                         v-model="statusFilter"
-                        class="h-11 rounded-xl border border-white/10 bg-zinc-800/80 px-4 text-sm text-zinc-200 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                        class="h-11 appearance-none rounded-lg border border-gray-300 bg-white pr-10 pl-4 text-sm text-gray-700 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200"
                     >
                         <option value="">All statuses</option>
                         <option value="pending">Pending</option>
@@ -279,24 +285,26 @@ defineOptions({
                     </select>
                     <div class="flex flex-wrap items-center gap-2 sm:gap-3">
                         <div class="flex items-center gap-2">
-                            <Calendar class="h-4 w-4 text-zinc-500" />
+                            <Calendar
+                                class="h-4 w-4 text-gray-500 dark:text-gray-400"
+                            />
                             <input
                                 v-model="dateFrom"
                                 type="date"
                                 aria-label="Date from"
-                                class="h-11 rounded-xl border border-white/10 bg-zinc-800/80 px-3 text-sm text-zinc-200 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                                class="h-11 rounded-lg border border-gray-300 bg-white px-4 text-sm text-gray-700 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200"
                             />
                         </div>
-                        <span class="text-zinc-500">–</span>
+                        <span class="text-gray-500 dark:text-gray-400">–</span>
                         <input
                             v-model="dateTo"
                             type="date"
                             aria-label="Date to"
-                            class="h-11 rounded-xl border border-white/10 bg-zinc-800/80 px-3 text-sm text-zinc-200 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                            class="h-11 rounded-lg border border-gray-300 bg-white px-4 text-sm text-gray-700 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200"
                         />
                         <Button
                             type="button"
-                            class="h-11 rounded-xl bg-blue-600 px-5 font-medium text-white shadow-lg shadow-blue-500/20 hover:bg-blue-500"
+                            class="h-11 rounded-lg bg-primary px-5 font-medium text-white shadow-lg shadow-blue-500/20 hover:bg-primary/90"
                             @click="applyFilters"
                         >
                             Apply
@@ -307,7 +315,7 @@ defineOptions({
 
             <!-- Data table card -->
             <section
-                class="overflow-hidden rounded-2xl border border-white/5 bg-zinc-900/80 shadow-xl shadow-black/20"
+                class="overflow-hidden rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900/50"
                 aria-label="Orders table"
             >
                 <div class="hidden overflow-x-auto sm:block">
@@ -317,27 +325,41 @@ defineOptions({
                         role="table"
                     >
                         <thead>
-                            <tr class="border-b border-white/5 bg-zinc-800/50">
-                                <th class="px-5 py-4 font-medium text-zinc-400">
+                            <tr
+                                class="border-b border-gray-200 bg-white/50 dark:border-gray-800 dark:bg-gray-900/50"
+                            >
+                                <th
+                                    class="px-5 py-4 font-medium text-gray-800 dark:text-white"
+                                >
                                     Order ID
                                 </th>
-                                <th class="px-5 py-4 font-medium text-zinc-400">
+                                <th
+                                    class="px-5 py-4 font-medium text-gray-800 dark:text-white"
+                                >
                                     Customer
                                 </th>
-                                <th class="px-5 py-4 font-medium text-zinc-400">
+                                <th
+                                    class="px-5 py-4 font-medium text-gray-800 dark:text-white"
+                                >
                                     Date
                                 </th>
-                                <th class="px-5 py-4 font-medium text-zinc-400">
+                                <th
+                                    class="px-5 py-4 font-medium text-gray-800 dark:text-white"
+                                >
                                     Total
                                 </th>
-                                <th class="px-5 py-4 font-medium text-zinc-400">
+                                <th
+                                    class="px-5 py-4 font-medium text-gray-800 dark:text-white"
+                                >
                                     Payment
                                 </th>
-                                <th class="px-5 py-4 font-medium text-zinc-400">
+                                <th
+                                    class="px-5 py-4 font-medium text-gray-800 dark:text-white"
+                                >
                                     Status
                                 </th>
                                 <th
-                                    class="w-24 px-5 py-4 text-right font-medium text-zinc-400"
+                                    class="w-24 px-5 py-4 text-right font-medium text-gray-800 dark:text-white"
                                     aria-label="Actions"
                                 >
                                     Action
@@ -348,7 +370,7 @@ defineOptions({
                             <tr
                                 v-for="order in orderList"
                                 :key="order.id"
-                                class="border-b border-white/5 transition-colors hover:bg-white/3"
+                                class="border-b border-gray-200 transition-colors hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-900/50"
                             >
                                 <td class="px-5 py-4">
                                     <Link
@@ -356,28 +378,34 @@ defineOptions({
                                         :href="
                                             route('admin.orders.show', order.id)
                                         "
-                                        class="font-medium text-blue-400 hover:text-blue-300 hover:underline"
+                                        class="font-medium text-primary hover:text-primary/80 hover:underline"
                                     >
                                         #{{ order.order_number ?? order.id }}
                                     </Link>
                                     <span
                                         v-else
-                                        class="text-zinc-500"
+                                        class="text-gray-500 dark:text-gray-400"
                                         >—</span
                                     >
                                 </td>
-                                <td class="px-5 py-4 text-zinc-300">
+                                <td
+                                    class="px-5 py-4 text-gray-800 dark:text-white"
+                                >
                                     {{ order.customer_name ?? '—' }}
                                 </td>
-                                <td class="px-5 py-4 text-zinc-400">
+                                <td
+                                    class="px-5 py-4 text-gray-400 dark:text-gray-500"
+                                >
                                     {{ formatDate(order.created_at) }}
                                 </td>
-                                <td class="px-5 py-4 font-medium text-white">
+                                <td
+                                    class="px-5 py-4 font-medium text-gray-900 dark:text-gray-100"
+                                >
                                     {{ formatMoney(order.total) }}
                                 </td>
                                 <td class="px-5 py-4">
                                     <span
-                                        class="inline-flex items-center gap-1.5 text-zinc-300"
+                                        class="inline-flex items-center gap-1.5 text-gray-800 dark:text-white"
                                     >
                                         <component
                                             :is="
@@ -385,7 +413,7 @@ defineOptions({
                                                     order.payment_method,
                                                 ).icon
                                             "
-                                            class="h-4 w-4 text-zinc-500"
+                                            class="h-4 w-4 text-gray-500 dark:text-gray-400"
                                         />
                                         {{
                                             paymentDisplay(order.payment_method)
@@ -414,7 +442,7 @@ defineOptions({
                                         <Button
                                             variant="ghost"
                                             size="sm"
-                                            class="h-9 gap-2 text-zinc-400 hover:bg-white/5 hover:text-white"
+                                            class="h-9 gap-2 text-gray-400 hover:bg-gray-50 dark:text-gray-500 dark:hover:bg-gray-900/50 dark:hover:text-gray-100"
                                         >
                                             <Eye class="h-4 w-4" />
                                             View
@@ -431,21 +459,23 @@ defineOptions({
                     <div
                         v-for="order in orderList"
                         :key="order.id"
-                        class="flex flex-wrap items-center gap-3 border-b border-white/5 px-4 py-4 last:border-b-0"
+                        class="flex flex-wrap items-center gap-3 border-b border-gray-200 px-4 py-4 last:border-b-0 dark:border-gray-800"
                     >
                         <div class="min-w-0 flex-1">
                             <Link
                                 v-if="order.id"
                                 :href="route('admin.orders.show', order.id)"
-                                class="font-medium text-blue-400 hover:underline"
+                                class="font-medium text-primary hover:text-primary/80 hover:underline"
                             >
                                 #{{ order.order_number ?? order.id }}
                             </Link>
-                            <p class="text-sm text-zinc-400">
+                            <p class="text-sm text-gray-400 dark:text-gray-500">
                                 {{ order.customer_name ?? '—' }} ·
                                 {{ formatDate(order.created_at) }}
                             </p>
-                            <p class="mt-1 text-sm font-medium text-white">
+                            <p
+                                class="mt-1 text-sm font-medium text-gray-900 dark:text-gray-100"
+                            >
                                 {{ formatMoney(order.total) }}
                             </p>
                             <span
@@ -464,7 +494,7 @@ defineOptions({
                             <Button
                                 variant="ghost"
                                 size="sm"
-                                class="gap-2 text-zinc-400"
+                                class="gap-2 text-gray-400 dark:text-gray-500"
                             >
                                 <Eye class="h-4 w-4" />
                                 View
@@ -476,7 +506,7 @@ defineOptions({
                 <!-- Empty state -->
                 <div
                     v-if="orderList.length === 0"
-                    class="px-6 py-16 text-center text-zinc-500"
+                    class="px-6 py-16 text-center text-gray-500 dark:text-gray-400"
                 >
                     No orders found. Try adjusting search or filters.
                 </div>
@@ -484,7 +514,7 @@ defineOptions({
                 <!-- Pagination -->
                 <div
                     v-if="orders && orderList.length > 0"
-                    class="border-t border-white/5 px-4 py-3"
+                    class="border-t border-gray-200 px-4 py-3 dark:border-gray-800"
                 >
                     <Pagination :meta="orders" />
                 </div>
@@ -502,7 +532,7 @@ defineOptions({
         >
             <div
                 v-if="showNewOrderNotification"
-                class="fixed top-20 right-6 z-50 flex max-w-sm items-start gap-3 rounded-2xl border border-emerald-500/20 bg-zinc-900 p-4 shadow-2xl ring-1 shadow-black/40 ring-white/5"
+                class="fixed top-20 right-6 z-50 flex max-w-sm items-start gap-3 rounded-xl border border-emerald-500/20 bg-gray-900 p-4 shadow-sm ring-1 shadow-black/40 ring-gray-200/5 dark:border-emerald-500/20 dark:bg-gray-900 dark:ring-gray-800/5"
                 role="alert"
                 aria-live="polite"
             >
@@ -513,12 +543,14 @@ defineOptions({
                 </div>
                 <div class="min-w-0 flex-1">
                     <p class="font-medium text-white">New order received</p>
-                    <p class="mt-0.5 text-sm text-zinc-400">Order #ORD-5502</p>
+                    <p class="mt-0.5 text-sm text-gray-400 dark:text-gray-500">
+                        Order #ORD-5502
+                    </p>
                 </div>
                 <Button
                     variant="ghost"
                     size="icon"
-                    class="h-8 w-8 shrink-0 text-zinc-500 hover:text-white"
+                    class="h-8 w-8 shrink-0 text-gray-500 hover:text-white dark:text-gray-500 dark:hover:text-gray-100"
                     aria-label="Dismiss notification"
                     @click="dismissNotification"
                 >

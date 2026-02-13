@@ -101,7 +101,7 @@ defineOptions({
             <!-- Back link -->
             <Link
                 :href="route('admin.orders')"
-                class="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground"
+                class="inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
             >
                 <ArrowLeft class="h-4 w-4" />
                 Back to Orders
@@ -109,13 +109,13 @@ defineOptions({
 
             <!-- Top Navigation Bar: Order ID + Status Stepper + Update Status + Print -->
             <header
-                class="flex flex-col gap-4 rounded-xl border border-border bg-card p-4 shadow-sm sm:rounded-2xl sm:p-6 xl:flex-row xl:items-center xl:justify-between xl:gap-6"
+                class="flex flex-col gap-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm sm:rounded-2xl sm:p-6 xl:flex-row xl:items-center xl:justify-between xl:gap-6 dark:border-gray-800 dark:bg-gray-900/50"
             >
                 <div
                     class="min-w-0 space-y-3 sm:space-y-4 xl:flex-1 xl:overflow-hidden"
                 >
                     <h1
-                        class="truncate text-lg font-semibold tracking-tight text-foreground sm:text-xl md:text-2xl"
+                        class="truncate text-lg font-semibold tracking-tight text-gray-900 sm:text-xl md:text-2xl dark:text-gray-100"
                     >
                         Order #{{ order.order_number ?? order.id }}
                     </h1>
@@ -176,7 +176,7 @@ defineOptions({
                         <DropdownMenuTrigger as-child>
                             <Button
                                 variant="outline"
-                                class="w-full gap-2 border-border bg-background shadow-sm sm:w-auto"
+                                class="w-full gap-2 border-gray-200 bg-white shadow-sm sm:w-auto dark:border-gray-800 dark:bg-gray-900/50 dark:hover:bg-gray-800/50"
                             >
                                 Update Status
                                 <ChevronDown class="h-4 w-4" />
@@ -184,19 +184,20 @@ defineOptions({
                         </DropdownMenuTrigger>
                         <DropdownMenuContent
                             align="end"
-                            class="w-48"
+                            class="w-48 dark:bg-gray-900/50"
                         >
                             <DropdownMenuItem
                                 v-for="s in steps"
                                 :key="s.key"
                                 @click="onUpdateStatus(s.key)"
+                                class="dark:hover:bg-gray-800/50"
                             >
                                 {{ s.label }}
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
                     <Button
-                        class="w-full gap-2 bg-primary text-primary-foreground shadow-sm hover:opacity-90 sm:w-auto"
+                        class="w-full gap-2 bg-primary text-primary-foreground shadow-sm hover:opacity-90 sm:w-auto dark:bg-primary dark:text-primary-foreground"
                         @click="onPrintInvoice"
                     >
                         <Printer class="h-4 w-4 shrink-0" />
@@ -210,13 +211,15 @@ defineOptions({
                 <!-- Left column (wide): Ordered Items -->
                 <div class="min-w-0 lg:col-span-2">
                     <section
-                        class="overflow-hidden rounded-xl border border-border bg-card shadow-sm sm:rounded-2xl"
+                        class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm sm:rounded-2xl dark:border-gray-800 dark:bg-gray-900/50"
                         aria-label="Ordered items"
                     >
                         <div
-                            class="border-b border-border px-4 py-3 sm:px-6 sm:py-4"
+                            class="border-b border-gray-200 px-4 py-3 sm:px-6 sm:py-4 dark:border-gray-800"
                         >
-                            <h2 class="font-semibold text-foreground">
+                            <h2
+                                class="font-semibold text-gray-900 dark:text-gray-100"
+                            >
                                 Ordered Items
                             </h2>
                         </div>
@@ -226,10 +229,10 @@ defineOptions({
                             <div
                                 v-for="(item, index) in items"
                                 :key="index"
-                                class="flex gap-3 border-b border-border px-4 py-3 last:border-b-0"
+                                class="flex gap-3 border-b border-gray-200 px-4 py-3 last:border-b-0 dark:border-gray-800"
                             >
                                 <div
-                                    class="h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-muted"
+                                    class="h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800"
                                 >
                                     <img
                                         v-if="item.thumbnail_url"
@@ -239,45 +242,45 @@ defineOptions({
                                     />
                                     <div
                                         v-else
-                                        class="flex h-full w-full items-center justify-center text-xs text-muted-foreground"
+                                        class="flex h-full w-full items-center justify-center text-xs text-gray-500 dark:text-gray-400"
                                     >
                                         —
                                     </div>
                                 </div>
                                 <div class="min-w-0 flex-1">
                                     <p
-                                        class="truncate font-medium text-foreground"
+                                        class="truncate font-medium text-gray-900 dark:text-gray-100"
                                     >
                                         {{ item.product_name ?? '—' }}
                                     </p>
                                     <p
                                         v-if="item.variant"
-                                        class="text-xs text-muted-foreground"
+                                        class="text-xs text-gray-500 dark:text-gray-400"
                                     >
                                         {{ item.variant }}
                                     </p>
                                     <p
-                                        class="mt-1 text-sm text-muted-foreground"
+                                        class="mt-1 text-sm text-gray-500 dark:text-gray-400"
                                     >
                                         {{ item.quantity ?? 0 }} ×
                                         {{ formatMoney(item.unit_price) }}
                                     </p>
                                 </div>
                                 <p
-                                    class="shrink-0 text-right font-medium text-foreground"
+                                    class="shrink-0 text-right font-medium text-gray-900 dark:text-gray-100"
                                 >
                                     {{ formatMoney(item.line_total) }}
                                 </p>
                             </div>
                             <div
                                 v-if="items.length === 0"
-                                class="px-4 py-8 text-center text-sm text-muted-foreground"
+                                class="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400"
                             >
                                 No items in this order.
                             </div>
                             <div
                                 v-if="items.length > 0"
-                                class="flex justify-end border-t border-border bg-muted/50 px-4 py-3"
+                                class="flex justify-end border-t border-gray-200 bg-gray-50 px-4 py-3 dark:border-gray-800 dark:bg-gray-900/50"
                             >
                                 <div class="text-right">
                                     <p class="text-xs text-muted-foreground">
@@ -300,34 +303,34 @@ defineOptions({
                             >
                                 <thead>
                                     <tr
-                                        class="border-b border-border bg-muted/80"
+                                        class="border-b border-gray-200 bg-gray-50 dark:border-gray-800 dark:bg-gray-900/50"
                                     >
                                         <th
-                                            class="w-16 px-6 py-3 font-medium text-muted-foreground"
+                                            class="w-16 px-6 py-3 font-medium text-gray-500 dark:text-gray-400"
                                             scope="col"
                                         >
                                             —
                                         </th>
                                         <th
-                                            class="px-6 py-3 font-medium text-muted-foreground"
+                                            class="px-6 py-3 font-medium text-gray-500 dark:text-gray-400"
                                             scope="col"
                                         >
                                             Product
                                         </th>
                                         <th
-                                            class="w-24 px-6 py-3 text-right font-medium text-muted-foreground"
+                                            class="w-24 px-6 py-3 text-right font-medium text-gray-500 dark:text-gray-400"
                                             scope="col"
                                         >
                                             Qty
                                         </th>
                                         <th
-                                            class="w-28 px-6 py-3 text-right font-medium text-muted-foreground"
+                                            class="w-28 px-6 py-3 text-right font-medium text-gray-500 dark:text-gray-400"
                                             scope="col"
                                         >
                                             Unit price
                                         </th>
                                         <th
-                                            class="w-28 px-6 py-3 text-right font-medium text-muted-foreground"
+                                            class="w-28 px-6 py-3 text-right font-medium text-gray-500 dark:text-gray-400"
                                             scope="col"
                                         >
                                             Subtotal
@@ -338,11 +341,11 @@ defineOptions({
                                     <tr
                                         v-for="(item, index) in items"
                                         :key="index"
-                                        class="border-b border-border last:border-b-0"
+                                        class="border-b border-gray-200 last:border-b-0 dark:border-gray-800"
                                     >
                                         <td class="px-6 py-4">
                                             <div
-                                                class="h-14 w-14 overflow-hidden rounded-lg bg-muted"
+                                                class="h-14 w-14 overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800"
                                             >
                                                 <img
                                                     v-if="item.thumbnail_url"
@@ -352,7 +355,7 @@ defineOptions({
                                                 />
                                                 <div
                                                     v-else
-                                                    class="flex h-full w-full items-center justify-center text-xs text-muted-foreground"
+                                                    class="flex h-full w-full items-center justify-center text-xs text-gray-500 dark:text-gray-400"
                                                 >
                                                     —
                                                 </div>
@@ -360,29 +363,29 @@ defineOptions({
                                         </td>
                                         <td class="px-6 py-4">
                                             <p
-                                                class="font-medium text-foreground"
+                                                class="font-medium text-gray-900 dark:text-gray-100"
                                             >
                                                 {{ item.product_name ?? '—' }}
                                             </p>
                                             <p
                                                 v-if="item.variant"
-                                                class="mt-0.5 text-xs text-muted-foreground"
+                                                class="mt-0.5 text-xs text-gray-500 dark:text-gray-400"
                                             >
                                                 {{ item.variant }}
                                             </p>
                                         </td>
                                         <td
-                                            class="px-6 py-4 text-right text-muted-foreground"
+                                            class="px-6 py-4 text-right text-gray-500 dark:text-gray-400"
                                         >
                                             {{ item.quantity ?? 0 }}
                                         </td>
                                         <td
-                                            class="px-6 py-4 text-right text-muted-foreground"
+                                            class="px-6 py-4 text-right text-gray-500 dark:text-gray-400"
                                         >
                                             {{ formatMoney(item.unit_price) }}
                                         </td>
                                         <td
-                                            class="px-6 py-4 text-right font-medium text-foreground"
+                                            class="px-6 py-4 text-right font-medium text-gray-900 dark:text-gray-100"
                                         >
                                             {{ formatMoney(item.line_total) }}
                                         </td>
@@ -392,21 +395,23 @@ defineOptions({
                         </div>
                         <div
                             v-if="items.length === 0"
-                            class="hidden px-6 py-12 text-center text-muted-foreground sm:block"
+                            class="hidden px-6 py-12 text-center text-gray-500 sm:block dark:text-gray-400"
                         >
                             No items in this order.
                         </div>
                         <!-- Grand Total (desktop table) -->
                         <div
                             v-if="items.length > 0"
-                            class="hidden justify-end border-t border-border bg-muted/50 px-6 py-4 sm:flex"
+                            class="hidden justify-end border-t border-gray-200 bg-gray-50 px-6 py-4 sm:flex dark:border-gray-800 dark:bg-gray-900/50"
                         >
                             <div class="text-right">
-                                <p class="text-sm text-muted-foreground">
+                                <p
+                                    class="text-sm text-gray-500 dark:text-gray-400"
+                                >
                                     Grand Total
                                 </p>
                                 <p
-                                    class="text-xl font-semibold text-foreground"
+                                    class="text-xl font-semibold text-gray-900 dark:text-gray-100"
                                 >
                                     {{ formatMoney(order.total) }}
                                 </p>
@@ -419,54 +424,68 @@ defineOptions({
                 <div class="space-y-4 sm:space-y-6">
                     <!-- Customer Info Card -->
                     <section
-                        class="rounded-xl border border-border bg-card p-4 shadow-sm sm:rounded-2xl sm:p-5"
+                        class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm sm:rounded-2xl sm:p-5 dark:border-gray-800 dark:bg-gray-900/50"
                         aria-label="Customer information"
                     >
-                        <h2 class="mb-4 font-semibold text-foreground">
+                        <h2
+                            class="mb-4 font-semibold text-gray-900 dark:text-gray-100"
+                        >
                             Customer
                         </h2>
                         <div class="space-y-4">
                             <div class="flex items-center gap-3">
                                 <div
-                                    class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground"
+                                    class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400"
                                 >
                                     <User class="h-4 w-4" />
                                 </div>
                                 <div>
-                                    <p class="font-medium text-foreground">
+                                    <p
+                                        class="font-medium text-gray-900 dark:text-gray-100"
+                                    >
                                         {{ order.customer_name ?? '—' }}
                                     </p>
-                                    <p class="text-sm text-muted-foreground">
+                                    <p
+                                        class="text-sm text-gray-500 dark:text-gray-400"
+                                    >
                                         Customer name
                                     </p>
                                 </div>
                             </div>
                             <div class="flex items-center gap-3">
                                 <div
-                                    class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground"
+                                    class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400"
                                 >
                                     <Mail class="h-4 w-4" />
                                 </div>
                                 <div>
-                                    <p class="font-medium text-foreground">
+                                    <p
+                                        class="font-medium text-gray-900 dark:text-gray-100"
+                                    >
                                         {{ order.customer_email ?? '—' }}
                                     </p>
-                                    <p class="text-sm text-muted-foreground">
+                                    <p
+                                        class="text-sm text-gray-500 dark:text-gray-400"
+                                    >
                                         Email
                                     </p>
                                 </div>
                             </div>
                             <div class="flex items-center gap-3">
                                 <div
-                                    class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground"
+                                    class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400"
                                 >
                                     <Phone class="h-4 w-4" />
                                 </div>
                                 <div>
-                                    <p class="font-medium text-foreground">
+                                    <p
+                                        class="font-medium text-gray-900 dark:text-gray-100"
+                                    >
                                         {{ order.customer_phone ?? '—' }}
                                     </p>
-                                    <p class="text-sm text-muted-foreground">
+                                    <p
+                                        class="text-sm text-gray-500 dark:text-gray-400"
+                                    >
                                         Phone
                                     </p>
                                 </div>
@@ -476,28 +495,30 @@ defineOptions({
 
                     <!-- Shipping Address Card + static map preview -->
                     <section
-                        class="rounded-xl border border-border bg-card p-4 shadow-sm sm:rounded-2xl sm:p-5"
+                        class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm sm:rounded-2xl sm:p-5 dark:border-gray-800 dark:bg-gray-900/50"
                         aria-label="Shipping address"
                     >
-                        <h2 class="mb-4 font-semibold text-foreground">
+                        <h2
+                            class="mb-4 font-semibold text-gray-900 dark:text-gray-100"
+                        >
                             Shipping Address
                         </h2>
                         <div class="flex items-start gap-3">
                             <div
-                                class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground"
+                                class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400"
                             >
                                 <MapPin class="h-4 w-4" />
                             </div>
-                            <p class="text-sm text-foreground">
+                            <p class="text-sm text-gray-900 dark:text-gray-100">
                                 {{ order.shipping_address ?? '—' }}
                             </p>
                         </div>
                         <!-- Backend: provide embed URL or lat/lng for Google Maps iframe -->
                         <div
-                            class="mt-3 overflow-hidden rounded-lg border border-border bg-muted sm:mt-4 sm:rounded-xl"
+                            class="mt-3 overflow-hidden rounded-lg border border-gray-200 bg-gray-50 sm:mt-4 sm:rounded-xl dark:border-gray-800 dark:bg-gray-900/50"
                         >
                             <div
-                                class="flex h-24 items-center justify-center text-muted-foreground sm:h-32"
+                                class="flex h-24 items-center justify-center text-gray-500 sm:h-32 dark:text-gray-400"
                             >
                                 <!-- TODO: Replace with Google Maps embed or static map image from backend -->
                                 <span class="text-xs">Map preview</span>
@@ -507,19 +528,23 @@ defineOptions({
 
                     <!-- Payment Verification Card: Bank slip thumbnail + Transaction ID -->
                     <section
-                        class="rounded-xl border border-border bg-card p-4 shadow-sm sm:rounded-2xl sm:p-5"
+                        class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm sm:rounded-2xl sm:p-5 dark:border-gray-800 dark:bg-gray-900/50"
                         aria-label="Payment verification"
                     >
-                        <h2 class="mb-4 font-semibold text-foreground">
+                        <h2
+                            class="mb-4 font-semibold text-gray-900 dark:text-gray-100"
+                        >
                             Payment Verification
                         </h2>
-                        <p class="mb-3 text-sm text-muted-foreground">
+                        <p
+                            class="mb-3 text-sm text-gray-500 dark:text-gray-400"
+                        >
                             Bank slip (screenshot)
                         </p>
                         <button
                             v-if="bankSlipUrl"
                             type="button"
-                            class="block w-full overflow-hidden rounded-xl border border-border bg-muted transition-shadow hover:shadow-md focus:ring-2 focus:ring-ring focus:outline-none"
+                            class="block w-full overflow-hidden rounded-xl border border-gray-200 bg-gray-50 transition-shadow hover:shadow-md focus:ring-2 focus:ring-ring focus:outline-none dark:border-gray-800 dark:bg-gray-900/50"
                             @click="bankSlipOpen = true"
                         >
                             <img
@@ -530,14 +555,14 @@ defineOptions({
                         </button>
                         <div
                             v-else
-                            class="flex h-24 items-center justify-center rounded-lg border border-dashed border-border bg-muted text-sm text-muted-foreground sm:h-32 sm:rounded-xl"
+                            class="flex h-24 items-center justify-center rounded-lg border border-dashed border-gray-200 bg-gray-50 text-sm text-gray-500 sm:h-32 sm:rounded-xl dark:border-gray-800 dark:bg-gray-900/50 dark:text-gray-400"
                         >
                             No slip uploaded
                         </div>
                         <div class="mt-4">
                             <Label
                                 for="transaction-id"
-                                class="text-sm font-medium text-foreground"
+                                class="text-sm font-medium text-gray-900 dark:text-gray-100"
                             >
                                 Transaction ID
                             </Label>
@@ -546,7 +571,7 @@ defineOptions({
                                 type="text"
                                 v-model="transactionId"
                                 placeholder="Enter transaction ID"
-                                class="mt-1.5 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                                class="mt-1.5 w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-500 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none dark:border-gray-800 dark:bg-gray-900/50 dark:text-gray-100 dark:placeholder:text-gray-400"
                             />
                             <!-- Backend: bind to order.transaction_id and save on blur or submit -->
                         </div>
@@ -555,7 +580,7 @@ defineOptions({
                     <Link :href="route('admin.orders')">
                         <Button
                             variant="outline"
-                            class="w-full border-border bg-background shadow-sm"
+                            class="w-full border-gray-200 bg-white shadow-sm transition-all dark:border-gray-800 dark:bg-gray-900/50"
                         >
                             <ArrowLeft class="mr-2 h-4 w-4" />
                             Back to Orders
@@ -567,21 +592,23 @@ defineOptions({
             <!-- Footer: Internal Admin Notes + Activity Log -->
             <footer class="grid gap-4 sm:gap-6 lg:grid-cols-2">
                 <section
-                    class="rounded-xl border border-border bg-card p-4 shadow-sm sm:rounded-2xl sm:p-6"
+                    class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm sm:rounded-2xl sm:p-6 dark:border-gray-800 dark:bg-gray-900/50"
                     aria-label="Internal admin notes"
                 >
-                    <h2 class="mb-3 font-semibold text-foreground">
+                    <h2
+                        class="mb-3 font-semibold text-gray-900 dark:text-gray-100"
+                    >
                         Internal Admin Notes
                     </h2>
                     <textarea
                         v-model="adminNotes"
                         rows="4"
                         placeholder="Add notes visible only to admins..."
-                        class="w-full rounded-xl border border-input bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                        class="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 placeholder:text-gray-500 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none dark:border-gray-800 dark:bg-gray-900/50 dark:text-gray-100 dark:placeholder:text-gray-400"
                     />
                     <Button
                         size="sm"
-                        class="mt-3 bg-primary text-primary-foreground hover:opacity-90"
+                        class="mt-3 bg-primary text-primary-foreground hover:opacity-90 dark:bg-primary dark:text-primary-foreground"
                         @click="onSaveNotes"
                     >
                         Save notes
@@ -590,10 +617,12 @@ defineOptions({
                 </section>
 
                 <section
-                    class="rounded-xl border border-border bg-card p-4 shadow-sm sm:rounded-2xl sm:p-6"
+                    class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm sm:rounded-2xl sm:p-6 dark:border-gray-800 dark:bg-gray-900/50"
                     aria-label="Activity log"
                 >
-                    <h2 class="mb-4 font-semibold text-foreground">
+                    <h2
+                        class="mb-4 font-semibold text-gray-900 dark:text-gray-100"
+                    >
                         Activity Log
                     </h2>
                     <ul
@@ -603,23 +632,25 @@ defineOptions({
                         <li
                             v-for="(entry, i) in activityLog"
                             :key="i"
-                            class="flex items-start gap-2 border-b border-border pb-3 last:border-0 last:pb-0 sm:gap-3"
+                            class="flex items-start gap-2 border-b border-gray-200 pb-3 last:border-0 last:pb-0 sm:gap-3 dark:border-gray-800"
                         >
                             <div
-                                class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-muted sm:h-8 sm:w-8"
+                                class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gray-100 sm:h-8 sm:w-8 dark:bg-gray-800"
                             >
                                 <FileText
-                                    class="h-4 w-4 text-muted-foreground"
+                                    class="h-4 w-4 text-gray-500 dark:text-gray-400"
                                 />
                             </div>
                             <div>
                                 <p
-                                    class="text-xs font-medium wrap-break-word text-foreground sm:text-sm"
+                                    class="text-xs font-medium wrap-break-word text-gray-900 sm:text-sm dark:text-gray-100"
                                 >
                                     {{ entry.user_name ?? 'System' }} —
                                     {{ entry.action ?? 'Updated status' }}
                                 </p>
-                                <p class="mt-0.5 text-xs text-muted-foreground">
+                                <p
+                                    class="mt-0.5 text-xs text-gray-500 dark:text-gray-400"
+                                >
                                     {{ formatDate(entry.created_at) }}
                                 </p>
                             </div>
@@ -627,7 +658,7 @@ defineOptions({
                     </ul>
                     <p
                         v-else
-                        class="text-sm text-muted-foreground"
+                        class="text-sm text-gray-500 dark:text-gray-400"
                     >
                         No activity yet.
                     </p>

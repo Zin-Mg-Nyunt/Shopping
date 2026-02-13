@@ -74,7 +74,7 @@ function removeLogo() {
         <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
             <!-- 1. General Identity -->
             <Card
-                class="border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900/80"
+                class="border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900/50"
             >
                 <CardHeader>
                     <div class="flex items-center gap-3">
@@ -231,7 +231,7 @@ function removeLogo() {
 
             <!-- 2. Store Configuration -->
             <Card
-                class="border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900/80"
+                class="border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900/50"
             >
                 <CardHeader>
                     <div class="flex items-center gap-3">
@@ -376,7 +376,7 @@ function removeLogo() {
 
             <!-- 3. Email Configuration (SMTP) -->
             <Card
-                class="border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900/80"
+                class="border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900/50"
             >
                 <CardHeader>
                     <div class="flex items-center gap-3">
@@ -524,7 +524,7 @@ function removeLogo() {
 
             <!-- 4. Database Backup & Maintenance -->
             <Card
-                class="border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900/80"
+                class="border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900/50"
             >
                 <CardHeader>
                     <div class="flex items-center gap-3">

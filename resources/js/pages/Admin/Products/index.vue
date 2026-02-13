@@ -180,7 +180,7 @@ defineOptions({
         <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
             <!-- Best Sellers (Monthly) card -->
             <div
-                class="rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-900"
+                class="rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-900/50"
             >
                 <div
                     class="flex items-center justify-between border-b border-gray-200 px-4 py-3 dark:border-gray-700"
@@ -242,7 +242,7 @@ defineOptions({
             </div>
             <!-- Activity Log card -->
             <div
-                class="rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-900"
+                class="rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-900/50"
             >
                 <div
                     class="flex items-center gap-2 border-b border-gray-200 px-4 py-3 dark:border-gray-700"
@@ -316,7 +316,7 @@ defineOptions({
 
         <!-- Search & filters -->
         <div
-            class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-900"
+            class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-900/50"
         >
             <div
                 class="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-4"
@@ -392,7 +392,7 @@ defineOptions({
         </div>
         <!-- Table card -->
         <div
-            class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-900"
+            class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-900/50"
         >
             <!-- Mobile: card list -->
             <div class="block sm:hidden">

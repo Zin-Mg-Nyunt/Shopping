@@ -207,17 +207,17 @@ defineOptions({
             <div
                 v-for="stat in stats"
                 :key="stat.title"
-                class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900/80"
+                class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900/50"
             >
                 <div class="flex items-start justify-between">
-                    <div class="flex-1 min-w-0">
+                    <div class="min-w-0 flex-1">
                         <p
                             class="text-sm font-medium text-gray-500 dark:text-gray-400"
                         >
                             {{ stat.title }}
                         </p>
                         <p
-                            class="mt-2 text-2xl font-semibold tabular-nums text-gray-900 dark:text-white"
+                            class="mt-2 text-2xl font-semibold text-gray-900 tabular-nums dark:text-white"
                         >
                             {{ stat.value }}
                         </p>
@@ -250,12 +250,12 @@ defineOptions({
 
         <!-- Table Controls -->
         <div
-            class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900/80"
+            class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900/50"
         >
             <div
                 class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
             >
-                <div class="relative flex-1 max-w-md">
+                <div class="relative max-w-md flex-1">
                     <Search
                         class="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400"
                         aria-hidden="true"
@@ -264,7 +264,7 @@ defineOptions({
                         v-model="searchQuery"
                         type="search"
                         placeholder="Search by name or email..."
-                        class="h-10 w-full rounded-lg border-gray-300 bg-white pl-10 pr-4 text-sm focus:border-primary focus:ring-1 focus:ring-primary dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200"
+                        class="h-10 w-full rounded-lg border-gray-300 bg-white pr-4 pl-10 text-sm focus:border-primary focus:ring-1 focus:ring-primary dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200"
                         aria-label="Search customers"
                         @input="handleSearch"
                     />
@@ -274,7 +274,7 @@ defineOptions({
                     <div class="relative">
                         <select
                             :value="statusFilter"
-                            class="h-10 appearance-none rounded-lg border border-gray-300 bg-white pl-4 pr-10 text-sm text-gray-700 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200"
+                            class="h-10 appearance-none rounded-lg border border-gray-300 bg-white pr-10 pl-4 text-sm text-gray-700 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200"
                             aria-label="Filter by status"
                             @change="
                                 handleStatusFilterChange($event.target.value)
@@ -309,7 +309,7 @@ defineOptions({
 
         <!-- Customer Table -->
         <div
-            class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900/80"
+            class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900/50"
         >
             <div class="overflow-x-auto">
                 <table
@@ -362,12 +362,14 @@ defineOptions({
                         <tr
                             v-for="customer in customers"
                             :key="customer.id"
-                            class="border-b border-gray-100 transition-colors duration-150 hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-800/50 last:border-b-0"
+                            class="border-b border-gray-100 transition-colors duration-150 last:border-b-0 hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-800/50"
                         >
                             <!-- Customer -->
                             <td class="px-4 py-3.5">
                                 <div class="flex items-center gap-3">
-                                    <Avatar class="h-10 w-10 shrink-0 rounded-full border-2 border-gray-200 dark:border-gray-700">
+                                    <Avatar
+                                        class="h-10 w-10 shrink-0 rounded-full border-2 border-gray-200 dark:border-gray-700"
+                                    >
                                         <AvatarImage
                                             :src="customer.avatar"
                                             :alt="customer.name"
@@ -405,15 +407,21 @@ defineOptions({
                                 </span>
                             </td>
                             <!-- Orders -->
-                            <td class="px-4 py-3.5 text-gray-700 dark:text-gray-300">
+                            <td
+                                class="px-4 py-3.5 text-gray-700 dark:text-gray-300"
+                            >
                                 {{ customer.ordersCount }} Orders
                             </td>
                             <!-- Total Spent -->
-                            <td class="px-4 py-3.5 font-medium text-gray-700 dark:text-gray-300">
+                            <td
+                                class="px-4 py-3.5 font-medium text-gray-700 dark:text-gray-300"
+                            >
                                 {{ formatCurrency(customer.totalSpent) }}
                             </td>
                             <!-- Joined -->
-                            <td class="px-4 py-3.5 text-gray-600 dark:text-gray-400">
+                            <td
+                                class="px-4 py-3.5 text-gray-600 dark:text-gray-400"
+                            >
                                 {{ customer.joined }}
                             </td>
                             <!-- Support Needs -->
@@ -478,9 +486,13 @@ defineOptions({
                                             class="w-44"
                                         >
                                             <DropdownMenuItem
-                                                @click="handleViewCustomer(customer)"
+                                                @click="
+                                                    handleViewCustomer(customer)
+                                                "
                                             >
-                                                <ExternalLink class="mr-2 h-4 w-4" />
+                                                <ExternalLink
+                                                    class="mr-2 h-4 w-4"
+                                                />
                                                 View Details
                                             </DropdownMenuItem>
                                             <DropdownMenuItem>
@@ -514,9 +526,7 @@ defineOptions({
                 >
                     No customers found
                 </p>
-                <p
-                    class="mt-1 text-sm text-gray-500 dark:text-gray-400"
-                >
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
                     Try adjusting your search or filter criteria
                 </p>
             </div>

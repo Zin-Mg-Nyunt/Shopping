@@ -145,7 +145,7 @@ function handleSubmitEdit() {
 
         <!-- Top Bar: Search + Add New Category -->
         <div
-            class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900/80"
+            class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900/50"
         >
             <div
                 class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
@@ -175,7 +175,7 @@ function handleSubmitEdit() {
 
         <!-- Categories Table -->
         <div
-            class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900/80"
+            class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900/50"
         >
             <div class="overflow-x-auto">
                 <table
@@ -444,9 +444,7 @@ function handleSubmitEdit() {
                         >
                             Cancel
                         </Button>
-                        <Button type="submit">
-                            Save Changes
-                        </Button>
+                        <Button type="submit"> Save Changes </Button>
                     </SheetFooter>
                 </form>
             </SheetContent>
