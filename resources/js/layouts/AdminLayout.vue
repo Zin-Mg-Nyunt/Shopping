@@ -60,7 +60,11 @@ const navItems = [
     { title: 'Customers', href: route('admin.customers'), icon: Users },
     { title: 'Categories', href: route('admin.categories'), icon: FolderTree },
     { title: 'Coupons', href: route('admin.coupons'), icon: Tag },
-    { title: 'Settings', href: route('website.setting'), icon: Settings },
+    {
+        title: 'System Settings',
+        href: route('website.setting'),
+        icon: Settings,
+    },
 ];
 
 function isActive(href) {
