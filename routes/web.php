@@ -10,11 +10,16 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\StaffController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Settings\PasswordResetController;
 
 Route::get('/', [ProductController::class, 'home'])->name('home');
 Route::get('/products', [ProductController::class, 'index'])->name('products');
 Route::get('/products/{product:slug}', [ProductController::class, 'show'])->name('product.show');
 Route::post('/cart/add', AddToCartController::class)->name('cart.add');
+
+Route::get('/forgot-password', [PasswordResetController::class, 'create'])->name('password.request');
+Route::post('/forgot-password', [PasswordResetController::class, 'store'])->name('password.email');
+Route::get('change-email', [PasswordResetController::class, 'changeEmail'])->name('password.change-email');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('dashboard', DashboardController::class)->name('dashboard');

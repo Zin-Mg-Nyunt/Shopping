@@ -12,7 +12,6 @@ import { request } from '@/routes/password';
 import { Head, useForm } from '@inertiajs/vue3';
 
 defineProps({
-    status: String,
     canResetPassword: Boolean,
     canRegister: Boolean,
 });
@@ -41,13 +40,6 @@ defineOptions({
         description="Enter your email and password below to log in"
     >
         <Head title="Log in" />
-
-        <div
-            v-if="status"
-            class="mb-4 text-center text-sm font-medium text-green-600"
-        >
-            {{ status }}
-        </div>
 
         <form
             @submit.prevent="submit"
