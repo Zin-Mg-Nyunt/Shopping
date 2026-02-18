@@ -1,4 +1,5 @@
 <script setup>
+import InputError from '@/components/InputError.vue';
 import TextLink from '@/components/TextLink.vue';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -108,8 +109,8 @@ const form = useForm({
     otp: '',
 });
 const verifyCode = () => {
-    form.otp = digits.value.join('');
-    console.log(form.otp);
+    form.otp = Number(digits.value.join(''));
+    form.post(route('password.verify-otp'), { otp: form.otp });
 };
 </script>
 
@@ -187,6 +188,10 @@ const verifyCode = () => {
                         @paste="onDigitPaste"
                     />
                 </div>
+                <InputError
+                    :message="form.errors.otp"
+                    class="mt-2"
+                />
             </div>
 
             <div class="flex flex-col gap-4">

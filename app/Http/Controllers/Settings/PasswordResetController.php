@@ -42,7 +42,7 @@ class PasswordResetController extends Controller
             Mail::to($validated['email'])->queue(new OtpCodeMail($randomCode));
         });
         $expiredAt = now()->addMinutes(3)->timestamp;
-        return back()->with([
+        return redirect()->route('password.request')->with([
             'email' => $validated['email'],
             'expiredAt' => $expiredAt,
             'status' => 'OTP code sent to your email',

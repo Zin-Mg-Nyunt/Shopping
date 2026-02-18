@@ -41,9 +41,7 @@ onBeforeUnmount(() => {
     }
 });
 
-function onEmailSubmit() {
-    resetModalOpen.value = false;
-}
+const inputEmail = ref(page.props.auth?.user?.email);
 
 defineOptions({
     layout: null,
@@ -167,18 +165,25 @@ defineOptions({
                 </DialogHeader>
                 <Form
                     v-bind="email.form()"
+                    :transform="
+                        () => ({
+                            email: page.props.auth?.user?.email,
+                        })
+                    "
                     class="space-y-4"
                     v-slot="{ errors, processing }"
                 >
                     <div class="grid gap-2">
                         <Label for="reset-email">Email address</Label>
                         <Input
+                            v-model="inputEmail"
                             id="reset-email"
                             type="email"
                             name="email"
                             autocomplete="email"
                             placeholder="email@example.com"
                             class="border-input bg-background"
+                            readonly
                         />
                         <InputError :message="errors.email" />
                     </div>
@@ -199,7 +204,7 @@ defineOptions({
                                 v-if="processing"
                                 class="mr-2 size-4"
                             />
-                            Send reset link
+                            Send otp code
                         </Button>
                     </DialogFooter>
                 </Form>

@@ -5,7 +5,9 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CouponController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Settings\NewPasswordController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\OtpVerifyController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\StaffController;
@@ -20,6 +22,9 @@ Route::post('/cart/add', AddToCartController::class)->name('cart.add');
 Route::get('/forgot-password', [PasswordResetController::class, 'create'])->name('password.request');
 Route::post('/forgot-password', [PasswordResetController::class, 'store'])->name('password.email');
 Route::get('change-email', [PasswordResetController::class, 'changeEmail'])->name('password.change-email');
+Route::post('verify-otp', [OtpVerifyController::class, 'verifyOtp'])->name('password.verify-otp');
+Route::get('reset-password/{token}', [NewPasswordController::class, 'show'])->name('password.reset');
+Route::post('reset-password', [NewPasswordController::class, 'reset'])->name('password.update');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('dashboard', DashboardController::class)->name('dashboard');
