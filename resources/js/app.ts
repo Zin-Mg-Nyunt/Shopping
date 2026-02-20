@@ -37,7 +37,8 @@ createInertiaApp({
 
 router.on('success', (event) => {
     const cartCount = event.detail.page.props.cart_count;
-    if (cartCount != undefined) {
+    const oldCount = localStorage.getItem('cart_count');
+    if (cartCount != undefined && oldCount != cartCount) {
         localStorage.setItem('cart_count', String(cartCount));
         window.dispatchEvent(new Event('cart-count-updated'));
     }

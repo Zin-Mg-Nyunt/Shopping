@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/sheet';
 import { useAppearance } from '@/composables/useAppearance';
 import { useFilter } from '@/composables/useFilter';
-import { Link, usePage } from '@inertiajs/vue3';
+import { Link, router, usePage } from '@inertiajs/vue3';
 import {
     LayoutDashboard,
     LogIn,
@@ -256,6 +256,7 @@ const { search, filterBy } = useFilter();
                     <button
                         class="relative cursor-pointer rounded-lg p-2 transition-colors hover:text-primary"
                         aria-label="View shopping cart"
+                        @click="router.get(route('cart.show'))"
                     >
                         <span
                             class="inline-block transition-transform"

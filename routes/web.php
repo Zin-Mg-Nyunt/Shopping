@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AddToCartController;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CouponController;
 use App\Http\Controllers\CustomerController;
@@ -17,7 +18,6 @@ use App\Http\Controllers\Settings\PasswordResetController;
 Route::get('/', [ProductController::class, 'home'])->name('home');
 Route::get('/products', [ProductController::class, 'index'])->name('products');
 Route::get('/products/{product:slug}', [ProductController::class, 'show'])->name('product.show');
-Route::post('/cart/add', AddToCartController::class)->name('cart.add');
 
 Route::get('/forgot-password', [PasswordResetController::class, 'create'])->name('password.request');
 Route::post('/forgot-password', [PasswordResetController::class, 'store'])->name('password.email');
@@ -27,6 +27,12 @@ Route::get('reset-password/{token}', [NewPasswordController::class, 'show'])->na
 Route::post('reset-password', [NewPasswordController::class, 'reset'])->name('password.update');
 
 Route::middleware(['auth'])->group(function () {
+    Route::post('/cart/add', AddToCartController::class)->name('cart.add');
+    Route::get('/cart', [CartController::class, 'show'])->name('cart.show');
+    Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update');
+    Route::post('/cart/remove', [CartController::class, 'remove'])->name('cart.remove');
+    Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
+
     Route::get('dashboard', DashboardController::class)->name('dashboard');
     Route::get('user/dashboard', [DashboardController::class, 'user'])->name('user.dashboard');
     Route::get('user/orders', [OrderController::class, 'userOrders'])->name('user.orders');

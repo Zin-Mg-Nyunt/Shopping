@@ -48,8 +48,8 @@ const startCountdown = () => {
 };
 
 onMounted(() => {
-    const startTime = Math.floor(Date.now() / 1000);
-    const remainingTime = props.expiredAt - startTime;
+    const now = Math.floor(Date.now() / 1000);
+    const remainingTime = props.expiredAt - now;
     if (remainingTime > 0) {
         countdown.value = remainingTime;
         startCountdown();
