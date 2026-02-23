@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\AddToCartController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CouponController;
@@ -27,8 +26,8 @@ Route::get('reset-password/{token}', [NewPasswordController::class, 'show'])->na
 Route::post('reset-password', [NewPasswordController::class, 'reset'])->name('password.update');
 
 Route::middleware(['auth'])->group(function () {
-    Route::post('/cart/add', AddToCartController::class)->name('cart.add');
     Route::get('/cart', [CartController::class, 'show'])->name('cart.show');
+    Route::post('/cart/add', [CartController::class, 'addToCart'])->name('cart.add');
     Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update');
     Route::post('/cart/remove', [CartController::class, 'remove'])->name('cart.remove');
     Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');

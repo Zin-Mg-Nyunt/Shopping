@@ -2,7 +2,7 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, router } from '@inertiajs/vue3';
 import {
     Minus,
     Plus,
@@ -10,42 +10,18 @@ import {
     ShoppingCart,
     Trash2,
 } from 'lucide-vue-next';
-import { computed, ref } from 'vue';
+import { computed } from 'vue';
 
-// UI-only mock cart items
-const items = ref([
-    {
-        id: 1,
-        name: 'Wireless Earbuds Pro',
-        price: 79.99,
-        quantity: 1,
-        image_url: null,
-        slug: 'wireless-earbuds-pro',
-    },
-    {
-        id: 2,
-        name: 'USB-C Hub 7-in-1',
-        price: 72.99,
-        quantity: 1,
-        image_url: null,
-        slug: 'usb-c-hub',
-    },
-    {
-        id: 3,
-        name: 'Laptop Sleeve',
-        price: 45.0,
-        quantity: 1,
-        image_url: null,
-        slug: 'laptop-sleeve',
-    },
-]);
+const { items } = defineProps({
+    items: Array,
+});
 
-const isEmpty = computed(() => items.value.length === 0);
+const isEmpty = computed(() => items.length === 0);
 const totalItems = computed(() =>
-    items.value.reduce((sum, item) => sum + item.quantity, 0),
+    items.reduce((sum, item) => sum + item.quantity, 0),
 );
 const subtotal = computed(() =>
-    items.value.reduce((sum, item) => sum + item.price * item.quantity, 0),
+    items.reduce((sum, item) => sum + item.product.price * item.quantity, 0),
 );
 const shippingEstimate = computed(() => (subtotal.value >= 100 ? 0 : 9.99));
 const total = computed(() => subtotal.value + shippingEstimate.value);
@@ -56,26 +32,40 @@ function formatMoney(amount) {
 }
 
 function lineTotal(item) {
-    return item.price * item.quantity;
+    return item.product.price * item.quantity;
 }
 
-function updateQuantity(id, delta) {
-    const item = items.value.find((i) => i.id === id);
-    if (!item) return;
-    const next = item.quantity + delta;
-    if (next < 1) return;
-    item.quantity = next;
+function updateQuantity(item, delta) {
+    const quantity = Number(item.quantity) + delta;
+    if (quantity <= 0 || quantity > item.product.stock) return;
+    router.post(
+        route('cart.update'),
+        {
+            id: item.id,
+            quantity,
+        },
+        {
+            preserveScroll: true,
+            preserveState: true,
+        },
+    );
 }
 
-function setQuantity(id, value) {
-    const num = Number.parseInt(value, 10);
-    if (Number.isNaN(num) || num < 1) return;
-    const item = items.value.find((i) => i.id === id);
-    if (item) item.quantity = num;
+function setQuantity(item, quantity) {
+    updateQuantity(item, quantity - item.quantity);
 }
 
 function removeItem(id) {
-    items.value = items.value.filter((i) => i.id !== id);
+    router.post(
+        route('cart.remove'),
+        {
+            id,
+        },
+        {
+            preserveScroll: true,
+            preserveState: true,
+        },
+    );
 }
 </script>
 
@@ -119,9 +109,9 @@ function removeItem(id) {
                                         class="flex size-24 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-muted sm:size-28"
                                     >
                                         <img
-                                            v-if="item.image_url"
-                                            :src="item.image_url"
-                                            :alt="item.name"
+                                            v-if="item.product.thumbnail"
+                                            :src="item.product.thumbnail"
+                                            :alt="item.product.name"
                                             class="size-full object-cover"
                                         />
                                         <ShoppingBag
@@ -140,13 +130,15 @@ function removeItem(id) {
                                                 <h2
                                                     class="font-semibold text-foreground"
                                                 >
-                                                    {{ item.name }}
+                                                    {{ item.product.name }}
                                                 </h2>
                                                 <p
                                                     class="text-lg font-semibold text-foreground"
                                                 >
                                                     {{
-                                                        formatMoney(item.price)
+                                                        formatMoney(
+                                                            item.product.price,
+                                                        )
                                                     }}
                                                 </p>
                                             </div>
@@ -170,13 +162,15 @@ function removeItem(id) {
                                                     type="button"
                                                     variant="ghost"
                                                     size="icon"
-                                                    class="size-9 shrink-0 rounded-r-none text-foreground hover:bg-accent"
+                                                    :class="[
+                                                        'size-9 shrink-0 rounded-r-none text-foreground hover:bg-accent',
+                                                        item.quantity <= 1
+                                                            ? 'cursor-not-allowed opacity-50'
+                                                            : '',
+                                                    ]"
                                                     aria-label="Decrease quantity"
                                                     @click="
-                                                        updateQuantity(
-                                                            item.id,
-                                                            -1,
-                                                        )
+                                                        updateQuantity(item, -1)
                                                     "
                                                 >
                                                     <Minus
@@ -191,23 +185,23 @@ function removeItem(id) {
                                                     class="h-9 w-14 border-0 bg-transparent text-center text-sm [-moz-appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                                                     @update:model-value="
                                                         (v) =>
-                                                            setQuantity(
-                                                                item.id,
-                                                                v,
-                                                            )
+                                                            setQuantity(item, v)
                                                     "
                                                 />
                                                 <Button
                                                     type="button"
                                                     variant="ghost"
                                                     size="icon"
-                                                    class="size-9 shrink-0 rounded-l-none text-foreground hover:bg-accent"
+                                                    :class="[
+                                                        'size-9 shrink-0 rounded-l-none text-foreground hover:bg-accent',
+                                                        item.quantity >=
+                                                        item.product.stock
+                                                            ? 'cursor-not-allowed opacity-50'
+                                                            : '',
+                                                    ]"
                                                     aria-label="Increase quantity"
                                                     @click="
-                                                        updateQuantity(
-                                                            item.id,
-                                                            1,
-                                                        )
+                                                        updateQuantity(item, 1)
                                                     "
                                                 >
                                                     <Plus

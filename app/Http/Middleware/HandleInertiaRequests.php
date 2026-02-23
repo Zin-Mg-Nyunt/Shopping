@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -42,7 +43,9 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user(),
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
-            'cart_count' => collect(session('cart', []))->sum()
+            'cart_count' => Auth::check() ? 
+                            $request->user()->cartItems()->sum('quantity') : 
+                            collect(session('cart', []))->sum('quantity')
         ];
     }
 }

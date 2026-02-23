@@ -34,6 +34,7 @@ class OtpVerifyController extends Controller
         };
         $token = Str::random(60);
         $keyword = 'success_otp_verify';
+        DB::table('password_reset_tokens')->where('email', $email)->delete();
         return redirect()->route('password.reset', ['token' => $token])->with(['email' => $email, 'keyword' => $keyword]);
     }   
 }
