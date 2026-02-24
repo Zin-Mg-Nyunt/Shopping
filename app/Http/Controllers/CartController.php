@@ -30,15 +30,16 @@ class CartController extends Controller
     public function show(Request $request)
     {
         $items = $request->user()->cartItems()->with('product')->get();
-        return inertia('User/Cart/show', compact('items'));
+        $address = $request->user()->addressBooks()->where('is_default', true)->first();
+        return inertia('User/Cart/show', compact('items', 'address'));
     }
     public function update(Request $request)
     {
         $request->validate([
             'id' => 'required|integer|exists:cart_items,id',
-            'quantity' => 'required|integer',
+            'quantity' => 'required|integer|min:1',
         ]);
-        $item=CartItem::where('id', $request->id)->first();
+        $item=$request->user()->cartItems()->with('product')->find($request->id);
         if($request->quantity <= 0 || $request->quantity > $item->product->stock){
             return back();
         }
@@ -50,7 +51,7 @@ class CartController extends Controller
         $request->validate([
             'id' => 'required|integer|exists:cart_items,id',
         ]);
-        CartItem::where('id', $request->id)->delete();
+        $request->user()->cartItems()->find($request->id)->delete();
         return back();
     }
 }
