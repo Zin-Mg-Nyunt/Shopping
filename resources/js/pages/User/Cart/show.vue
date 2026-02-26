@@ -1,5 +1,6 @@
 <script setup>
 import InputError from '@/components/InputError.vue';
+import OrderConfirmationModal from '@/components/OrderConfirmationModal.vue';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -29,6 +30,7 @@ const PAYMENT_OPTIONS = [
     { id: 'cod', label: 'Cash on delivery', icon: Banknote },
 ];
 
+const orderConfirmOpen = ref(false);
 const selectedPayment = ref('kbz_pay');
 const { items, address } = defineProps({
     items: Array,
@@ -49,6 +51,7 @@ const form = useForm({
     state_or_region: address?.state_or_region ?? '',
     email: page.props.auth.user.email ?? '',
 });
+
 const saveAsDefaultAddress = () => {
     form.post(route('user.address.save-as-default'), {
         preserveScroll: true,
@@ -72,6 +75,55 @@ const subtotal = computed(() =>
 );
 const shippingEstimate = computed(() => (subtotal.value >= 100 ? 0 : 9.99));
 const total = computed(() => subtotal.value + shippingEstimate.value);
+
+const selectedPaymentLabel = computed(
+    () =>
+        PAYMENT_OPTIONS.find((o) => o.id === selectedPayment.value)?.label ??
+        '',
+);
+const addressForModal = computed(() => ({
+    contact_name: form.contact_name,
+    phone: form.phone,
+    street_address: form.street_address,
+    quarter_or_village: form.quarter_or_village,
+    township: form.township,
+    state_or_region: form.state_or_region,
+}));
+
+const orderForm = useForm({
+    address: addressForModal,
+    payment_method: selectedPayment,
+    items: items,
+});
+
+function checkout() {
+    if (
+        !form.phone ||
+        !form.street_address ||
+        !form.quarter_or_village ||
+        !form.state_or_region ||
+        !form.email
+    ) {
+        toast.error('Please fill in all the required fields');
+        return;
+    }
+    orderConfirmOpen.value = true;
+}
+
+function confirmOrder() {
+    orderForm.post(route('user.orders.store'), {
+        preserveScroll: true,
+        preserveState: true,
+        onSuccess: () => {
+            if (page.props.flash.error) toast.error(page.props.flash.error);
+            else toast.success(page.props.flash.success);
+            orderConfirmOpen.value = false;
+        },
+        onError: () => {
+            toast.error('Failed to create order');
+        },
+    });
+}
 
 function formatMoney(amount) {
     if (amount == null) return '—';
@@ -99,6 +151,10 @@ function updateQuantity(item, delta) {
 }
 
 function setQuantity(item, quantity) {
+    if (quantity > item.product.stock) {
+        quantity = item.product.stock;
+    }
+    item.quantity = quantity;
     updateQuantity(item, quantity - item.quantity);
 }
 
@@ -228,6 +284,7 @@ function removeItem(id) {
                                                 <Input
                                                     type="number"
                                                     min="1"
+                                                    :max="item.product.stock"
                                                     :model-value="item.quantity"
                                                     class="h-9 w-14 border-0 bg-transparent text-center text-sm [-moz-appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                                                     @update:model-value="
@@ -347,7 +404,11 @@ function removeItem(id) {
                                                 />
                                             </div>
                                             <div class="grid gap-2">
-                                                <Label for="phone">Phone</Label>
+                                                <Label
+                                                    for="phone"
+                                                    required
+                                                    >Phone</Label
+                                                >
                                                 <Input
                                                     id="phone"
                                                     v-model="form.phone"
@@ -362,7 +423,11 @@ function removeItem(id) {
                                                 />
                                             </div>
                                             <div class="grid gap-2">
-                                                <Label for="email">Email</Label>
+                                                <Label
+                                                    for="email"
+                                                    required
+                                                    >Email</Label
+                                                >
                                                 <Input
                                                     id="email"
                                                     v-model="form.email"
@@ -390,7 +455,9 @@ function removeItem(id) {
                                         </p>
                                         <div class="grid gap-4">
                                             <div class="grid gap-2">
-                                                <Label for="street_address"
+                                                <Label
+                                                    for="street_address"
+                                                    required
                                                     >Street address</Label
                                                 >
                                                 <Input
@@ -417,6 +484,7 @@ function removeItem(id) {
                                                 <div class="grid gap-2">
                                                     <Label
                                                         for="quarter_or_village"
+                                                        required
                                                         >Quarter/Village</Label
                                                     >
                                                     <Input
@@ -457,7 +525,9 @@ function removeItem(id) {
                                                     />
                                                 </div>
                                                 <div class="grid gap-2">
-                                                    <Label for="state_or_region"
+                                                    <Label
+                                                        for="state_or_region"
+                                                        required
                                                         >State / Region</Label
                                                     >
                                                     <Input
@@ -568,9 +638,9 @@ function removeItem(id) {
                                 </div>
                                 <Button
                                     class="w-full bg-primary text-primary-foreground hover:bg-primary/90"
-                                    as-child
+                                    @click="checkout"
                                 >
-                                    <Link href="#">Proceed to Checkout</Link>
+                                    Proceed to Checkout
                                 </Button>
                                 <Button
                                     variant="outline"
@@ -585,6 +655,17 @@ function removeItem(id) {
                         </Card>
                     </div>
                 </div>
+
+                <OrderConfirmationModal
+                    v-model:open="orderConfirmOpen"
+                    :items="items"
+                    :address="addressForModal"
+                    :payment-method-label="selectedPaymentLabel"
+                    :subtotal="subtotal"
+                    :delivery-fee="shippingEstimate"
+                    :total="total"
+                    @confirm="confirmOrder"
+                />
             </template>
 
             <!-- Empty state -->

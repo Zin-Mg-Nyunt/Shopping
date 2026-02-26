@@ -62,4 +62,7 @@ class User extends Authenticatable
     public function addressBooks(){
         return $this->hasMany(AddressBook::class);
     }
+    public function orders(){
+        return $this->hasMany(Order::class);
+    }
 }

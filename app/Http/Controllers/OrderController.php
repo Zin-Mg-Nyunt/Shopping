@@ -2,7 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Order;
+use App\Models\OrderItem;
+use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
@@ -222,5 +226,58 @@ class OrderController extends Controller
         return Inertia::render('User/OrderDetail', [
             'order' => $order,
         ]);
+    }
+
+    public function store(Request $request){
+        $request->validate([
+            'address' => 'required|array',
+            'payment_method' => 'required|string',
+            'items' => 'required|array',
+        ]);
+        
+        $totalItems = collect($request->items)->sum('quantity');
+        $orderNumber = (new Order)->generateOrderNumber();
+
+        try{
+            DB::transaction(function() use ($request, $totalItems, $orderNumber) {
+                $order = Order::create([
+                    'user_id' => $request->user()->id,
+                    'total_amount' => 0,
+                    'total_items' => $totalItems,
+                    'address' => $request->address,
+                    'payment_method' => $request->payment_method,
+                    'order_number' => $orderNumber,
+                ]);
+
+                $totalAmount = 0;
+                $shippingFee = 0;
+
+                foreach ($request->items as $item) {
+                    $quantity = $item['quantity'];
+                    $product = Product::find($item['product_id']);
+
+                    if($product->stock == 0) throw new \Exception('Product '.$product->name.' is out of stock');
+                    if($product->stock < $quantity) throw new \Exception('Product '.$product->name.' stock is not enough');
+
+                    OrderItem::create([
+                        'order_id' => $order->id,
+                        'product_name' => $product->name,
+                        'product_price' => $product->price,
+                        'quantity' => $quantity,
+                    ]);
+
+                    $product->decrement('stock', $quantity);
+                    $totalAmount += $product->price * $quantity;
+                }
+
+                $shippingFee = $totalAmount <= 100 ? 9.99 : 0;
+                $order->update([
+                    'total_amount' => $totalAmount + $shippingFee,
+                ]);
+                return redirect()->back()->with('success', 'Order created successfully');
+            });
+        }catch(\Exception $e){
+            return redirect()->back()->with('error', $e->getMessage());
+        }
     }
 }
