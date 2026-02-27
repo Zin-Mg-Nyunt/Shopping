@@ -1,12 +1,21 @@
 <script setup>
+import Pagination from '@/components/main/Pagination.vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { useFilter } from '@/composables/useFilter';
 import UserLayout from '@/layouts/UserLayout.vue';
-import { Head, Link } from '@inertiajs/vue3';
-import { route } from 'ziggy-js';
-import { Filter, Package, Search } from 'lucide-vue-next';
-import { computed, ref } from 'vue';
+import { Head, Link, usePage } from '@inertiajs/vue3';
+import { Package, Search } from 'lucide-vue-next';
+import { onMounted } from 'vue';
+import { toast } from 'vue-sonner';
+
+const page = usePage();
+onMounted(() => {
+    if (page.props.flash.success) {
+        toast.success(page.props.flash.success);
+    }
+});
 
 defineOptions({
     name: 'UserOrders',
@@ -14,28 +23,19 @@ defineOptions({
 });
 
 const props = defineProps({
-    orders: { type: Array, default: () => [] },
+    orders: { type: Object, default: () => {} },
+    filter: { type: Object, default: () => {} },
 });
 
 const tabs = [
-    { key: 'all', label: 'All' },
-    { key: 'processing', label: 'Processing' },
+    { key: null, label: 'All' },
+    { key: 'pending', label: 'Processing' },
     { key: 'shipped', label: 'Shipped' },
     { key: 'delivered', label: 'Delivered' },
     { key: 'cancelled', label: 'Cancelled' },
 ];
 
-const activeTab = ref('all');
-
-const filteredOrders = computed(() => {
-    const list = Array.isArray(props.orders) ? props.orders : [];
-    if (activeTab.value === 'all') return list;
-    return list.filter(
-        (o) => (o.status || '').toLowerCase() === activeTab.value,
-    );
-});
-
-const maxThumbnails = 4;
+const maxThumbnails = 5;
 
 function formatDate(dateStr) {
     if (!dateStr) return '—';
@@ -52,37 +52,39 @@ function formatMoney(amount) {
 }
 
 function statusBadgeClass(status) {
-    const s = (status || '').toLowerCase();
-    if (s === 'delivered') {
+    if (status === 'delivered') {
         return 'border-transparent bg-emerald-500/15 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400';
     }
-    if (s === 'shipped') {
+    if (status === 'shipped') {
         return 'border-transparent bg-amber-500/15 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400';
     }
-    if (s === 'processing' || s === 'ordered' || s === 'pending') {
+    if (
+        status === 'processing' ||
+        status === 'ordered' ||
+        status === 'pending'
+    ) {
         return 'border-transparent bg-primary/15 text-primary';
     }
-    if (s === 'cancelled') {
+    if (status === 'cancelled') {
         return 'border-transparent bg-destructive/15 text-destructive';
     }
     return '';
 }
 
 function statusLabel(status) {
-    const s = (status || '').toLowerCase();
-    if (s === 'ordered' || s === 'pending') return 'Processing';
-    return (s && s.charAt(0).toUpperCase() + s.slice(1)) || '—';
+    if (status === 'ordered' || status === 'pending') return 'Processing';
+    return (status && status.charAt(0).toUpperCase() + status.slice(1)) || '—';
 }
 
 function canTrack(status) {
-    const s = (status || '').toLowerCase();
-    return s === 'shipped' || s === 'processing' || s === 'ordered' || s === 'pending';
+    return status === 'pending' || status === 'shipped';
 }
 
 function canReorder(status) {
-    const s = (status || '').toLowerCase();
-    return s === 'delivered';
+    return status === 'delivered';
 }
+
+const { filterBy } = useFilter();
 </script>
 
 <template>
@@ -91,19 +93,15 @@ function canReorder(status) {
         <!-- Top Section: Title + Tabs -->
         <header>
             <h1
-                class="mb-4 font-serif text-2xl font-bold tracking-tight text-foreground sm:text-3xl"
+                class="mb-4 text-2xl font-bold tracking-tight text-foreground sm:text-3xl"
             >
                 My Orders
             </h1>
             <div
                 class="flex flex-wrap items-center gap-2 border-b border-border pb-2"
             >
-                <Filter
-                    class="size-4 shrink-0 text-muted-foreground sm:mr-1"
-                    aria-hidden="true"
-                />
                 <nav
-                    class="flex flex-wrap gap-1 overflow-x-auto pb-0.5"
+                    class="flex w-full flex-wrap items-center gap-1 overflow-x-auto pb-0.5"
                     aria-label="Filter orders by status"
                 >
                     <button
@@ -112,22 +110,28 @@ function canReorder(status) {
                         type="button"
                         class="rounded-lg px-3 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none"
                         :class="
-                            activeTab === tab.key
+                            filter.status === tab.key
                                 ? 'bg-primary text-primary-foreground'
                                 : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                         "
-                        @click="activeTab = tab.key"
+                        @click="filterBy('orders', 'status', tab.key)"
                     >
                         {{ tab.label }}
                     </button>
+                    <span class="ml-auto py-2 text-sm text-muted-foreground">
+                        {{ orders.total }} orders
+                    </span>
                 </nav>
             </div>
         </header>
 
         <!-- Orders List: Card-based -->
-        <div v-if="filteredOrders.length > 0" class="space-y-4">
+        <div
+            v-if="orders.data.length > 0"
+            class="space-y-4"
+        >
             <Card
-                v-for="order in filteredOrders"
+                v-for="order in orders.data"
                 :key="order.id"
                 class="overflow-hidden border-border bg-card shadow-sm transition-shadow hover:shadow-md"
             >
@@ -137,9 +141,7 @@ function canReorder(status) {
                         class="mb-4 flex flex-wrap items-center justify-between gap-2 border-b border-border pb-4"
                     >
                         <div class="min-w-0">
-                            <span
-                                class="font-semibold text-foreground"
-                            >
+                            <span class="font-semibold text-foreground">
                                 #{{ order.order_number }}
                             </span>
                             <span
@@ -148,9 +150,7 @@ function canReorder(status) {
                                 {{ formatDate(order.created_at) }}
                             </span>
                         </div>
-                        <Badge
-                            :class="statusBadgeClass(order.status)"
-                        >
+                        <Badge :class="statusBadgeClass(order.status)">
                             {{ statusLabel(order.status) }}
                         </Badge>
                     </div>
@@ -159,15 +159,15 @@ function canReorder(status) {
                     <div class="mb-4 overflow-x-auto">
                         <div class="flex gap-2">
                             <template
-                                v-for="(item, idx) in (order.items || []).slice(0, maxThumbnails)"
-                                :key="idx"
+                                v-for="item in order.order_items"
+                                :key="item.id"
                             >
                                 <div
                                     class="size-14 shrink-0 overflow-hidden rounded-lg bg-muted sm:size-16"
                                 >
                                     <img
-                                        v-if="item.image_url"
-                                        :src="item.image_url"
+                                        v-if="item.thumbnail"
+                                        :src="item.thumbnail"
                                         :alt="item.name"
                                         class="size-full object-cover"
                                     />
@@ -183,10 +183,11 @@ function canReorder(status) {
                                 </div>
                             </template>
                             <div
-                                v-if="(order.items || []).length > maxThumbnails"
+                                v-if="order.order_items.length > maxThumbnails"
                                 class="flex size-14 shrink-0 items-center justify-center rounded-lg bg-muted text-xs font-medium text-muted-foreground sm:size-16"
                             >
-                                +{{ (order.items || []).length - maxThumbnails }} more
+                                +{{ order.order_items.length - maxThumbnails }}
+                                more
                             </div>
                         </div>
                     </div>
@@ -196,10 +197,12 @@ function canReorder(status) {
                         class="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4"
                     >
                         <p class="text-lg font-semibold text-foreground">
-                            {{ formatMoney(order.total) }}
-                            <span class="text-sm font-normal text-muted-foreground">
-                                total
+                            <span
+                                class="text-sm font-normal text-muted-foreground"
+                            >
+                                total -
                             </span>
+                            {{ formatMoney(order.total_amount) }}
                         </p>
                         <div class="flex flex-wrap gap-2">
                             <Button
@@ -208,7 +211,14 @@ function canReorder(status) {
                                 class="border-border"
                                 as-child
                             >
-                                <Link :href="route('user.orders.show', order.id)">
+                                <Link
+                                    :href="
+                                        route(
+                                            'user.orders.show',
+                                            order.order_number,
+                                        )
+                                    "
+                                >
                                     View Detail
                                 </Link>
                             </Button>
@@ -218,7 +228,14 @@ function canReorder(status) {
                                 class="bg-primary text-primary-foreground hover:bg-primary/90"
                                 as-child
                             >
-                                <Link :href="route('user.orders.show', order.id)">
+                                <Link
+                                    :href="
+                                        route(
+                                            'user.orders.show',
+                                            order.order_number,
+                                        )
+                                    "
+                                >
                                     Track
                                 </Link>
                             </Button>
@@ -228,9 +245,7 @@ function canReorder(status) {
                                 class="bg-primary text-primary-foreground hover:bg-primary/90"
                                 as-child
                             >
-                                <Link :href="route('products')">
-                                    Reorder
-                                </Link>
+                                <Link :href="route('products')"> Reorder </Link>
                             </Button>
                         </div>
                     </div>
@@ -247,14 +262,21 @@ function canReorder(status) {
                 <div
                     class="flex size-16 items-center justify-center rounded-full bg-muted text-muted-foreground sm:size-20"
                 >
-                    <Search class="size-8 sm:size-10" aria-hidden="true" />
+                    <Search
+                        class="size-8 sm:size-10"
+                        aria-hidden="true"
+                    />
                 </div>
                 <div class="space-y-1">
                     <h2 class="font-semibold text-foreground">
                         No orders found
                     </h2>
                     <p class="text-sm text-muted-foreground">
-                        {{ activeTab === 'all' ? "You haven't placed any orders yet." : `No orders with status "${tabs.find((t) => t.key === activeTab)?.label}".` }}
+                        {{
+                            filter.status === ''
+                                ? "You haven't placed any orders yet."
+                                : `No orders with status "${tabs.find((t) => t.key === filter.status)?.label}".`
+                        }}
                     </p>
                 </div>
                 <Button
@@ -263,11 +285,10 @@ function canReorder(status) {
                     class="bg-primary text-primary-foreground hover:bg-primary/90"
                     as-child
                 >
-                    <Link :href="route('products')">
-                        Browse Products
-                    </Link>
+                    <Link :href="route('products')"> Browse Products </Link>
                 </Button>
             </CardContent>
         </Card>
+        <Pagination :meta="orders" />
     </div>
 </template>

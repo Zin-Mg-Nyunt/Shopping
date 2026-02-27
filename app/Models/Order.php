@@ -34,4 +34,10 @@ class Order extends Model
 
         return $orderNumber;
     }
+
+    public function scopeFilter($query,$filter){
+        return $query->when($filter['status']??false,function($query,$status){
+            $query->where('status',$status);
+        });
+    }
 }

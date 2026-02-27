@@ -25,6 +25,7 @@ import {
     Sun,
 } from 'lucide-vue-next';
 import { computed } from 'vue';
+import { Toaster } from 'vue-sonner';
 
 defineOptions({ name: 'UserLayout' });
 
@@ -63,6 +64,11 @@ function isActive(href) {
 
 <template>
     <div class="min-h-screen bg-background text-foreground">
+        <Toaster
+            position="top-right"
+            :expand="true"
+            richColors
+        />
         <!-- Top navigation: dark (background) -->
         <header
             class="sticky top-0 z-30 flex h-16 items-center gap-4 border-b border-border bg-background px-4 sm:px-6"

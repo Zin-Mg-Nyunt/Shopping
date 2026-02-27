@@ -116,8 +116,6 @@ function confirmOrder() {
         preserveState: true,
         onSuccess: () => {
             if (page.props.flash.error) toast.error(page.props.flash.error);
-            else toast.success(page.props.flash.success);
-            orderConfirmOpen.value = false;
         },
         onError: () => {
             toast.error('Failed to create order');

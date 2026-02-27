@@ -36,7 +36,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('user/dashboard', [DashboardController::class, 'user'])->name('user.dashboard');
     Route::get('user/orders', [OrderController::class, 'userOrders'])->name('user.orders');
     Route::post('user/orders/store', [OrderController::class, 'store'])->name('user.orders.store');
-    Route::get('user/orders/{id}', [OrderController::class, 'userOrderDetail'])->name('user.orders.show');
+    Route::get('user/orders/{order:order_number}', [OrderController::class, 'userOrderDetail'])->name('user.orders.show');
     Route::get('user/wishlist', [ProductController::class, 'userWishlist'])->name('user.wishlist');
     Route::get('user/address/book', [CustomerController::class, 'userAddressBook'])->name('user.address.book');
     Route::post('user/address/save-as-default', [CustomerController::class, 'saveAsDefaultAddress'])->name('user.address.save-as-default');

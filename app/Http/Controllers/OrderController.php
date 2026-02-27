@@ -144,91 +144,29 @@ class OrderController extends Controller
         ]);
     }
 
-    /**
-     * User orders list page. Pass orders for card layout; filter by status on frontend or via query.
-     */
     public function userOrders(Request $request): Response
     {
-        $orders = $this->userOrdersList();
-
+        $filter = ['status' => $request->status];
+        $orders = $request->user()->orders()
+                ->with('orderItems')
+                ->filter($filter)
+                ->latest()
+                ->paginate(3)
+                ->withQueryString();
         return Inertia::render('User/Orders', [
             'orders' => $orders,
+            'filter' => $filter,
         ]);
     }
 
-    /**
-     * Orders list for user UI. Each: id, order_number, created_at, status, total, items (name, image_url).
-     *
-     * @return array<int, array<string, mixed>>
-     */
-    private function userOrdersList(): array
+    public function userOrderDetail(Request $request, Order $order): Response|HttpResponse
     {
-        $base = now();
-
-        return [
-            [
-                'id' => 1,
-                'order_number' => 'ORD-7721',
-                'created_at' => $base->copy()->subDays(2)->format('Y-m-d\TH:i:s.v\Z'),
-                'status' => 'shipped',
-                'total' => 268.62,
-                'items' => [
-                    ['name' => 'Wireless Earbuds Pro', 'image_url' => null],
-                    ['name' => 'Phone Stand', 'image_url' => null],
-                    ['name' => 'USB-C Hub 7-in-1', 'image_url' => null],
-                ],
-            ],
-            [
-                'id' => 2,
-                'order_number' => 'ORD-7722',
-                'created_at' => $base->copy()->subDays(5)->format('Y-m-d\TH:i:s.v\Z'),
-                'status' => 'delivered',
-                'total' => 239.76,
-                'items' => [
-                    ['name' => 'Laptop Sleeve', 'image_url' => null],
-                    ['name' => 'Monitor Arm', 'image_url' => null],
-                ],
-            ],
-            [
-                'id' => 3,
-                'order_number' => 'ORD-7723',
-                'created_at' => $base->copy()->subDay()->format('Y-m-d\TH:i:s.v\Z'),
-                'status' => 'processing',
-                'total' => 49.65,
-                'items' => [
-                    ['name' => 'Screen Cleaner Kit', 'image_url' => null],
-                ],
-            ],
-            [
-                'id' => 4,
-                'order_number' => 'ORD-7724',
-                'created_at' => $base->copy()->subDays(10)->format('Y-m-d\TH:i:s.v\Z'),
-                'status' => 'cancelled',
-                'total' => 89.50,
-                'items' => [
-                    ['name' => 'USB-C Hub', 'image_url' => null],
-                ],
-            ],
-        ];
+        $order = $order->load('orderItems');
+        return Inertia::render('User/OrderDetail', compact('order'));
     }
 
-    /**
-     * User order detail page. UI demo with sample orders; replace with Order::findOrFail($id) when ready.
-     */
-    public function userOrderDetail(Request $request, int $id): Response|HttpResponse
+    public function store(Request $request)
     {
-        $samples = $this->userOrdersList();
-        $order = collect($samples)->firstWhere('id', $id);
-        if (! $order) {
-            abort(404);
-        }
-
-        return Inertia::render('User/OrderDetail', [
-            'order' => $order,
-        ]);
-    }
-
-    public function store(Request $request){
         $request->validate([
             'address' => 'required|array',
             'payment_method' => 'required|string',
@@ -261,6 +199,7 @@ class OrderController extends Controller
 
                     OrderItem::create([
                         'order_id' => $order->id,
+                        'thumbnail' => $product->thumbnail,
                         'product_name' => $product->name,
                         'product_price' => $product->price,
                         'quantity' => $quantity,
@@ -274,8 +213,10 @@ class OrderController extends Controller
                 $order->update([
                     'total_amount' => $totalAmount + $shippingFee,
                 ]);
-                return redirect()->back()->with('success', 'Order created successfully');
+
+                $request->user()->cartItems()->delete();
             });
+            return redirect()->route('user.orders')->with('success', 'Order created successfully');
         }catch(\Exception $e){
             return redirect()->back()->with('error', $e->getMessage());
         }
