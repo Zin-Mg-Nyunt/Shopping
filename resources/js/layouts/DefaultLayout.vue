@@ -1,4 +1,5 @@
-<script setup lang="ts">
+<script setup>
+import { Link } from '@inertiajs/vue3';
 import AppLogo from '@/components/AppLogo.vue';
 </script>
 <template>
@@ -7,9 +8,9 @@ import AppLogo from '@/components/AppLogo.vue';
             <div
                 class="mx-auto flex w-full max-w-7xl items-center gap-4 px-6 py-4 lg:px-8"
             >
-                <a :href="route('home')">
+                <Link :href="route('home')">
                     <AppLogo />
-                </a>
+                </Link>
 
                 <div class="flex-1">
                     <label for="search" class="sr-only">Search products</label>
@@ -56,21 +57,61 @@ import AppLogo from '@/components/AppLogo.vue';
                             />
                         </svg>
                     </button>
-                    <button
-                        class="rounded-full border border-gray-200 bg-white p-2 text-gray-600 transition hover:border-primary/40 hover:text-primary"
-                    >
-                        <span class="sr-only">Account</span>
-                        <svg
-                            class="h-5 w-5"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="1.8"
+                    <details class="relative">
+                        <summary
+                            class="list-none rounded-full border border-gray-200 bg-white p-2 text-gray-600 transition hover:border-primary/40 hover:text-primary [&::-webkit-details-marker]:hidden"
                         >
-                            <circle cx="12" cy="8" r="4" />
-                            <path d="M4 20c1.5-3.5 4.5-5 8-5s6.5 1.5 8 5" />
-                        </svg>
-                    </button>
+                            <span class="sr-only">Account menu</span>
+                            <svg
+                                class="h-5 w-5"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.8"
+                            >
+                                <circle cx="12" cy="8" r="4" />
+                                <path d="M4 20c1.5-3.5 4.5-5 8-5s6.5 1.5 8 5" />
+                            </svg>
+                        </summary>
+
+                        <div
+                            class="absolute right-0 z-20 mt-2 w-48 rounded-xl border border-gray-200 bg-white p-2 shadow-lg"
+                        >
+                            <template v-if="$page.props.auth?.user">
+                                <p
+                                    class="px-3 py-2 text-xs font-medium text-gray-500"
+                                >
+                                    {{ $page.props.auth.user.name }}
+                                </p>
+                                <Link
+                                    :href="route('dashboard')"
+                                    class="block rounded-lg px-3 py-2 text-sm text-gray-700 transition hover:bg-gray-100 hover:text-primary"
+                                >
+                                    Dashboard
+                                </Link>
+                                <Link
+                                    :href="route('profile.edit')"
+                                    class="block rounded-lg px-3 py-2 text-sm text-gray-700 transition hover:bg-gray-100 hover:text-primary"
+                                >
+                                    Profile
+                                </Link>
+                            </template>
+                            <template v-else>
+                                <Link
+                                    :href="route('login')"
+                                    class="block rounded-lg px-3 py-2 text-sm text-gray-700 transition hover:bg-gray-100 hover:text-primary"
+                                >
+                                    Log In
+                                </Link>
+                                <Link
+                                    :href="route('register')"
+                                    class="block rounded-lg px-3 py-2 text-sm text-gray-700 transition hover:bg-gray-100 hover:text-primary"
+                                >
+                                    Register
+                                </Link>
+                            </template>
+                        </div>
+                    </details>
                 </nav>
             </div>
         </header>
@@ -86,9 +127,7 @@ import AppLogo from '@/components/AppLogo.vue';
                     <a href="#" class="transition hover:text-primary"
                         >Privacy</a
                     >
-                    <a href="#" class="transition hover:text-primary"
-                        >Terms</a
-                    >
+                    <a href="#" class="transition hover:text-primary">Terms</a>
                     <a href="#" class="transition hover:text-primary"
                         >Support</a
                     >

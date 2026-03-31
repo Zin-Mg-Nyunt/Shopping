@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import { Form, Head, Link, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
@@ -8,25 +8,16 @@ import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { edit } from '@/routes/profile';
 import { send } from '@/routes/verification';
+import UserDashboardLayout from '@/layouts/UserDashboardLayout.vue';
 
-type Props = {
-    mustVerifyEmail: boolean;
-    status?: string;
-};
-
-defineProps<Props>();
+const { mustVerifyEmail, status } = defineProps({
+    mustVerifyEmail: Boolean,
+    status: String,
+});
 
 defineOptions({
-    layout: {
-        breadcrumbs: [
-            {
-                title: 'Profile settings',
-                href: edit(),
-            },
-        ],
-    },
+    layout: UserDashboardLayout,
 });
 
 const page = usePage();
