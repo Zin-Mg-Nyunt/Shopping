@@ -1,26 +1,23 @@
 import { createInertiaApp } from '@inertiajs/vue3';
 import { initializeTheme } from '@/composables/useAppearance';
-import AppLayout from '@/layouts/AppLayout.vue';
-import AuthLayout from '@/layouts/AuthLayout.vue';
-import SettingsLayout from '@/layouts/settings/Layout.vue';
+import DefaultLayout from '@/layouts/DefaultLayout.vue';
 import { ZiggyVue } from 'ziggy-js';
 import { Ziggy } from './ziggy';
+import { createApp, DefineComponent, h } from 'vue';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
-    layout: (name) => {
-        switch (true) {
-            case name === 'Welcome':
-                return null;
-            case name.startsWith('auth/'):
-                return AuthLayout;
-            case name.startsWith('settings/'):
-                return [AppLayout, SettingsLayout];
-            default:
-                return AppLayout;
-        }
+    resolve: (name) => {
+        const pages = import.meta.glob<DefineComponent>('./pages/**/*.vue');
+        let page = pages[`./pages/${name}.vue`]();
+        return page.then((module) => {
+            if (module.default.layout === undefined) {
+                module.default.layout = DefaultLayout;
+            }
+            return module;
+        });
     },
     progress: {
         color: '#4B5563',
@@ -30,7 +27,7 @@ createInertiaApp({
             render: () => h(App, props),
         })
             .use(plugin)
-            .use(ZiggyVue, Ziggy) // <- ဒါရေး
+            .use(ZiggyVue, Ziggy)
             .mount(el);
     },
 });
