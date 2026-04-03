@@ -1,6 +1,13 @@
 <script setup>
 import { Head, Link } from '@inertiajs/vue3';
-import { Minus, Plus, ShoppingBag, Trash2 } from 'lucide-vue-next';
+import {
+    MapPin,
+    Minus,
+    Phone,
+    Plus,
+    ShoppingBag,
+    Trash2,
+} from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 import { route } from 'ziggy-js';
 
@@ -96,12 +103,110 @@ function applyPromo() {
 function lineSubtotal(line) {
     return line.unit_price * line.quantity;
 }
+
+/** Shipping address — demo data; replace with API props later */
+const savedAddresses = ref([
+    {
+        id: 1,
+        fullName: 'Alex Morgan',
+        phone: '+1 (415) 555-0142',
+        street: '123 Market Street, Suite 400',
+        city: 'San Francisco, CA',
+        postalCode: '94102',
+        isDefault: true,
+    },
+    {
+        id: 2,
+        fullName: 'Alex Morgan',
+        phone: '+1 (510) 555-0198',
+        street: '88 Oak Avenue',
+        city: 'Oakland, CA',
+        postalCode: '94607',
+        isDefault: false,
+    },
+]);
+
+let nextAddressId = 3;
+
+const selectedAddressId = ref(
+    savedAddresses.value.find((a) => a.isDefault)?.id ??
+        savedAddresses.value[0]?.id ??
+        null,
+);
+
+/** 'compact' = selected card only | 'list' = pick saved | 'form' = new address */
+const addressUi = ref('compact');
+
+const newAddress = ref({
+    fullName: '',
+    phone: '',
+    street: '',
+    city: '',
+    postalCode: '',
+});
+
+const selectedAddress = computed(() =>
+    savedAddresses.value.find((a) => a.id === selectedAddressId.value),
+);
+
+function openAddressPicker() {
+    addressUi.value = 'list';
+}
+
+function closeAddressPicker() {
+    addressUi.value = 'compact';
+}
+
+function openNewAddressForm() {
+    newAddress.value = {
+        fullName: '',
+        phone: '',
+        street: '',
+        city: '',
+        postalCode: '',
+    };
+    addressUi.value = 'form';
+}
+
+function backFromFormToList() {
+    addressUi.value = 'list';
+}
+
+function selectAddressAndClose(id) {
+    selectedAddressId.value = id;
+    addressUi.value = 'compact';
+}
+
+function saveNewAddress() {
+    const n = newAddress.value;
+
+    if (!n.fullName.trim() || !n.street.trim() || !n.city.trim()) {
+        return;
+    }
+
+    const id = nextAddressId++;
+    savedAddresses.value.push({
+        id,
+        fullName: n.fullName.trim(),
+        phone: n.phone.trim() || '—',
+        street: n.street.trim(),
+        city: n.city.trim(),
+        postalCode: n.postalCode.trim() || '—',
+        isDefault: false,
+    });
+    selectedAddressId.value = id;
+    addressUi.value = 'compact';
+}
+
+function selectAddressId(id) {
+    selectedAddressId.value = id;
+}
 </script>
 
 <template>
     <Head title="Shopping Cart" />
 
-    <main class="">
+    <main class="bg-background">
         <div class="mx-auto w-full max-w-7xl px-6 py-10 lg:px-8">
             <!-- Empty state -->
             <div
@@ -307,6 +412,336 @@ function lineSubtotal(line) {
                                 </p>
                             </div>
                         </article>
+
+                        <!-- Shipping address -->
+                        <section
+                            class="overflow-hidden rounded-2xl border border-border bg-card shadow-sm"
+                            aria-labelledby="shipping-heading"
+                        >
+                            <div
+                                class="flex items-start justify-between gap-4 border-b border-border px-5 py-4"
+                            >
+                                <div class="flex items-center gap-2.5">
+                                    <span
+                                        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary"
+                                    >
+                                        <MapPin
+                                            class="h-5 w-5"
+                                            stroke-width="2"
+                                            aria-hidden="true"
+                                        />
+                                    </span>
+                                    <div>
+                                        <h2
+                                            id="shipping-heading"
+                                            class="text-base font-semibold text-foreground"
+                                        >
+                                            Shipping address
+                                        </h2>
+                                        <p
+                                            class="text-xs text-muted-foreground"
+                                        >
+                                            Where should we deliver your order?
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="p-5">
+                                <Transition
+                                    mode="out-in"
+                                    enter-active-class="transition duration-300 ease-out"
+                                    enter-from-class="opacity-0 translate-y-1"
+                                    enter-to-class="opacity-100 translate-y-0"
+                                    leave-active-class="transition duration-200 ease-in"
+                                    leave-from-class="opacity-100"
+                                    leave-to-class="opacity-0"
+                                >
+                                    <!-- Default / compact: selected card -->
+                                    <div
+                                        v-if="addressUi === 'compact'"
+                                        key="compact"
+                                        class="space-y-4"
+                                    >
+                                        <div
+                                            v-if="selectedAddress"
+                                            class="relative rounded-xl border-2 border-primary bg-primary/3 p-4 dark:bg-primary/5"
+                                        >
+                                            <div
+                                                class="absolute top-3 right-3 flex items-center gap-2"
+                                            >
+                                                <span
+                                                    v-if="
+                                                        selectedAddress.isDefault
+                                                    "
+                                                    class="rounded-full bg-primary/15 px-2.5 py-0.5 text-[10px] font-bold tracking-wide text-primary uppercase"
+                                                >
+                                                    Default
+                                                </span>
+                                            </div>
+                                            <ul
+                                                class="space-y-1 pr-16 text-sm text-foreground"
+                                            >
+                                                <li class="font-semibold">
+                                                    {{
+                                                        selectedAddress.fullName
+                                                    }}
+                                                </li>
+                                                <li
+                                                    class="flex items-center gap-2 text-muted-foreground"
+                                                >
+                                                    <Phone
+                                                        class="h-3.5 w-3.5 shrink-0 text-primary/70"
+                                                        aria-hidden="true"
+                                                    />
+                                                    {{ selectedAddress.phone }}
+                                                </li>
+                                                <li
+                                                    class="text-muted-foreground"
+                                                >
+                                                    {{ selectedAddress.street }}
+                                                </li>
+                                                <li
+                                                    class="text-muted-foreground"
+                                                >
+                                                    {{ selectedAddress.city }}
+                                                    {{
+                                                        selectedAddress.postalCode
+                                                    }}
+                                                </li>
+                                            </ul>
+                                        </div>
+
+                                        <button
+                                            type="button"
+                                            class="text-sm font-semibold text-primary transition hover:text-primary/80 hover:underline"
+                                            @click="openAddressPicker"
+                                        >
+                                            Change address
+                                        </button>
+                                    </div>
+
+                                    <!-- Saved addresses (radio list) -->
+                                    <div
+                                        v-else-if="addressUi === 'list'"
+                                        key="list"
+                                        class="space-y-4"
+                                    >
+                                        <p
+                                            class="text-sm text-muted-foreground"
+                                        >
+                                            Select a saved address or add a new
+                                            one.
+                                        </p>
+                                        <ul class="space-y-3">
+                                            <li
+                                                v-for="addr in savedAddresses"
+                                                :key="addr.id"
+                                            >
+                                                <button
+                                                    type="button"
+                                                    class="flex w-full cursor-pointer rounded-xl border-2 p-4 text-left transition"
+                                                    :class="
+                                                        selectedAddressId ===
+                                                        addr.id
+                                                            ? 'border-primary bg-primary/4 ring-2 ring-primary/15 dark:bg-primary/10'
+                                                            : 'border-border bg-muted/30 hover:border-primary/40'
+                                                    "
+                                                    @click="
+                                                        selectAddressId(addr.id)
+                                                    "
+                                                >
+                                                    <span
+                                                        class="mt-0.5 mr-3 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition"
+                                                        :class="
+                                                            selectedAddressId ===
+                                                            addr.id
+                                                                ? 'border-primary bg-primary'
+                                                                : 'border-muted-foreground/40 bg-card'
+                                                        "
+                                                        aria-hidden="true"
+                                                    >
+                                                        <span
+                                                            v-if="
+                                                                selectedAddressId ===
+                                                                addr.id
+                                                            "
+                                                            class="h-2 w-2 rounded-full bg-primary-foreground"
+                                                        />
+                                                    </span>
+                                                    <span
+                                                        class="min-w-0 flex-1"
+                                                    >
+                                                        <span
+                                                            class="flex items-center gap-2"
+                                                        >
+                                                            <span
+                                                                class="font-medium text-foreground"
+                                                                >{{
+                                                                    addr.fullName
+                                                                }}</span
+                                                            >
+                                                            <span
+                                                                v-if="
+                                                                    addr.isDefault
+                                                                "
+                                                                class="rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-bold text-primary uppercase"
+                                                            >
+                                                                Default
+                                                            </span>
+                                                        </span>
+                                                        <span
+                                                            class="mt-1 block text-sm text-muted-foreground"
+                                                            >{{
+                                                                addr.street
+                                                            }}</span
+                                                        >
+                                                        <span
+                                                            class="block text-sm text-muted-foreground"
+                                                            >{{ addr.city }}
+                                                            {{
+                                                                addr.postalCode
+                                                            }}</span
+                                                        >
+                                                    </span>
+                                                </button>
+                                            </li>
+                                        </ul>
+
+                                        <div
+                                            class="flex flex-col gap-3 border-t border-border pt-4 sm:flex-row sm:items-center sm:justify-between"
+                                        >
+                                            <button
+                                                type="button"
+                                                class="inline-flex items-center justify-center rounded-xl border-2 border-dashed border-primary/40 px-4 py-3 text-sm font-semibold text-primary transition hover:bg-primary/10"
+                                                @click="openNewAddressForm"
+                                            >
+                                                + Add new address
+                                            </button>
+                                            <div class="flex flex-wrap gap-2">
+                                                <button
+                                                    type="button"
+                                                    class="rounded-xl border border-border px-4 py-2.5 text-sm font-medium text-muted-foreground transition hover:bg-muted"
+                                                    @click="closeAddressPicker"
+                                                >
+                                                    Cancel
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    class="rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm transition hover:bg-primary/90"
+                                                    @click="
+                                                        selectAddressAndClose(
+                                                            selectedAddressId,
+                                                        )
+                                                    "
+                                                >
+                                                    Use this address
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- New address form -->
+                                    <div v-else key="form" class="space-y-4">
+                                        <button
+                                            type="button"
+                                            class="inline-flex items-center gap-1 text-sm font-medium text-primary transition hover:underline"
+                                            @click="backFromFormToList"
+                                        >
+                                            ← Back to saved addresses
+                                        </button>
+                                        <div class="grid gap-4 sm:grid-cols-2">
+                                            <div class="sm:col-span-2">
+                                                <label
+                                                    for="ship-name"
+                                                    class="mb-1.5 block text-xs font-medium text-muted-foreground"
+                                                    >Full name</label
+                                                >
+                                                <input
+                                                    id="ship-name"
+                                                    v-model="
+                                                        newAddress.fullName
+                                                    "
+                                                    type="text"
+                                                    autocomplete="name"
+                                                    class="w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
+                                                    placeholder="Jane Doe"
+                                                />
+                                            </div>
+                                            <div class="sm:col-span-2">
+                                                <label
+                                                    for="ship-phone"
+                                                    class="mb-1.5 block text-xs font-medium text-muted-foreground"
+                                                    >Phone number</label
+                                                >
+                                                <input
+                                                    id="ship-phone"
+                                                    v-model="newAddress.phone"
+                                                    type="tel"
+                                                    autocomplete="tel"
+                                                    class="w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
+                                                    placeholder="+1 (555) 000-0000"
+                                                />
+                                            </div>
+                                            <div class="sm:col-span-2">
+                                                <label
+                                                    for="ship-street"
+                                                    class="mb-1.5 block text-xs font-medium text-muted-foreground"
+                                                    >Street address</label
+                                                >
+                                                <input
+                                                    id="ship-street"
+                                                    v-model="newAddress.street"
+                                                    type="text"
+                                                    autocomplete="street-address"
+                                                    class="w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
+                                                    placeholder="123 Main St, Apt 4"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label
+                                                    for="ship-city"
+                                                    class="mb-1.5 block text-xs font-medium text-muted-foreground"
+                                                    >City</label
+                                                >
+                                                <input
+                                                    id="ship-city"
+                                                    v-model="newAddress.city"
+                                                    type="text"
+                                                    autocomplete="address-level2"
+                                                    class="w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
+                                                    placeholder="San Francisco"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label
+                                                    for="ship-postal"
+                                                    class="mb-1.5 block text-xs font-medium text-muted-foreground"
+                                                    >Postal code</label
+                                                >
+                                                <input
+                                                    id="ship-postal"
+                                                    v-model="
+                                                        newAddress.postalCode
+                                                    "
+                                                    type="text"
+                                                    autocomplete="postal-code"
+                                                    class="w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
+                                                    placeholder="94102"
+                                                />
+                                            </div>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            class="w-full rounded-xl bg-primary py-3 text-sm font-semibold text-primary-foreground shadow-sm transition hover:bg-primary/90"
+                                            @click="saveNewAddress"
+                                        >
+                                            Save &amp; use this address
+                                        </button>
+                                    </div>
+                                </Transition>
+                            </div>
+                        </section>
                     </div>
 
                     <!-- Order summary -->

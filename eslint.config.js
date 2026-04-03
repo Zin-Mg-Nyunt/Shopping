@@ -102,6 +102,9 @@ export default defineConfigWithVueTs(
     {
         files: [
             'resources/js/layouts/DefaultLayout.vue',
+            'resources/js/layouts/AdminDashboardLayout.vue',
+            'resources/js/pages/Admin/Dashboard.vue',
+            'resources/js/pages/Admin/Products.vue',
             'resources/js/pages/Products/Cart.vue',
         ],
         rules: {
