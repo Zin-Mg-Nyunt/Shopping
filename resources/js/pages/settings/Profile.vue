@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { Form, Head, Link, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
@@ -8,8 +8,8 @@ import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { send } from '@/routes/verification';
 import UserDashboardLayout from '@/layouts/UserDashboardLayout.vue';
+import { send } from '@/routes/verification';
 
 const { mustVerifyEmail, status } = defineProps({
     mustVerifyEmail: Boolean,
@@ -76,7 +76,7 @@ const user = computed(() => page.props.auth.user);
                     <Link
                         :href="send()"
                         as="button"
-                        class="text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current! dark:decoration-neutral-500"
+                        class="text-foreground underline decoration-border underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current!"
                     >
                         Click here to resend the verification email.
                     </Link>
@@ -103,7 +103,7 @@ const user = computed(() => page.props.auth.user);
                 >
                     <p
                         v-show="recentlySuccessful"
-                        class="text-sm text-neutral-600"
+                        class="text-sm text-muted-foreground"
                     >
                         Saved.
                     </p>

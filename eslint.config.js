@@ -99,4 +99,13 @@ export default defineConfigWithVueTs(
             '@stylistic/brace-style': ['error', '1tbs', { allowSingleLine: false }],
         },
     },
+    {
+        files: [
+            'resources/js/layouts/DefaultLayout.vue',
+            'resources/js/pages/Products/Cart.vue',
+        ],
+        rules: {
+            'vue/block-lang': 'off',
+        },
+    },
 );

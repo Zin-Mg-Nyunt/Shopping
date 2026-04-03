@@ -5,17 +5,22 @@ import { router } from '@inertiajs/vue3';
 const { products } = defineProps({
     products: Array,
 });
+
+const addToCard = (product) => {
+    alert(product.name);
+};
 </script>
 
 <template>
     <article
         v-for="product in products"
         :key="product.id"
-        class="group relative cursor-pointer overflow-hidden rounded-2xl border border-gray-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+        class="group relative cursor-pointer overflow-hidden rounded-2xl border border-border bg-card p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
         @click="router.visit(route('product.detail', { id: product.id }))"
     >
         <button
-            class="absolute top-4 right-4 rounded-full border border-gray-200 bg-white p-1.5 text-gray-400 transition hover:border-primary/40 hover:text-primary"
+            type="button"
+            class="absolute top-4 right-4 rounded-full border border-border bg-card p-1.5 text-muted-foreground transition hover:border-primary/40 hover:text-primary"
         >
             <span class="sr-only">Add to wishlist</span>
             <svg
@@ -31,13 +36,13 @@ const { products } = defineProps({
             </svg>
         </button>
 
-        <div class="mb-4 aspect-4/5 rounded-xl bg-gray-100"></div>
+        <div class="mb-4 aspect-4/5 rounded-xl bg-muted"></div>
 
         <div class="space-y-2">
-            <h3 class="text-sm font-semibold text-gray-900">
+            <h3 class="text-sm font-semibold text-foreground">
                 {{ product.name }}
             </h3>
-            <p class="truncate text-sm text-gray-500">
+            <p class="truncate text-sm text-muted-foreground">
                 {{ product.description }}
             </p>
             <p class="text-lg font-bold text-primary">
@@ -46,7 +51,9 @@ const { products } = defineProps({
         </div>
 
         <button
-            class="mt-4 w-full rounded-full border border-primary bg-white px-4 py-2 text-sm font-semibold text-primary transition hover:bg-primary hover:text-primary-foreground"
+            type="button"
+            class="mt-4 w-full rounded-full border border-primary bg-card px-4 py-2 text-sm font-semibold text-primary transition hover:bg-primary hover:text-primary-foreground"
+            @click.stop="addToCard(product)"
         >
             Add to Cart
         </button>

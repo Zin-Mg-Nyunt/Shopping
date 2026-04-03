@@ -1,34 +1,31 @@
-<script setup>
+<script setup lang="ts">
 import { route } from 'ziggy-js';
 </script>
 <template>
-    <main class="bg-white">
+    <main class="bg-background">
         <div class="mx-auto w-full max-w-7xl px-6 py-10 lg:px-8">
             <section class="grid gap-8 lg:grid-cols-2">
                 <div class="space-y-4">
                     <div
-                        class="overflow-hidden rounded-3xl border border-gray-200 bg-white p-4 shadow-sm"
+                        class="overflow-hidden rounded-3xl border border-border bg-card p-4 shadow-sm"
                     >
-                        <div
-                            class="aspect-square rounded-2xl bg-gray-100"
-                        ></div>
+                        <div class="aspect-square rounded-2xl bg-muted"></div>
                     </div>
 
                     <div class="grid grid-cols-4 gap-3">
                         <button
                             v-for="thumbnail in 4"
                             :key="thumbnail"
-                            class="overflow-hidden rounded-xl border border-gray-200 bg-white p-2 shadow-sm transition hover:border-primary/40"
+                            type="button"
+                            class="overflow-hidden rounded-xl border border-border bg-card p-2 shadow-sm transition hover:border-primary/40"
                         >
-                            <div
-                                class="aspect-square rounded-lg bg-gray-100"
-                            ></div>
+                            <div class="aspect-square rounded-lg bg-muted"></div>
                         </button>
                     </div>
                 </div>
 
                 <div class="space-y-6">
-                    <nav class="flex items-center gap-2 text-sm text-gray-500">
+                    <nav class="flex items-center gap-2 text-sm text-muted-foreground">
                         <a
                             :href="route('home')"
                             class="transition hover:text-primary"
@@ -41,12 +38,12 @@ import { route } from 'ziggy-js';
                             >Products List</a
                         >
                         <span>></span>
-                        <span class="text-gray-700">Aero Running Shoes</span>
+                        <span class="text-foreground">Aero Running Shoes</span>
                     </nav>
 
                     <div class="space-y-3">
                         <h1
-                            class="text-3xl font-bold tracking-tight text-gray-950 lg:text-4xl"
+                            class="text-3xl font-bold tracking-tight text-foreground lg:text-4xl"
                         >
                             Aero Running Shoes - Ultra Comfort Edition
                         </h1>
@@ -64,7 +61,7 @@ import { route } from 'ziggy-js';
                                     />
                                 </svg>
                             </div>
-                            <p class="text-sm text-gray-600">
+                            <p class="text-sm text-muted-foreground">
                                 4.8 (214 reviews)
                             </p>
                         </div>
@@ -72,30 +69,32 @@ import { route } from 'ziggy-js';
 
                     <p class="text-4xl font-bold text-primary">$129.00</p>
 
-                    <p class="max-w-xl text-base leading-relaxed text-gray-600">
+                    <p class="max-w-xl text-base leading-relaxed text-muted-foreground">
                         Performance-engineered running shoes with breathable
                         materials, responsive cushioning, and a modern aesthetic
                         designed for all-day comfort.
                     </p>
 
                     <div class="space-y-3">
-                        <p class="text-sm font-semibold text-gray-800">
+                        <p class="text-sm font-semibold text-foreground">
                             Quantity
                         </p>
                         <div
-                            class="flex w-fit items-center rounded-full border border-gray-200 bg-white p-1 shadow-sm"
+                            class="flex w-fit items-center rounded-full border border-border bg-card p-1 shadow-sm"
                         >
                             <button
-                                class="flex h-9 w-9 items-center justify-center rounded-full text-lg text-gray-600 transition hover:bg-gray-100"
+                                type="button"
+                                class="flex h-9 w-9 items-center justify-center rounded-full text-lg text-muted-foreground transition hover:bg-muted"
                             >
                                 -
                             </button>
                             <span
-                                class="w-10 text-center text-sm font-semibold text-gray-900"
+                                class="w-10 text-center text-sm font-semibold text-foreground"
                                 >1</span
                             >
                             <button
-                                class="flex h-9 w-9 items-center justify-center rounded-full text-lg text-gray-600 transition hover:bg-gray-100"
+                                type="button"
+                                class="flex h-9 w-9 items-center justify-center rounded-full text-lg text-muted-foreground transition hover:bg-muted"
                             >
                                 +
                             </button>
@@ -104,17 +103,20 @@ import { route } from 'ziggy-js';
 
                     <div class="flex flex-col gap-3 sm:flex-row">
                         <button
+                            type="button"
                             class="rounded-full bg-primary px-8 py-3 text-sm font-semibold text-primary-foreground shadow-sm transition hover:bg-primary/90"
                         >
                             Add to Cart
                         </button>
                         <button
+                            type="button"
                             class="rounded-full bg-primary/90 px-8 py-3 text-sm font-semibold text-primary-foreground shadow-sm transition hover:bg-primary"
                         >
                             Buy Now
                         </button>
                         <button
-                            class="cursor-pointer rounded-full bg-primary/10 p-3 text-primary shadow-md transition"
+                            type="button"
+                            class="cursor-pointer rounded-full bg-primary/10 p-3 text-primary shadow-md transition hover:bg-primary/20"
                         >
                             <span class="sr-only">Add to wishlist</span>
                             <svg
@@ -134,28 +136,31 @@ import { route } from 'ziggy-js';
             </section>
 
             <section
-                class="mt-12 rounded-3xl border border-gray-200 bg-white p-6 shadow-sm lg:p-8"
+                class="mt-12 rounded-3xl border border-border bg-card p-6 shadow-sm lg:p-8"
             >
-                <div class="flex flex-wrap gap-2 border-b border-gray-200 pb-4">
+                <div class="flex flex-wrap gap-2 border-b border-border pb-4">
                     <button
+                        type="button"
                         class="rounded-full bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground"
                     >
                         Long Description
                     </button>
                     <button
-                        class="rounded-full border border-gray-200 px-5 py-2 text-sm font-semibold text-gray-600 transition hover:border-primary/40 hover:text-primary"
+                        type="button"
+                        class="rounded-full border border-border px-5 py-2 text-sm font-semibold text-muted-foreground transition hover:border-primary/40 hover:text-primary"
                     >
                         Specifications
                     </button>
                     <button
-                        class="rounded-full border border-gray-200 px-5 py-2 text-sm font-semibold text-gray-600 transition hover:border-primary/40 hover:text-primary"
+                        type="button"
+                        class="rounded-full border border-border px-5 py-2 text-sm font-semibold text-muted-foreground transition hover:border-primary/40 hover:text-primary"
                     >
                         Customer Reviews
                     </button>
                 </div>
 
                 <div class="pt-6">
-                    <p class="leading-relaxed text-gray-600">
+                    <p class="leading-relaxed text-muted-foreground">
                         Crafted for everyday athletes and style-conscious
                         wearers, the Aero Running Shoes feature a knit upper for
                         breathability, reinforced heel support for stability,

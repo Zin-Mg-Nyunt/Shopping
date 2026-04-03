@@ -3,8 +3,10 @@ import { Link } from '@inertiajs/vue3';
 import AppLogo from '@/components/AppLogo.vue';
 </script>
 <template>
-    <div class="min-h-screen bg-gray-50 text-gray-900">
-        <header class="border-b border-gray-200 bg-white">
+    <div class="flex min-h-screen flex-col bg-muted text-foreground">
+        <header
+            class="border-b border-border bg-card shadow-sm dark:bg-card/95"
+        >
             <div
                 class="mx-auto flex w-full max-w-7xl items-center gap-4 px-6 py-4 lg:px-8"
             >
@@ -19,10 +21,10 @@ import AppLogo from '@/components/AppLogo.vue';
                             id="search"
                             type="search"
                             placeholder="Search for products..."
-                            class="w-full rounded-full border border-gray-200 bg-gray-100 py-2 pr-10 pl-4 text-sm text-gray-700 placeholder:text-gray-400 focus:border-primary focus:bg-white focus:outline-none"
+                            class="w-full rounded-full border border-border bg-muted py-2 pr-10 pl-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:bg-card focus:outline-none"
                         />
                         <span
-                            class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-400"
+                            class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-muted-foreground"
                         >
                             <svg
                                 class="h-5 w-5"
@@ -39,8 +41,9 @@ import AppLogo from '@/components/AppLogo.vue';
                 </div>
 
                 <nav class="ml-auto flex items-center gap-3">
-                    <button
-                        class="rounded-full border border-gray-200 bg-white p-2 text-gray-600 transition hover:border-primary/40 hover:text-primary"
+                    <Link
+                        :href="route('cart')"
+                        class="rounded-full border border-border bg-card p-2 text-muted-foreground transition hover:border-primary/40 hover:text-primary"
                     >
                         <span class="sr-only">Cart</span>
                         <svg
@@ -56,10 +59,10 @@ import AppLogo from '@/components/AppLogo.vue';
                                 d="M3 4h2l2.2 10.5a1 1 0 0 0 1 .8h9.6a1 1 0 0 0 1-.8L21 7H6.2"
                             />
                         </svg>
-                    </button>
+                    </Link>
                     <details class="relative">
                         <summary
-                            class="list-none rounded-full border border-gray-200 bg-white p-2 text-gray-600 transition hover:border-primary/40 hover:text-primary [&::-webkit-details-marker]:hidden"
+                            class="list-none rounded-full border border-border bg-card p-2 text-muted-foreground transition hover:border-primary/40 hover:text-primary [&::-webkit-details-marker]:hidden"
                         >
                             <span class="sr-only">Account menu</span>
                             <svg
@@ -75,23 +78,23 @@ import AppLogo from '@/components/AppLogo.vue';
                         </summary>
 
                         <div
-                            class="absolute right-0 z-20 mt-2 w-48 rounded-xl border border-gray-200 bg-white p-2 shadow-lg"
+                            class="absolute right-0 z-20 mt-2 w-48 rounded-xl border border-border bg-popover p-2 text-popover-foreground shadow-lg"
                         >
                             <template v-if="$page.props.auth?.user">
                                 <p
-                                    class="px-3 py-2 text-xs font-medium text-gray-500"
+                                    class="px-3 py-2 text-xs font-medium text-muted-foreground"
                                 >
                                     {{ $page.props.auth.user.name }}
                                 </p>
                                 <Link
                                     :href="route('dashboard')"
-                                    class="block rounded-lg px-3 py-2 text-sm text-gray-700 transition hover:bg-gray-100 hover:text-primary"
+                                    class="block rounded-lg px-3 py-2 text-sm transition hover:bg-accent hover:text-primary"
                                 >
                                     Dashboard
                                 </Link>
                                 <Link
                                     :href="route('profile.edit')"
-                                    class="block rounded-lg px-3 py-2 text-sm text-gray-700 transition hover:bg-gray-100 hover:text-primary"
+                                    class="block rounded-lg px-3 py-2 text-sm transition hover:bg-accent hover:text-primary"
                                 >
                                     Profile
                                 </Link>
@@ -99,13 +102,13 @@ import AppLogo from '@/components/AppLogo.vue';
                             <template v-else>
                                 <Link
                                     :href="route('login')"
-                                    class="block rounded-lg px-3 py-2 text-sm text-gray-700 transition hover:bg-gray-100 hover:text-primary"
+                                    class="block rounded-lg px-3 py-2 text-sm transition hover:bg-accent hover:text-primary"
                                 >
                                     Log In
                                 </Link>
                                 <Link
                                     :href="route('register')"
-                                    class="block rounded-lg px-3 py-2 text-sm text-gray-700 transition hover:bg-gray-100 hover:text-primary"
+                                    class="block rounded-lg px-3 py-2 text-sm transition hover:bg-accent hover:text-primary"
                                 >
                                     Register
                                 </Link>
@@ -118,9 +121,9 @@ import AppLogo from '@/components/AppLogo.vue';
 
         <slot />
 
-        <footer class="border-t border-gray-200 bg-white">
+        <footer class="mt-auto border-t border-border bg-card">
             <div
-                class="mx-auto flex w-full max-w-7xl flex-col gap-3 px-6 py-8 text-sm text-gray-500 md:flex-row md:items-center md:justify-between lg:px-8"
+                class="mx-auto flex w-full max-w-7xl flex-col gap-3 px-6 py-8 text-sm text-muted-foreground md:flex-row md:items-center md:justify-between lg:px-8"
             >
                 <p>© 2026 Shopping. All rights reserved.</p>
                 <div class="flex items-center gap-5">

@@ -1,8 +1,8 @@
 <script setup>
 import { Link } from '@inertiajs/vue3';
+import { route } from 'ziggy-js';
 import AppLogo from '@/components/AppLogo.vue';
 import { useCurrentUrl } from '@/composables/useCurrentUrl';
-import { route } from 'ziggy-js';
 
 const { isCurrentUrl } = useCurrentUrl();
 
@@ -36,8 +36,10 @@ const navItems = [
 </script>
 
 <template>
-    <div class="flex min-h-screen flex-col bg-[#F4F7F6] text-gray-900">
-        <header class="border-b border-gray-200/80 bg-white shadow-sm">
+    <div class="flex min-h-screen flex-col bg-muted text-foreground">
+        <header
+            class="border-b border-border bg-card shadow-sm dark:bg-card/95"
+        >
             <div
                 class="mx-auto flex w-full max-w-7xl flex-wrap items-center gap-4 px-6 py-4 lg:px-8"
             >
@@ -50,14 +52,14 @@ const navItems = [
                     </Link>
                     <Link
                         :href="route('products.list')"
-                        class="hidden rounded-full px-3 py-2 text-sm font-medium text-primary transition hover:bg-primary/10 hover:text-primary sm:inline"
+                        class="hidden rounded-full px-3 py-2 text-sm font-medium text-muted-foreground transition hover:bg-muted hover:text-foreground sm:inline"
                     >
                         Shop more
                     </Link>
                 </div>
 
                 <div class="w-full flex-1 md:max-w-md">
-                    <label for="account-search" class="sr-only"
+                    <label for="order-search" class="sr-only"
                         >Search order with order number</label
                     >
                     <div class="relative">
@@ -65,10 +67,10 @@ const navItems = [
                             id="order-search"
                             type="search"
                             placeholder="Search order with order number"
-                            class="w-full rounded-full border border-gray-200 bg-[#F4F7F6] py-2 pr-10 pl-4 text-sm text-gray-700 placeholder:text-gray-400 focus:border-primary focus:bg-white focus:outline-none"
+                            class="w-full rounded-full border border-border bg-muted py-2 pr-10 pl-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:bg-card focus:outline-none"
                         />
                         <span
-                            class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-400"
+                            class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-muted-foreground"
                         >
                             <svg
                                 class="h-5 w-5"
@@ -85,9 +87,9 @@ const navItems = [
                 </div>
 
                 <nav class="ml-auto flex shrink-0 items-center gap-2 sm:gap-3">
-                    <button
-                        type="button"
-                        class="rounded-full border border-gray-200 bg-[#F4F7F6] p-2 text-gray-600 transition hover:border-primary/40 hover:text-primary"
+                    <Link
+                        :href="route('cart')"
+                        class="rounded-full border border-border bg-card p-2 text-muted-foreground transition hover:border-primary/40 hover:text-primary"
                     >
                         <span class="sr-only">Cart</span>
                         <svg
@@ -103,10 +105,10 @@ const navItems = [
                                 d="M3 4h2l2.2 10.5a1 1 0 0 0 1 .8h9.6a1 1 0 0 0 1-.8L21 7H6.2"
                             />
                         </svg>
-                    </button>
+                    </Link>
                     <details class="relative">
                         <summary
-                            class="list-none rounded-full border border-gray-200 bg-[#F4F7F6] p-2 text-gray-600 transition hover:border-primary/40 hover:text-primary [&::-webkit-details-marker]:hidden"
+                            class="list-none rounded-full border border-border bg-card p-2 text-muted-foreground transition hover:border-primary/40 hover:text-primary [&::-webkit-details-marker]:hidden"
                         >
                             <span class="sr-only">Account menu</span>
                             <svg
@@ -122,23 +124,23 @@ const navItems = [
                         </summary>
 
                         <div
-                            class="absolute right-0 z-20 mt-2 w-52 rounded-2xl border border-gray-200/80 bg-white p-2 shadow-lg"
+                            class="absolute right-0 z-20 mt-2 w-52 rounded-xl border border-border bg-popover p-2 text-popover-foreground shadow-lg"
                         >
                             <template v-if="$page.props.auth?.user">
                                 <p
-                                    class="px-3 py-2 text-xs font-medium text-gray-500"
+                                    class="px-3 py-2 text-xs font-medium text-muted-foreground"
                                 >
                                     {{ $page.props.auth.user.name }}
                                 </p>
                                 <Link
                                     :href="route('dashboard')"
-                                    class="block rounded-xl px-3 py-2 text-sm text-gray-700 transition hover:bg-primary/10 hover:text-primary"
+                                    class="block rounded-lg px-3 py-2 text-sm transition hover:bg-accent hover:text-primary"
                                 >
                                     Dashboard
                                 </Link>
                                 <Link
                                     :href="route('profile.edit')"
-                                    class="block rounded-xl px-3 py-2 text-sm text-gray-700 transition hover:bg-primary/10 hover:text-primary"
+                                    class="block rounded-lg px-3 py-2 text-sm transition hover:bg-accent hover:text-primary"
                                 >
                                     Profile
                                 </Link>
@@ -146,13 +148,13 @@ const navItems = [
                             <template v-else>
                                 <Link
                                     :href="route('login')"
-                                    class="block rounded-xl px-3 py-2 text-sm text-gray-700 transition hover:bg-primary/10 hover:text-primary"
+                                    class="block rounded-lg px-3 py-2 text-sm transition hover:bg-accent hover:text-primary"
                                 >
                                     Log In
                                 </Link>
                                 <Link
                                     :href="route('register')"
-                                    class="block rounded-xl px-3 py-2 text-sm text-gray-700 transition hover:bg-primary/10 hover:text-primary"
+                                    class="block rounded-lg px-3 py-2 text-sm transition hover:bg-accent hover:text-primary"
                                 >
                                     Register
                                 </Link>
@@ -169,11 +171,11 @@ const navItems = [
             >
                 <aside class="w-full shrink-0 lg:w-64">
                     <nav
-                        class="rounded-2xl border border-gray-200/80 bg-white p-3 shadow-sm"
+                        class="rounded-2xl border border-border bg-card p-3 shadow-sm"
                         aria-label="Account navigation"
                     >
                         <p
-                            class="px-3 pb-2 text-xs font-semibold tracking-wide text-gray-400 uppercase"
+                            class="px-3 pb-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase"
                         >
                             My account
                         </p>
@@ -185,8 +187,8 @@ const navItems = [
                                     class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition"
                                     :class="
                                         item.match()
-                                            ? 'bg-primary/10 text-primary shadow-sm'
-                                            : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
+                                            ? 'border border-primary/25 bg-primary/12 text-primary shadow-sm'
+                                            : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                                     "
                                 >
                                     <span
@@ -194,21 +196,21 @@ const navItems = [
                                         :class="
                                             item.match()
                                                 ? 'bg-primary'
-                                                : 'bg-transparent'
+                                                : 'bg-muted-foreground/40'
                                         "
                                     />
                                     {{ item.label }}
                                 </Link>
                                 <span
                                     v-else
-                                    class="flex cursor-not-allowed items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-400"
+                                    class="flex cursor-not-allowed items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-muted-foreground/60"
                                 >
                                     <span
-                                        class="h-1.5 w-1.5 shrink-0 rounded-full bg-transparent"
+                                        class="h-1.5 w-1.5 shrink-0 rounded-full bg-muted-foreground/30"
                                     />
                                     {{ item.label }}
                                     <span
-                                        class="ml-auto text-[10px] font-normal text-gray-400"
+                                        class="ml-auto text-[10px] font-normal text-muted-foreground"
                                         >Soon</span
                                     >
                                 </span>
@@ -223,11 +225,9 @@ const navItems = [
             </div>
         </main>
 
-        <footer
-            class="mt-auto border-t border-gray-200/80 bg-white shadow-[0_-1px_0_rgba(0,0,0,0.03)]"
-        >
+        <footer class="mt-auto border-t border-border bg-card">
             <div
-                class="mx-auto flex w-full max-w-7xl flex-col gap-4 px-6 py-8 text-sm text-gray-500 md:flex-row md:items-center md:justify-between lg:px-8"
+                class="mx-auto flex w-full max-w-7xl flex-col gap-4 px-6 py-8 text-sm text-muted-foreground md:flex-row md:items-center md:justify-between lg:px-8"
             >
                 <p>© 2026 Shopping. All rights reserved.</p>
                 <div class="flex flex-wrap items-center gap-5">
