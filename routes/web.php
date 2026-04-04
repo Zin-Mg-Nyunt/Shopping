@@ -1,15 +1,11 @@
 <?php
 
+use App\Http\Controllers\ProductController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return inertia('Welcome');
-})->name('home');
-
-Route::get('/products', function () {
-    return inertia('Products/List');
-})->name('products.list');
+Route::get('/', [ProductController::class, 'index'])->name('home');
+Route::get('/products', [ProductController::class, 'list'])->name('products.list');
 
 Route::get('/products/{id}', function ($id) {
     return inertia('Products/Detail', [

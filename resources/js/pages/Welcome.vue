@@ -1,33 +1,13 @@
 <script setup>
 import ProductsCard from '@/components/Products/Card.vue';
 import { route } from 'ziggy-js';
+import { usePage } from '@inertiajs/vue3';
 
-const products = [
-    {
-        id: 1,
-        name: 'Aero Running Shoes',
-        description: 'Lightweight daily trainers with breathable mesh comfort.',
-        price: '$129.00',
-    },
-    {
-        id: 2,
-        name: 'Classic Leather Backpack',
-        description: 'Minimal silhouette with premium full-grain leather.',
-        price: '$179.00',
-    },
-    {
-        id: 3,
-        name: 'Smart Fitness Watch',
-        description: 'Track performance, sleep, and wellness all day long.',
-        price: '$249.00',
-    },
-    {
-        id: 4,
-        name: 'Noise-Canceling Headphones',
-        description: 'Immersive sound in a clean and comfortable design.',
-        price: '$299.00',
-    },
-];
+const page = usePage();
+const categories = page.props.categories;
+const { products } = defineProps({
+    products: Array,
+});
 </script>
 <template>
     <main
@@ -114,13 +94,8 @@ const products = [
 
             <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
                 <article
-                    v-for="category in [
-                        'Furniture',
-                        'Fashion',
-                        'Electronics',
-                        'Accessories',
-                    ]"
-                    :key="category"
+                    v-for="category in categories"
+                    :key="category.id"
                     class="group rounded-2xl border border-border bg-card p-5 shadow-sm transition hover:border-primary/40"
                 >
                     <div
@@ -138,7 +113,7 @@ const products = [
                         </svg>
                     </div>
                     <h3 class="text-base font-semibold text-foreground">
-                        {{ category }}
+                        {{ category.name }}
                     </h3>
                     <a
                         href="#"
