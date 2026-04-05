@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
-
+use Illuminate\Http\Request;
 class ProductController extends Controller
 {
     public function index(){
@@ -13,10 +13,11 @@ class ProductController extends Controller
         ]);
     }
 
-    public function list(){
+    public function list(Request $request){
         $products = Product::with('brand','categories')
+                    ->filterBy($request->all())
                     ->latest()
-                    ->paginate(8)
+                    ->paginate(4)
                     ->withQueryString();
         return inertia('Products/List', [
             'products' => $products

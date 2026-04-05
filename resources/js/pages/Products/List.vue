@@ -1,11 +1,14 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import ProductsCard from '@/components/Products/Card.vue';
 import Pagination from '@/components/ui/Pagination.vue';
+import useFilterBy from '@/composables/useFilterBy';
+import { usePage } from '@inertiajs/vue3';
 
 const { products } = defineProps({
     products: Object,
 });
+
 const minPrice = 0;
 const maxPrice = 1000;
 const selectedPrice = ref(20);
@@ -22,6 +25,18 @@ function updatePriceFromInput(event) {
     const parsedValue = Number(target?.value);
     selectedPrice.value = clampPrice(parsedValue);
 }
+
+const { filterBy } = useFilterBy();
+
+const page = usePage();
+const currentCategory = ref(null);
+watch(
+    () => page.url,
+    () => {
+        currentCategory.value = route().params.category;
+    },
+    { deep: true },
+);
 </script>
 
 <template>
@@ -40,7 +55,32 @@ function updatePriceFromInput(event) {
                             <h3 class="text-sm font-semibold text-foreground">
                                 Categories
                             </h3>
-                            <div class="mt-3 flex flex-col gap-2"></div>
+                            <div class="mt-3 flex flex-col gap-2">
+                                <button
+                                    type="button"
+                                    class="flex cursor-pointer items-center gap-2 text-sm text-muted-foreground hover:text-primary"
+                                    :class="{
+                                        'text-primary':
+                                            currentCategory === null,
+                                    }"
+                                    @click="filterBy('category', null)"
+                                >
+                                    All
+                                </button>
+                                <button
+                                    v-for="category in $page.props.categories"
+                                    :key="category.id"
+                                    type="button"
+                                    class="flex cursor-pointer items-center gap-2 text-sm text-muted-foreground hover:text-primary"
+                                    :class="{
+                                        'text-primary':
+                                            currentCategory === category.slug,
+                                    }"
+                                    @click="filterBy('category', category.slug)"
+                                >
+                                    {{ category.name }}
+                                </button>
+                            </div>
                         </section>
 
                         <section>

@@ -29,4 +29,15 @@ class Product extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function scopeFilterBy($query, $filters){
+        return $query->when($filters['category']??false, function($query, $slug){
+            $query->whereHas('categories',function($query) use($slug){
+                $query->where('slug',$slug);
+            });
+        })
+        ->when($filters['search']??false, function($query,$search){
+            dd($search);
+        });
+    }
 }
