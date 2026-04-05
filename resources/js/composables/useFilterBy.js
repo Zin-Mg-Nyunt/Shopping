@@ -2,24 +2,31 @@ import { router } from '@inertiajs/vue3';
 import { debounce } from 'lodash';
 
 const useFilterBy = () => {
-    const useFilter = (filterKey, filterValue) => {
-        router.get(
-            route('products.list'),
-            { [filterKey]: filterValue },
-            {
-                preserveState: true,
-                preserveScroll: true,
-                replace: true,
-            },
-        );
+    const normalFilter = (filterKey, filterValue) => {
+        const currentParams = route().params;
+        const newParams = { ...currentParams, [filterKey]: filterValue };
+
+        Object.keys(newParams).forEach((key) => {
+            if (newParams[key] == null || newParams[key] === '') {
+                delete newParams[key];
+            }
+        });
+
+        router.get(route('products.list'), newParams, {
+            preserveState: true,
+            preserveScroll: true,
+            replace: true,
+        });
     };
+    const debouncedFilter = debounce((filterKey, filterValue) => {
+        normalFilter(filterKey, filterValue);
+    }, 500);
+
     const filterBy = (filterKey, filterValue) => {
         if (filterKey === 'search') {
-            debounce(() => {
-                useFilter(filterKey, filterValue);
-            }, 500);
+            debouncedFilter(filterKey, filterValue);
         } else {
-            useFilter(filterKey, filterValue);
+            normalFilter(filterKey, filterValue);
         }
     };
     return { filterBy };

@@ -37,7 +37,10 @@ class Product extends Model
             });
         })
         ->when($filters['search']??false, function($query,$search){
-            dd($search);
+            $query->where(function($query) use($search){
+                $query->where('title','like','%'.$search.'%')
+                        ->orWhere('description','like','%'.$search.'%');
+            });
         });
     }
 }

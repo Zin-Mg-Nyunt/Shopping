@@ -40,7 +40,7 @@ const addToCard = (product) => {
 
         <div class="space-y-2">
             <h3 class="text-sm font-semibold text-foreground">
-                {{ product.name }}
+                {{ product.title }}
             </h3>
             <p class="truncate text-sm text-muted-foreground">
                 {{ product.description }}

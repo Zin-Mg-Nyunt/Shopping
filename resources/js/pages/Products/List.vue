@@ -33,7 +33,7 @@ const currentCategory = ref(null);
 watch(
     () => page.url,
     () => {
-        currentCategory.value = route().params.category;
+        currentCategory.value = route().params.category ?? null;
     },
     { deep: true },
 );

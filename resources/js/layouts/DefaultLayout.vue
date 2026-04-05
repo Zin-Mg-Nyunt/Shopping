@@ -1,6 +1,9 @@
 <script setup>
 import { Link } from '@inertiajs/vue3';
 import AppLogo from '@/components/AppLogo.vue';
+import useFilterBy from '@/composables/useFilterBy';
+
+const { filterBy } = useFilterBy();
 </script>
 <template>
     <div class="flex min-h-screen flex-col bg-muted text-foreground">
@@ -22,6 +25,7 @@ import AppLogo from '@/components/AppLogo.vue';
                             type="search"
                             placeholder="Search for products..."
                             class="w-full rounded-full border border-border bg-muted py-2 pr-10 pl-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:bg-card focus:outline-none"
+                            @input="filterBy('search', $event.target.value)"
                         />
                         <span
                             class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-muted-foreground"

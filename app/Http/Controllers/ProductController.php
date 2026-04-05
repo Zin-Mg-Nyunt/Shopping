@@ -14,13 +14,15 @@ class ProductController extends Controller
     }
 
     public function list(Request $request){
+        // dd($request->all());
         $products = Product::with('brand','categories')
                     ->filterBy($request->all())
                     ->latest()
                     ->paginate(4)
                     ->withQueryString();
         return inertia('Products/List', [
-            'products' => $products
+            'products' => $products,
+            'filters' => $request->all()
         ]);
     }
 }
