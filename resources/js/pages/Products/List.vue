@@ -11,7 +11,10 @@ const { products } = defineProps({
 
 const minPrice = 0;
 const maxPrice = 1000;
-const selectedPrice = ref(20);
+const page = usePage();
+const selectedPrice = ref(route().params.price ?? 0);
+const currentBrand = ref(null);
+const currentCategory = ref(null);
 
 function clampPrice(value) {
     if (isNaN(value)) {
@@ -24,16 +27,25 @@ function updatePriceFromInput(event) {
     const target = event.target;
     const parsedValue = Number(target?.value);
     selectedPrice.value = clampPrice(parsedValue);
+    if (target?.value) {
+        target.value = selectedPrice.value;
+    }
 }
 
 const { filterBy } = useFilterBy();
 
-const page = usePage();
-const currentCategory = ref(null);
 watch(
     () => page.url,
     () => {
         currentCategory.value = route().params.category ?? null;
+        currentBrand.value = route().params.brand ?? null;
+    },
+    { deep: true, immediate: true },
+);
+watch(
+    selectedPrice,
+    () => {
+        filterBy('price', selectedPrice.value);
     },
     { deep: true },
 );
@@ -166,28 +178,29 @@ watch(
                             <div
                                 class="mt-3 flex flex-col gap-2 text-sm text-muted-foreground"
                             >
-                                <label class="flex items-center gap-2">
-                                    <input
-                                        type="checkbox"
-                                        class="accent-primary"
-                                        checked
-                                    />
-                                    Nova
-                                </label>
-                                <label class="flex items-center gap-2">
-                                    <input
-                                        type="checkbox"
-                                        class="accent-primary"
-                                    />
-                                    Urban Line
-                                </label>
-                                <label class="flex items-center gap-2">
-                                    <input
-                                        type="checkbox"
-                                        class="accent-primary"
-                                    />
-                                    Peak Studio
-                                </label>
+                                <button
+                                    type="button"
+                                    class="flex cursor-pointer items-center gap-2 text-sm text-muted-foreground hover:text-primary"
+                                    :class="{
+                                        'text-primary': currentBrand === null,
+                                    }"
+                                    @click="filterBy('brand', null)"
+                                >
+                                    All
+                                </button>
+                                <button
+                                    v-for="brand in $page.props.brands"
+                                    :key="brand.id"
+                                    type="button"
+                                    class="flex cursor-pointer items-center gap-2 text-sm text-muted-foreground hover:text-primary"
+                                    :class="{
+                                        'text-primary':
+                                            currentBrand === brand.slug,
+                                    }"
+                                    @click="filterBy('brand', brand.slug)"
+                                >
+                                    {{ brand.name }}
+                                </button>
                             </div>
                         </section>
                     </div>

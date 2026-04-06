@@ -41,6 +41,15 @@ class Product extends Model
                 $query->where('title','like','%'.$search.'%')
                         ->orWhere('description','like','%'.$search.'%');
             });
+        })
+        ->when($filters['brand']??false, function($query,$slug){
+            $query->whereHas('brand',function($query) use($slug){
+                $query->where('slug',$slug);
+            });
+        })
+        ->when($filters['price']??false, function($query,$price){
+            $query->whereBetween('price',[0,$price]);
         });
+
     }
 }

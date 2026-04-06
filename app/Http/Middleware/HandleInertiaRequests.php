@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Brand;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -42,7 +43,8 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
-            'categories' => Category::all()
+            'categories' => Category::all(),
+            'brands' => Brand::all()
         ];
     }
 }
