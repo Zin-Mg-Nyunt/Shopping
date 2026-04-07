@@ -228,11 +228,17 @@ watch(
                             <select
                                 id="sort"
                                 class="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none"
+                                :value="route().params.sort ?? 'newest'"
+                                @change="filterBy('sort', $event.target.value)"
                             >
-                                <option>Newest</option>
-                                <option>Price: Low to High</option>
-                                <option>Price: High to Low</option>
-                                <option>Top Rated</option>
+                                <option value="newest">Newest</option>
+                                <option value="low-to-high">
+                                    Price: Low to High
+                                </option>
+                                <option value="high-to-low">
+                                    Price: High to Low
+                                </option>
+                                <option value="top-rated">Top Rated</option>
                             </select>
                         </div>
                     </div>

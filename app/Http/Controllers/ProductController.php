@@ -23,4 +23,10 @@ class ProductController extends Controller
             'products' => $products
         ]);
     }
+
+    public function detail(Product $product){
+        return inertia('Products/Detail',[
+            'product' => $product
+        ]);
+    }
 }

@@ -7,16 +7,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [ProductController::class, 'index'])->name('home');
 Route::get('/products', [ProductController::class, 'list'])->name('products.list');
 
-Route::get('/products/{id}', function ($id) {
-    return inertia('Products/Detail', [
-        'product' => [
-            'id' => $id,
-            'name' => 'Product '.$id,
-            'description' => 'Description for product '.$id,
-            'price' => 100 * $id,
-        ],
-    ]);
-})->name('product.detail');
+Route::get('/products/{product:slug}', [ProductController::class, 'detail'])->name('product.detail');
 
 Route::get('/cart', function (Request $request) {
     $items = $request->boolean('empty')

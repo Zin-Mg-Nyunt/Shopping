@@ -16,7 +16,7 @@ const addToCard = (product) => {
         v-for="product in products"
         :key="product.id"
         class="group relative cursor-pointer overflow-hidden rounded-2xl border border-border bg-card p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
-        @click="router.visit(route('product.detail', { id: product.id }))"
+        @click="router.visit(route('product.detail', { slug: product.slug }))"
     >
         <button
             type="button"
@@ -36,7 +36,13 @@ const addToCard = (product) => {
             </svg>
         </button>
 
-        <div class="mb-4 aspect-4/5 rounded-xl bg-muted"></div>
+        <div class="mb-4 aspect-4/5 rounded-xl bg-muted">
+            <img
+                :src="product.thumbnail"
+                alt="Product Image"
+                class="h-full w-full object-cover"
+            />
+        </div>
 
         <div class="space-y-2">
             <h3 class="text-sm font-semibold text-foreground">

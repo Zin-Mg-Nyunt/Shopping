@@ -2,10 +2,13 @@
 import { Link } from '@inertiajs/vue3';
 import AppLogo from '@/components/AppLogo.vue';
 import useFilterBy from '@/composables/useFilterBy';
+import { Toaster } from 'vue-sonner';
+import 'vue-sonner/style.css';
 
 const { filterBy } = useFilterBy();
 </script>
 <template>
+    <Toaster position="top-right" richColors />
     <div class="flex min-h-screen flex-col bg-muted text-foreground">
         <header
             class="border-b border-border bg-card shadow-sm dark:bg-card/95"

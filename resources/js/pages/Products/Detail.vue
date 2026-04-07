@@ -1,5 +1,32 @@
-<script setup lang="ts">
-import { route } from 'ziggy-js';
+<script setup>
+import { useCustomToast } from '@/composables/useCustomToast';
+import { ref } from 'vue';
+
+const { product } = defineProps({
+    product: Object,
+});
+const { customToast } = useCustomToast();
+const quantity = ref(1);
+
+function addToCart(product) {
+    customToast(product.thumbnail, ` x${quantity.value} added to cart`);
+}
+
+function calQuantity(event) {
+    const target = event.target;
+    if (target.value == '') {
+        quantity.value = '';
+        return;
+    }
+    quantity.value = Math.max(1, Math.min(product.stock, target.value));
+    target.value = quantity.value;
+}
+
+function blurQuantity(event) {
+    if (event.target.value == '') {
+        quantity.value = 1;
+    }
+}
 </script>
 <template>
     <main class="bg-background">
@@ -9,23 +36,37 @@ import { route } from 'ziggy-js';
                     <div
                         class="overflow-hidden rounded-3xl border border-border bg-card p-4 shadow-sm"
                     >
-                        <div class="aspect-square rounded-2xl bg-muted"></div>
+                        <div class="aspect-square rounded-2xl bg-muted">
+                            <img
+                                :src="product.thumbnail"
+                                alt="Product Image"
+                                class="h-full w-full object-cover"
+                            />
+                        </div>
                     </div>
 
                     <div class="grid grid-cols-4 gap-3">
                         <button
-                            v-for="thumbnail in 4"
+                            v-for="thumbnail in product.images"
                             :key="thumbnail"
                             type="button"
                             class="overflow-hidden rounded-xl border border-border bg-card p-2 shadow-sm transition hover:border-primary/40"
                         >
-                            <div class="aspect-square rounded-lg bg-muted"></div>
+                            <div class="aspect-square rounded-lg bg-muted">
+                                <img
+                                    :src="thumbnail.url"
+                                    alt="Product Image"
+                                    class="h-full w-full object-cover"
+                                />
+                            </div>
                         </button>
                     </div>
                 </div>
 
                 <div class="space-y-6">
-                    <nav class="flex items-center gap-2 text-sm text-muted-foreground">
+                    <nav
+                        class="flex items-center gap-2 text-sm text-muted-foreground"
+                    >
                         <a
                             :href="route('home')"
                             class="transition hover:text-primary"
@@ -38,14 +79,14 @@ import { route } from 'ziggy-js';
                             >Products List</a
                         >
                         <span>></span>
-                        <span class="text-foreground">Aero Running Shoes</span>
+                        <span class="text-foreground">{{ product.title }}</span>
                     </nav>
 
                     <div class="space-y-3">
                         <h1
                             class="text-3xl font-bold tracking-tight text-foreground lg:text-4xl"
                         >
-                            Aero Running Shoes - Ultra Comfort Edition
+                            {{ product.title }}
                         </h1>
 
                         <div class="flex items-center gap-3">
@@ -67,12 +108,14 @@ import { route } from 'ziggy-js';
                         </div>
                     </div>
 
-                    <p class="text-4xl font-bold text-primary">$129.00</p>
+                    <p class="text-4xl font-bold text-primary">
+                        ${{ product.price }}
+                    </p>
 
-                    <p class="max-w-xl text-base leading-relaxed text-muted-foreground">
-                        Performance-engineered running shoes with breathable
-                        materials, responsive cushioning, and a modern aesthetic
-                        designed for all-day comfort.
+                    <p
+                        class="max-w-xl text-base leading-relaxed text-muted-foreground"
+                    >
+                        {{ product.description }}
                     </p>
 
                     <div class="space-y-3">
@@ -85,16 +128,28 @@ import { route } from 'ziggy-js';
                             <button
                                 type="button"
                                 class="flex h-9 w-9 items-center justify-center rounded-full text-lg text-muted-foreground transition hover:bg-muted"
+                                @click="quantity = Math.max(1, (quantity -= 1))"
+                                :disabled="quantity <= 1"
                             >
                                 -
                             </button>
-                            <span
+                            <input
+                                type="number"
                                 class="w-10 text-center text-sm font-semibold text-foreground"
-                                >1</span
-                            >
+                                :value="quantity"
+                                @input="calQuantity($event)"
+                                @blur="blurQuantity($event)"
+                            />
                             <button
                                 type="button"
                                 class="flex h-9 w-9 items-center justify-center rounded-full text-lg text-muted-foreground transition hover:bg-muted"
+                                @click="
+                                    quantity = Math.min(
+                                        product.stock,
+                                        (quantity += 1),
+                                    )
+                                "
+                                :disabled="quantity >= product.stock"
                             >
                                 +
                             </button>
@@ -105,6 +160,7 @@ import { route } from 'ziggy-js';
                         <button
                             type="button"
                             class="rounded-full bg-primary px-8 py-3 text-sm font-semibold text-primary-foreground shadow-sm transition hover:bg-primary/90"
+                            @click="addToCart(product)"
                         >
                             Add to Cart
                         </button>
@@ -161,11 +217,7 @@ import { route } from 'ziggy-js';
 
                 <div class="pt-6">
                     <p class="leading-relaxed text-muted-foreground">
-                        Crafted for everyday athletes and style-conscious
-                        wearers, the Aero Running Shoes feature a knit upper for
-                        breathability, reinforced heel support for stability,
-                        and an adaptive sole that softens impact while
-                        maintaining excellent energy return.
+                        {{ product.description }}
                     </p>
                 </div>
             </section>

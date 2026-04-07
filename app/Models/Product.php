@@ -49,7 +49,16 @@ class Product extends Model
         })
         ->when($filters['price']??false, function($query,$price){
             $query->whereBetween('price',[0,$price]);
+        })
+        ->when($filters['sort']??false, function($query,$sort){
+            match($sort){
+                'newest' => $query->latest(),
+                'low-to-high' => $query->orderBy('price','asc'),
+                'high-to-low' => $query->orderBy('price','desc'),
+                default => $query->latest(),
+            };
+        },function($query){
+            $query->latest();
         });
-
     }
 }
