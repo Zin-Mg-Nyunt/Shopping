@@ -50,7 +50,7 @@ const { filterBy } = useFilterBy();
                 <nav class="ml-auto flex items-center gap-3">
                     <Link
                         :href="route('cart')"
-                        class="rounded-full border border-border bg-card p-2 text-muted-foreground transition hover:border-primary/40 hover:text-primary"
+                        class="relative rounded-full border border-border bg-card p-2 text-muted-foreground transition hover:border-primary/40 hover:text-primary"
                     >
                         <span class="sr-only">Cart</span>
                         <svg
@@ -66,6 +66,12 @@ const { filterBy } = useFilterBy();
                                 d="M3 4h2l2.2 10.5a1 1 0 0 0 1 .8h9.6a1 1 0 0 0 1-.8L21 7H6.2"
                             />
                         </svg>
+                        <span
+                            v-if="cartItemCount > 0"
+                            class="absolute -top-1 -right-1 inline-flex min-h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[11px] leading-none font-semibold text-primary-foreground"
+                        >
+                            {{ cartItemCount }}
+                        </span>
                     </Link>
                     <details class="relative">
                         <summary

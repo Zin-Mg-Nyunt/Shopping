@@ -9,6 +9,7 @@ class Product extends Model
 {
     /** @use HasFactory<\Database\Factories\ProductFactory> */
     use HasFactory;
+    protected $guarded = ['id'];
 
     public function images()
     {
@@ -28,6 +29,10 @@ class Product extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function carts(){
+        return $this->hasMany(Cart::class);
     }
 
     public function scopeFilterBy($query, $filters){

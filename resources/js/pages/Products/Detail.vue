@@ -1,6 +1,7 @@
 <script setup>
 import { useCustomToast } from '@/composables/useCustomToast';
 import { ref } from 'vue';
+import { router } from '@inertiajs/vue3';
 
 const { product } = defineProps({
     product: Object,
@@ -9,7 +10,22 @@ const { customToast } = useCustomToast();
 const quantity = ref(1);
 
 function addToCart(product) {
-    customToast(product.thumbnail, ` x${quantity.value} added to cart`);
+    router.post(
+        route('cart.add'),
+        {
+            product_id: product.id,
+            quantity: quantity.value,
+        },
+        {
+            preserveScroll: true,
+            onSuccess: () => {
+                customToast(
+                    product.thumbnail,
+                    ` x${quantity.value} added to cart`,
+                );
+            },
+        },
+    );
 }
 
 function calQuantity(event) {

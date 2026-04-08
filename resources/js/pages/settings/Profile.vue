@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import { Form, Head, Link, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import UserDashboardLayout from '@/layouts/UserDashboardLayout.vue';
+import { logout } from '@/routes';
 import { send } from '@/routes/verification';
 
 const { mustVerifyEmail, status } = defineProps({
@@ -108,6 +109,7 @@ const user = computed(() => page.props.auth.user);
                         Saved.
                     </p>
                 </Transition>
+                <Link :href="logout()" as="button">Logout</Link>
             </div>
         </Form>
     </div>

@@ -6,8 +6,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [ProductController::class, 'index'])->name('home');
 Route::get('/products', [ProductController::class, 'list'])->name('products.list');
-
 Route::get('/products/{product:slug}', [ProductController::class, 'detail'])->name('product.detail');
+Route::post('/cart/add', [ProductController::class, 'addToCart'])->name('cart.add');
 
 Route::get('/cart', function (Request $request) {
     $items = $request->boolean('empty')
