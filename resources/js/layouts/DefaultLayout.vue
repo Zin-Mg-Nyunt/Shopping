@@ -2,10 +2,22 @@
 import { Link } from '@inertiajs/vue3';
 import AppLogo from '@/components/AppLogo.vue';
 import useFilterBy from '@/composables/useFilterBy';
+import { useCartCount } from '@/composables/useCartCount';
+import { ref, watch } from 'vue';
 import { Toaster } from 'vue-sonner';
 import 'vue-sonner/style.css';
 
+const bounce = ref(false);
+const { cartCount } = useCartCount();
 const { filterBy } = useFilterBy();
+watch(cartCount, (newCount, oldCount) => {
+    if (newCount > oldCount) {
+        bounce.value = true;
+        setTimeout(() => {
+            bounce.value = false;
+        }, 1000);
+    }
+});
 </script>
 <template>
     <Toaster position="top-right" richColors />
@@ -55,6 +67,7 @@ const { filterBy } = useFilterBy();
                         <span class="sr-only">Cart</span>
                         <svg
                             class="h-5 w-5"
+                            :class="{ 'cart-shake': bounce }"
                             viewBox="0 0 24 24"
                             fill="none"
                             stroke="currentColor"
@@ -67,10 +80,10 @@ const { filterBy } = useFilterBy();
                             />
                         </svg>
                         <span
-                            v-if="cartItemCount > 0"
+                            v-if="cartCount > 0"
                             class="absolute -top-1 -right-1 inline-flex min-h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[11px] leading-none font-semibold text-primary-foreground"
                         >
-                            {{ cartItemCount }}
+                            {{ cartCount }}
                         </span>
                     </Link>
                     <details class="relative">
@@ -152,3 +165,29 @@ const { filterBy } = useFilterBy();
         </footer>
     </div>
 </template>
+
+<style scoped>
+@keyframes cart-shake {
+    0%,
+    100% {
+        transform: rotate(0deg);
+    }
+    20% {
+        transform: rotate(-10deg);
+    }
+    40% {
+        transform: rotate(8deg);
+    }
+    60% {
+        transform: rotate(-6deg);
+    }
+    80% {
+        transform: rotate(4deg);
+    }
+}
+
+.cart-shake {
+    animation: cart-shake 420ms ease-in-out;
+    transform-origin: center;
+}
+</style>

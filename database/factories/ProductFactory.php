@@ -25,7 +25,7 @@ class ProductFactory extends Factory
             'description' => fake()->text(),
             'price' => fake()->randomFloat(2, 0, 1000),
             'stock' => fake()->numberBetween(0, 100),
-            'thumbnail' => fake()->imageUrl(),
+            'thumbnail' => "https://www.vecteezy.com/free-photos/product-placeholder",
             'discount_price' => fake()->randomFloat(2, 0, 1000),
             'brand_id' => fn()=>Brand::factory()->create(),
             'user_id' => fn()=>User::factory()->create(),

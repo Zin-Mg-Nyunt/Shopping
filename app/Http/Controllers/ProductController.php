@@ -38,9 +38,9 @@ class ProductController extends Controller
             'product_id' => 'required|exists:products,id',
             'quantity' => 'required|integer|min:1',
         ]);
-        if(auth()->check()){
+        if($request->user()){
             Cart::updateOrCreate([
-                'user_id' => auth()->user()->id,
+                'user_id' => $request->user()->id,
                 'product_id' => $request->product_id,
             ],[
                 'quantity' => DB::raw('quantity + '.$request->quantity)

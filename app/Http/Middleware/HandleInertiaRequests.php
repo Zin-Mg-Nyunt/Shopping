@@ -44,7 +44,10 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user(),
             ],
             'categories' => Category::all(),
-            'brands' => Brand::all()
+            'brands' => Brand::all(),
+            'cart_count' => $request->user() 
+                            ? (int) $request->user()->cartProducts()->sum('quantity')
+                            : array_sum(session()->get('cart',[])),
         ];
     }
 }
