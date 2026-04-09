@@ -2,6 +2,7 @@
 import { useCustomToast } from '@/composables/useCustomToast';
 import { ref } from 'vue';
 import { router } from '@inertiajs/vue3';
+import { toast } from 'vue-sonner';
 
 const { product } = defineProps({
     product: Object,
@@ -42,6 +43,18 @@ function blurQuantity(event) {
     if (event.target.value == '') {
         quantity.value = 1;
     }
+}
+
+function addToWishlist(id) {
+    router.post(
+        route('wishlist.add', id),
+        {},
+        {
+            preserveScroll: true,
+            onSuccess: (response) =>
+                toast.success(response.props.flash.success),
+        },
+    );
 }
 </script>
 <template>
@@ -189,10 +202,15 @@ function blurQuantity(event) {
                         <button
                             type="button"
                             class="cursor-pointer rounded-full bg-primary/10 p-3 text-primary shadow-md transition hover:bg-primary/20"
+                            @click="addToWishlist(product.id)"
                         >
                             <span class="sr-only">Add to wishlist</span>
                             <svg
                                 class="h-5 w-5"
+                                :class="{
+                                    'fill-primary text-primary':
+                                        product.wishlisted,
+                                }"
                                 viewBox="0 0 24 24"
                                 fill="none"
                                 stroke="currentColor"

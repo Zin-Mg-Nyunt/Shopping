@@ -35,6 +35,10 @@ class Product extends Model
         return $this->hasMany(Cart::class);
     }
 
+    public function wishlistUsers(){
+        return $this->belongsToMany(User::class, 'wishlists')->withTimestamps();
+    }
+
     public function scopeFilterBy($query, $filters){
         return $query->when($filters['category']??false, function($query, $slug){
             $query->whereHas('categories',function($query) use($slug){

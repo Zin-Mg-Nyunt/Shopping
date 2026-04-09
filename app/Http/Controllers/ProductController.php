@@ -6,6 +6,7 @@ use App\Models\Product;
 use App\Models\Cart;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 
 class ProductController extends Controller
 {
@@ -27,7 +28,10 @@ class ProductController extends Controller
         ]);
     }
 
-    public function detail(Product $product){
+    public function detail(Product $product, Request $request){
+        $product->wishlisted = $request->user() 
+                                ? $product->wishlistUsers()->where('user_id',$request->user()->id)->exists() 
+                                : false;
         return inertia('Products/Detail',[
             'product' => $product
         ]);
@@ -51,5 +55,14 @@ class ProductController extends Controller
             session()->put('cart',$cart);
         }
         return redirect()->back()->with('success', 'Product added to cart successfully');
+    }
+
+    public function addWishlist(Product $product, Request $request){
+        if(Gate::allows('add-to-wishlist')){
+            $result=$request->user()->wishlistProducts()->toggle($product->id);
+            $result['attached'] ? $message = 'Added to wishlist' : $message = 'Removed from wishlist';
+            return redirect()->back()->with('success', $message);
+        }
+        return redirect()->route('login');
     }
 }

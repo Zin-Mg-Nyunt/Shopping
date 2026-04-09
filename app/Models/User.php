@@ -40,4 +40,8 @@ class User extends Authenticatable
     public function cartProducts(){
         return $this->hasMany(Cart::class);
     }
+
+    public function wishlistProducts(){
+        return $this->belongsToMany(Product::class, 'wishlists')->withTimestamps();
+    }
 }

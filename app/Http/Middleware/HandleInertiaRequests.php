@@ -48,6 +48,9 @@ class HandleInertiaRequests extends Middleware
             'cart_count' => $request->user() 
                             ? (int) $request->user()->cartProducts()->sum('quantity')
                             : array_sum(session()->get('cart',[])),
+            'flash' => [
+                'success' => $request->session()->get('success'),
+            ],
         ];
     }
 }
