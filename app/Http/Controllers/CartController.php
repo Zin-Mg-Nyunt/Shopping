@@ -9,8 +9,10 @@ class CartController extends Controller
 {
     public function index(Request $request)  {
         $items = [];
-        if($request->user()){
-            $items = $request->user()->cartProducts()->with('brand')->get();
+        $user = $request->user();
+        
+        if($user){
+            $items = $user->cartProducts()->with('brand')->get();
         }else{
             $cart=session()->get('cart',[]);
             $items=Product::whereIn('id',array_keys($cart))
@@ -22,7 +24,8 @@ class CartController extends Controller
                             });
         }
         return inertia('Products/Cart', [
-            'items' => $items
+            'items' => $items,
+            'addresses' => $user ? $user->addresses()->get() : []
         ]);
     }
 
@@ -50,7 +53,7 @@ class CartController extends Controller
         }
 
         if($hasError){
-            return redirect()->back()->withErrors(['error'=>'We have only '.$product->stock.' in stock.','quantity'=>$product->stock]);
+            return redirect()->back()->withErrors(['error'=>'We have only '.$product->stock.' in stock.']);
         }
 
         return back();
@@ -60,5 +63,15 @@ class CartController extends Controller
         $cart=session()->get('cart',[]);
         $cart[$product_id]=$quantity;
         session()->put('cart',$cart);
+    }
+
+    public function destroy($id,Request $request){
+        $user = $request->user();
+        if($user){
+            $user->carts()->where('product_id',$id)->delete();
+        }else{
+            session()->forget("cart.{$id}");
+        }
+        return redirect()->back();
     }
 }

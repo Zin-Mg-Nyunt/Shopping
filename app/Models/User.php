@@ -17,7 +17,7 @@ class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable, TwoFactorAuthenticatable;
-
+    protected $guarded = ['id'];
     /**
      * Get the attributes that should be cast.
      *
@@ -48,5 +48,9 @@ class User extends Authenticatable
 
     public function carts(){
         return $this->hasMany(Cart::class,'user_id');
+    }
+
+    public function addresses(){
+        return $this->hasMany(Address::class);
     }
 }

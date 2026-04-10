@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Address;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
@@ -21,11 +22,13 @@ class DatabaseSeeder extends Seeder
         Category::truncate();
         Product::truncate();
         User::truncate();
+        Address::truncate();
         Schema::enableForeignKeyConstraints();
 
         $users = [
             ['name'=>'Admin','email'=>'admin@gmail.com','password'=>'password','role'=>'admin'],
-            ['name'=>'User','email'=>'user@gmail.com','password'=>'password','role'=>'user']
+            ['name'=>'User','email'=>'user@gmail.com','password'=>'password','role'=>'user'],
+            ['name'=>'User2','email'=>'user2@gmail.com','password'=>'password','role'=>'user']
         ];
 
         $users=collect($users)->map(function($user){
@@ -34,6 +37,13 @@ class DatabaseSeeder extends Seeder
                 'email'=>$user['email'],
                 'password'=>$user['password'],
                 'role'=>$user['role'],
+            ]);
+        });
+
+        $users->where('role','!=','admin')->each(function ($user) {
+            Address::factory(rand(1,3))->create([
+                'user_id'=>$user->id,
+                'full_name'=>$user->name
             ]);
         });
 

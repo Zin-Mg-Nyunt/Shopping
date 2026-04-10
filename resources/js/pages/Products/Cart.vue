@@ -8,7 +8,7 @@ import {
     ShoppingBag,
     Trash2,
 } from 'lucide-vue-next';
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { route } from 'ziggy-js';
 import { toast } from 'vue-sonner';
 import { debounce } from 'lodash';
@@ -18,14 +18,26 @@ const props = defineProps({
         type: Array,
         required: true,
     },
+    addresses: {
+        type: Array,
+        required: true,
+    },
 });
-const lines = ref(
-    props.items.map((item) => ({
-        ...item,
-        quantity: item.pivot?.quantity ?? item.quantity,
-        price: item.discount_price ?? item.price,
-        brand: item.brand?.name,
-    })),
+const lines = ref([]);
+watch(
+    () => props.items,
+    () => {
+        lines.value = props.items.map((item) => ({
+            ...item,
+            quantity: item.pivot?.quantity ?? item.quantity,
+            price: item.discount_price ?? item.price,
+            brand: item.brand?.name,
+        }));
+    },
+    {
+        immediate: true,
+        deep: true,
+    },
 );
 
 const promoInput = ref('');
@@ -79,7 +91,6 @@ const cartUpdate = debounce((line) => {
 
     form.post(route('cart.update'), {
         onError: (response) => {
-            line.quantity = response.quantity;
             toast.error(response.error);
         },
     });
@@ -88,19 +99,25 @@ const cartUpdate = debounce((line) => {
 function increment(line) {
     if (line && line.quantity < line.stock) {
         line.quantity += 1;
+        cartUpdate(line);
     }
-    cartUpdate(line);
 }
 
 function decrement(line) {
     if (line && line.quantity > 1) {
         line.quantity -= 1;
+        cartUpdate(line);
     }
-    cartUpdate(line);
 }
 
 function removeLine(id) {
-    lines.value = lines.value.filter((l) => l.id !== id);
+    router.delete(route('cart.destroy', { id }), {
+        preserveScroll: true,
+        preserveState: true,
+        onSuccess: () => {
+            toast.success('Item removed from cart');
+        },
+    });
 }
 
 function applyPromo() {
@@ -127,32 +144,12 @@ function lineSubtotal(line) {
 }
 
 /** Shipping address — demo data; replace with API props later */
-const savedAddresses = ref([
-    {
-        id: 1,
-        fullName: 'Alex Morgan',
-        phone: '+1 (415) 555-0142',
-        street: '123 Market Street, Suite 400',
-        city: 'San Francisco, CA',
-        postalCode: '94102',
-        isDefault: true,
-    },
-    {
-        id: 2,
-        fullName: 'Alex Morgan',
-        phone: '+1 (510) 555-0198',
-        street: '88 Oak Avenue',
-        city: 'Oakland, CA',
-        postalCode: '94607',
-        isDefault: false,
-    },
-]);
 
 let nextAddressId = 3;
 
 const selectedAddressId = ref(
-    savedAddresses.value.find((a) => a.isDefault)?.id ??
-        savedAddresses.value[0]?.id ??
+    props.addresses.find((a) => a.is_default)?.id ??
+        props.addresses[0]?.id ??
         null,
 );
 
@@ -160,15 +157,23 @@ const selectedAddressId = ref(
 const addressUi = ref('compact');
 
 const newAddress = ref({
-    fullName: '',
+    full_name: '',
     phone: '',
     street: '',
     city: '',
-    postalCode: '',
+    postal_code: '',
 });
 
 const selectedAddress = computed(() =>
-    savedAddresses.value.find((a) => a.id === selectedAddressId.value),
+    props.addresses.find((a) => a.id === selectedAddressId.value),
+);
+
+const paymentMethod = ref('bank');
+
+const selectedPaymentDescription = computed(() =>
+    paymentMethod.value === 'bank'
+        ? 'Complete payment with bank transfer. We will process your order after confirmation.'
+        : 'Pay with cash when your order arrives at your delivery address.',
 );
 
 function openAddressPicker() {
@@ -181,11 +186,11 @@ function closeAddressPicker() {
 
 function openNewAddressForm() {
     newAddress.value = {
-        fullName: '',
+        full_name: '',
         phone: '',
         street: '',
         city: '',
-        postalCode: '',
+        postal_code: '',
     };
     addressUi.value = 'form';
 }
@@ -202,18 +207,18 @@ function selectAddressAndClose(id) {
 function saveNewAddress() {
     const n = newAddress.value;
 
-    if (!n.fullName.trim() || !n.street.trim() || !n.city.trim()) {
+    if (!n.full_name.trim() || !n.street.trim() || !n.city.trim()) {
         return;
     }
 
     const id = nextAddressId++;
-    savedAddresses.value.push({
+    props.addresses.push({
         id,
-        fullName: n.fullName.trim(),
+        full_name: n.full_name.trim(),
         phone: n.phone.trim() || '—',
         street: n.street.trim(),
         city: n.city.trim(),
-        postalCode: n.postalCode.trim() || '—',
+        postal_code: n.postal_code.trim() || '—',
         isDefault: false,
     });
     selectedAddressId.value = id;
@@ -505,7 +510,7 @@ function selectAddressId(id) {
                                             >
                                                 <span
                                                     v-if="
-                                                        selectedAddress.isDefault
+                                                        selectedAddress.is_default
                                                     "
                                                     class="rounded-full bg-primary/15 px-2.5 py-0.5 text-[10px] font-bold tracking-wide text-primary uppercase"
                                                 >
@@ -517,7 +522,7 @@ function selectAddressId(id) {
                                             >
                                                 <li class="font-semibold">
                                                     {{
-                                                        selectedAddress.fullName
+                                                        selectedAddress.full_name
                                                     }}
                                                 </li>
                                                 <li
@@ -537,9 +542,9 @@ function selectAddressId(id) {
                                                 <li
                                                     class="text-muted-foreground"
                                                 >
-                                                    {{ selectedAddress.city }}
+                                                    {{ selectedAddress.city }},
                                                     {{
-                                                        selectedAddress.postalCode
+                                                        selectedAddress.postal_code
                                                     }}
                                                 </li>
                                             </ul>
@@ -568,7 +573,7 @@ function selectAddressId(id) {
                                         </p>
                                         <ul class="space-y-3">
                                             <li
-                                                v-for="addr in savedAddresses"
+                                                v-for="addr in addresses"
                                                 :key="addr.id"
                                             >
                                                 <button
@@ -611,12 +616,12 @@ function selectAddressId(id) {
                                                             <span
                                                                 class="font-medium text-foreground"
                                                                 >{{
-                                                                    addr.fullName
+                                                                    addr.full_name
                                                                 }}</span
                                                             >
                                                             <span
                                                                 v-if="
-                                                                    addr.isDefault
+                                                                    addr.is_default
                                                                 "
                                                                 class="rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-bold text-primary uppercase"
                                                             >
@@ -633,7 +638,7 @@ function selectAddressId(id) {
                                                             class="block text-sm text-muted-foreground"
                                                             >{{ addr.city }}
                                                             {{
-                                                                addr.postalCode
+                                                                addr.postal_code
                                                             }}</span
                                                         >
                                                     </span>
@@ -851,6 +856,87 @@ function selectAddressId(id) {
                                     {{ formatMoney(orderTotal) }}
                                 </span>
                             </div>
+
+                            <section
+                                class="mt-6"
+                                aria-labelledby="payment-heading"
+                            >
+                                <h3
+                                    id="payment-heading"
+                                    class="text-sm font-semibold text-foreground"
+                                >
+                                    Payment method
+                                </h3>
+                                <p class="mt-1 text-xs text-muted-foreground">
+                                    Choose your preferred payment option.
+                                </p>
+
+                                <div class="mt-3 space-y-2.5">
+                                    <label
+                                        for="payment-bank"
+                                        class="flex cursor-pointer items-start gap-3 rounded-xl border p-3 text-sm transition"
+                                        :class="
+                                            paymentMethod === 'bank'
+                                                ? 'border-primary bg-primary/5 ring-1 ring-primary/20'
+                                                : 'border-border bg-background hover:border-primary/50'
+                                        "
+                                    >
+                                        <input
+                                            id="payment-bank"
+                                            v-model="paymentMethod"
+                                            type="radio"
+                                            value="bank"
+                                            name="payment-method"
+                                            class="mt-0.5 h-4 w-4 text-primary focus:ring-primary"
+                                        />
+                                        <span class="min-w-0">
+                                            <span
+                                                class="block font-medium text-foreground"
+                                                >Bank Payment</span
+                                            >
+                                            <span
+                                                class="mt-0.5 block text-xs text-muted-foreground"
+                                                >Transfer to our bank account
+                                                after placing your order.</span
+                                            >
+                                        </span>
+                                    </label>
+
+                                    <label
+                                        for="payment-cod"
+                                        class="flex cursor-pointer items-start gap-3 rounded-xl border p-3 text-sm transition"
+                                        :class="
+                                            paymentMethod === 'cod'
+                                                ? 'border-primary bg-primary/5 ring-1 ring-primary/20'
+                                                : 'border-border bg-background hover:border-primary/50'
+                                        "
+                                    >
+                                        <input
+                                            id="payment-cod"
+                                            v-model="paymentMethod"
+                                            type="radio"
+                                            value="cod"
+                                            name="payment-method"
+                                            class="mt-0.5 h-4 w-4 text-primary focus:ring-primary"
+                                        />
+                                        <span class="min-w-0">
+                                            <span
+                                                class="block font-medium text-foreground"
+                                                >Cash on Delivery (COD)</span
+                                            >
+                                            <span
+                                                class="mt-0.5 block text-xs text-muted-foreground"
+                                                >Pay in cash to the courier when
+                                                your package is delivered.</span
+                                            >
+                                        </span>
+                                    </label>
+                                </div>
+
+                                <p class="mt-3 text-xs text-muted-foreground">
+                                    {{ selectedPaymentDescription }}
+                                </p>
+                            </section>
 
                             <div class="mt-6 space-y-2">
                                 <label
