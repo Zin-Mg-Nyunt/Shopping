@@ -26,7 +26,7 @@ class MergeCartAfterLogin
         $getSessionProducts=session()->get('cart',[]);
         if($getSessionProducts){
             collect($getSessionProducts)->each(function($quantity,$id) use ($user){
-                $user->cartProducts()->updateOrCreate(
+                $user->carts()->updateOrCreate(
                     ['product_id' => $id],
                     ['quantity' => DB::raw('quantity + '.$quantity)]
                 );

@@ -1,7 +1,7 @@
 <?php
 
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\ProductController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [ProductController::class, 'index'])->name('home');
@@ -9,41 +9,8 @@ Route::get('/products', [ProductController::class, 'list'])->name('products.list
 Route::get('/products/{product:slug}', [ProductController::class, 'detail'])->name('product.detail');
 Route::post('/cart/add', [ProductController::class, 'addToCart'])->name('cart.add');
 Route::post('/wishlist/add/{product}', [ProductController::class, 'addWishlist'])->name('wishlist.add');
-
-Route::get('/cart', function (Request $request) {
-    $items = $request->boolean('empty')
-        ? []
-        : [
-            [
-                'id' => 1,
-                'name' => 'Aero Running Shoes',
-                'category' => 'Footwear · Running',
-                'image_url' => null,
-                'unit_price' => 129.0,
-                'quantity' => 2,
-            ],
-            [
-                'id' => 2,
-                'name' => 'Classic Leather Backpack',
-                'category' => 'Bags · Accessories',
-                'image_url' => null,
-                'unit_price' => 179.0,
-                'quantity' => 1,
-            ],
-            [
-                'id' => 3,
-                'name' => 'Smart Fitness Watch',
-                'category' => 'Electronics · Wearables',
-                'image_url' => null,
-                'unit_price' => 249.0,
-                'quantity' => 1,
-            ],
-        ];
-
-    return inertia('Products/Cart', [
-        'items' => $items,
-    ]);
-})->name('cart');
+Route::get('/cart', [CartController::class, 'index'])->name('cart');
+Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'Dashboard')->name('dashboard');

@@ -31,12 +31,17 @@ class Product extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function carts(){
-        return $this->hasMany(Cart::class);
+    public function cartUsers(){
+        return $this->belongsToMany(User::class, 'carts')
+                    ->withPivot('quantity');
     }
 
     public function wishlistUsers(){
         return $this->belongsToMany(User::class, 'wishlists')->withTimestamps();
+    }
+
+    public function carts(){
+        return $this->hasMany(Cart::class,'product_id');
     }
 
     public function scopeFilterBy($query, $filters){

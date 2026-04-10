@@ -38,10 +38,15 @@ class User extends Authenticatable
     }
 
     public function cartProducts(){
-        return $this->hasMany(Cart::class);
+        return $this->belongsToMany(Product::class, 'carts')
+                    ->withPivot('quantity');
     }
 
     public function wishlistProducts(){
         return $this->belongsToMany(Product::class, 'wishlists')->withTimestamps();
+    }
+
+    public function carts(){
+        return $this->hasMany(Cart::class,'user_id');
     }
 }

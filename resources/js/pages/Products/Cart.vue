@@ -1,5 +1,5 @@
 <script setup>
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import {
     MapPin,
     Minus,
@@ -10,6 +10,8 @@ import {
 } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 import { route } from 'ziggy-js';
+import { toast } from 'vue-sonner';
+import { debounce } from 'lodash';
 
 const props = defineProps({
     items: {
@@ -17,12 +19,20 @@ const props = defineProps({
         required: true,
     },
 });
-
-const lines = ref(props.items.map((item) => ({ ...item })));
+const lines = ref(
+    props.items.map((item) => ({
+        ...item,
+        quantity: item.pivot?.quantity ?? item.quantity,
+        price: item.discount_price ?? item.price,
+        brand: item.brand?.name,
+    })),
+);
 
 const promoInput = ref('');
 const appliedPromo = ref(null);
 const promoFeedback = ref('idle');
+
+const isEmpty = computed(() => lines.value.length === 0);
 
 const currency = new Intl.NumberFormat('en-US', {
     style: 'currency',
@@ -34,7 +44,7 @@ function formatMoney(value) {
 }
 
 const subtotal = computed(() =>
-    lines.value.reduce((sum, line) => sum + line.unit_price * line.quantity, 0),
+    lines.value.reduce((sum, line) => sum + line.price * line.quantity, 0),
 );
 
 const discountAmount = computed(() => {
@@ -52,29 +62,41 @@ const afterDiscount = computed(() =>
 const shipping = computed(() => (afterDiscount.value >= 200 ? 0 : 9.99));
 
 const estimatedTax = computed(
-    () => Math.round(afterDiscount.value * 0.08 * 100) / 100,
+    () => Math.round(afterDiscount.value * 0.05 * 100) / 100,
 );
 
 const orderTotal = computed(
     () => afterDiscount.value + shipping.value + estimatedTax.value,
 );
 
-const isEmpty = computed(() => lines.value.length === 0);
+const form = useForm({
+    product_id: null,
+    quantity: null,
+});
+const cartUpdate = debounce((line) => {
+    form.product_id = line.id;
+    form.quantity = line.quantity;
 
-function increment(id) {
-    const line = lines.value.find((l) => l.id === id);
+    form.post(route('cart.update'), {
+        onError: (response) => {
+            line.quantity = response.quantity;
+            toast.error(response.error);
+        },
+    });
+}, 500);
 
-    if (line && line.quantity < 99) {
+function increment(line) {
+    if (line && line.quantity < line.stock) {
         line.quantity += 1;
     }
+    cartUpdate(line);
 }
 
-function decrement(id) {
-    const line = lines.value.find((l) => l.id === id);
-
+function decrement(line) {
     if (line && line.quantity > 1) {
         line.quantity -= 1;
     }
+    cartUpdate(line);
 }
 
 function removeLine(id) {
@@ -101,7 +123,7 @@ function applyPromo() {
 }
 
 function lineSubtotal(line) {
-    return line.unit_price * line.quantity;
+    return line.price * line.quantity;
 }
 
 /** Shipping address — demo data; replace with API props later */
@@ -321,9 +343,9 @@ function selectAddressId(id) {
                         >
                             <div class="relative shrink-0">
                                 <img
-                                    v-if="line.image_url"
-                                    :src="line.image_url"
-                                    :alt="line.name"
+                                    v-if="line.thumbnail"
+                                    :src="line.thumbnail"
+                                    :alt="line.title"
                                     class="h-24 w-24 rounded-xl object-cover sm:h-28 sm:w-28"
                                 />
                                 <div
@@ -341,15 +363,20 @@ function selectAddressId(id) {
                                 <p
                                     class="text-xs font-medium tracking-wide text-muted-foreground uppercase"
                                 >
-                                    {{ line.category }}
+                                    {{ line.brand }}
                                 </p>
                                 <h2
                                     class="mt-0.5 font-semibold text-foreground"
                                 >
-                                    {{ line.name }}
+                                    {{ line.title }}
                                 </h2>
                                 <p class="mt-1 text-sm text-muted-foreground">
-                                    {{ formatMoney(line.unit_price) }} each
+                                    {{
+                                        formatMoney(
+                                            line.discount_price ?? line.price,
+                                        )
+                                    }}
+                                    each
                                 </p>
 
                                 <div
@@ -361,9 +388,12 @@ function selectAddressId(id) {
                                         <button
                                             type="button"
                                             class="flex h-9 w-9 items-center justify-center rounded-lg text-primary transition hover:bg-primary/10 disabled:cursor-not-allowed disabled:opacity-40"
-                                            :disabled="line.quantity <= 1"
+                                            :disabled="
+                                                line.quantity <= 1 ||
+                                                form.processing
+                                            "
                                             aria-label="Decrease quantity"
-                                            @click="decrement(line.id)"
+                                            @click="decrement(line)"
                                         >
                                             <Minus class="h-4 w-4" />
                                         </button>
@@ -375,9 +405,12 @@ function selectAddressId(id) {
                                         <button
                                             type="button"
                                             class="flex h-9 w-9 items-center justify-center rounded-lg text-primary transition hover:bg-primary/10 disabled:cursor-not-allowed disabled:opacity-40"
-                                            :disabled="line.quantity >= 99"
+                                            :disabled="
+                                                line.quantity >= line.stock ||
+                                                form.processing
+                                            "
                                             aria-label="Increase quantity"
-                                            @click="increment(line.id)"
+                                            @click="increment(line)"
                                         >
                                             <Plus class="h-4 w-4" />
                                         </button>
@@ -795,7 +828,7 @@ function selectAddressId(id) {
                                 </div>
                                 <div class="flex justify-between gap-4">
                                     <dt class="text-muted-foreground">
-                                        Estimated tax
+                                        Estimated tax (5%)
                                     </dt>
                                     <dd
                                         class="font-medium text-foreground tabular-nums"
@@ -854,8 +887,7 @@ function selectAddressId(id) {
                                     v-else-if="promoFeedback === 'invalid'"
                                     class="text-xs text-destructive"
                                 >
-                                    Invalid code. Try
-                                    <span class="font-mono">SAVE10</span>.
+                                    Invalid code. Try another one.
                                 </p>
                             </div>
 
