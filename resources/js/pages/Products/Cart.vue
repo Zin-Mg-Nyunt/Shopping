@@ -11,7 +11,7 @@ import {
 import { computed, ref, watch } from 'vue';
 import { route } from 'ziggy-js';
 import { toast } from 'vue-sonner';
-import { debounce } from 'lodash';
+import { debounce } from 'lodash-es';
 
 const props = defineProps({
     items: {
@@ -143,18 +143,26 @@ function lineSubtotal(line) {
     return line.price * line.quantity;
 }
 
-/** Shipping address — demo data; replace with API props later */
+const addressUi = ref('compact');
 
-let nextAddressId = 3;
+const sessionAddresses = ref(
+    JSON.parse(sessionStorage.getItem('addresses')) || [],
+);
+
+let allAddresses = computed(() => [
+    ...props.addresses,
+    ...sessionAddresses.value,
+]);
 
 const selectedAddressId = ref(
-    props.addresses.find((a) => a.is_default)?.id ??
-        props.addresses[0]?.id ??
+    allAddresses.value.find((a) => a.is_default)?.id ??
+        allAddresses.value[0]?.id ??
         null,
 );
 
-/** 'compact' = selected card only | 'list' = pick saved | 'form' = new address */
-const addressUi = ref('compact');
+const selectedAddress = computed(() =>
+    allAddresses.value.find((a) => a.id === selectedAddressId.value),
+);
 
 const newAddress = ref({
     full_name: '',
@@ -162,45 +170,22 @@ const newAddress = ref({
     street: '',
     city: '',
     postal_code: '',
+    oneTimeUse: true,
 });
 
-const selectedAddress = computed(() =>
-    props.addresses.find((a) => a.id === selectedAddressId.value),
-);
-
-const paymentMethod = ref('bank');
-
-const selectedPaymentDescription = computed(() =>
-    paymentMethod.value === 'bank'
-        ? 'Complete payment with bank transfer. We will process your order after confirmation.'
-        : 'Pay with cash when your order arrives at your delivery address.',
-);
+const selected = ref(selectedAddressId.value);
 
 function openAddressPicker() {
     addressUi.value = 'list';
 }
 
 function closeAddressPicker() {
+    selected.value = selectedAddressId.value;
     addressUi.value = 'compact';
 }
 
-function openNewAddressForm() {
-    newAddress.value = {
-        full_name: '',
-        phone: '',
-        street: '',
-        city: '',
-        postal_code: '',
-    };
-    addressUi.value = 'form';
-}
-
-function backFromFormToList() {
-    addressUi.value = 'list';
-}
-
-function selectAddressAndClose(id) {
-    selectedAddressId.value = id;
+function useAddress() {
+    selectedAddressId.value = selected.value;
     addressUi.value = 'compact';
 }
 
@@ -210,24 +195,21 @@ function saveNewAddress() {
     if (!n.full_name.trim() || !n.street.trim() || !n.city.trim()) {
         return;
     }
-
-    const id = nextAddressId++;
-    props.addresses.push({
-        id,
-        full_name: n.full_name.trim(),
-        phone: n.phone.trim() || '—',
-        street: n.street.trim(),
-        city: n.city.trim(),
-        postal_code: n.postal_code.trim() || '—',
-        isDefault: false,
-    });
-    selectedAddressId.value = id;
+    const id = allAddresses.value[allAddresses.value.length - 1].id + 1;
+    n.id = id;
+    sessionAddresses.value.push(n);
+    sessionStorage.setItem('addresses', JSON.stringify(sessionAddresses.value));
+    selectedAddressId.value = n.id;
     addressUi.value = 'compact';
 }
 
-function selectAddressId(id) {
-    selectedAddressId.value = id;
-}
+const paymentMethod = ref('bank');
+
+const selectedPaymentDescription = computed(() =>
+    paymentMethod.value === 'bank'
+        ? 'Complete payment with bank transfer. We will process your order after confirmation.'
+        : 'Pay with cash when your order arrives at your delivery address.',
+);
 </script>
 
 <template>
@@ -573,27 +555,23 @@ function selectAddressId(id) {
                                         </p>
                                         <ul class="space-y-3">
                                             <li
-                                                v-for="addr in addresses"
+                                                v-for="addr in allAddresses"
                                                 :key="addr.id"
                                             >
                                                 <button
                                                     type="button"
                                                     class="flex w-full cursor-pointer rounded-xl border-2 p-4 text-left transition"
                                                     :class="
-                                                        selectedAddressId ===
-                                                        addr.id
+                                                        selected === addr.id
                                                             ? 'border-primary bg-primary/4 ring-2 ring-primary/15 dark:bg-primary/10'
                                                             : 'border-border bg-muted/30 hover:border-primary/40'
                                                     "
-                                                    @click="
-                                                        selectAddressId(addr.id)
-                                                    "
+                                                    @click="selected = addr.id"
                                                 >
                                                     <span
                                                         class="mt-0.5 mr-3 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition"
                                                         :class="
-                                                            selectedAddressId ===
-                                                            addr.id
+                                                            selected === addr.id
                                                                 ? 'border-primary bg-primary'
                                                                 : 'border-muted-foreground/40 bg-card'
                                                         "
@@ -601,7 +579,7 @@ function selectAddressId(id) {
                                                     >
                                                         <span
                                                             v-if="
-                                                                selectedAddressId ===
+                                                                selected ===
                                                                 addr.id
                                                             "
                                                             class="h-2 w-2 rounded-full bg-primary-foreground"
@@ -636,7 +614,7 @@ function selectAddressId(id) {
                                                         >
                                                         <span
                                                             class="block text-sm text-muted-foreground"
-                                                            >{{ addr.city }}
+                                                            >{{ addr.city }},
                                                             {{
                                                                 addr.postal_code
                                                             }}</span
@@ -652,7 +630,7 @@ function selectAddressId(id) {
                                             <button
                                                 type="button"
                                                 class="inline-flex items-center justify-center rounded-xl border-2 border-dashed border-primary/40 px-4 py-3 text-sm font-semibold text-primary transition hover:bg-primary/10"
-                                                @click="openNewAddressForm"
+                                                @click="addressUi = 'form'"
                                             >
                                                 + Add new address
                                             </button>
@@ -667,11 +645,7 @@ function selectAddressId(id) {
                                                 <button
                                                     type="button"
                                                     class="rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm transition hover:bg-primary/90"
-                                                    @click="
-                                                        selectAddressAndClose(
-                                                            selectedAddressId,
-                                                        )
-                                                    "
+                                                    @click="useAddress"
                                                 >
                                                     Use this address
                                                 </button>
@@ -684,7 +658,7 @@ function selectAddressId(id) {
                                         <button
                                             type="button"
                                             class="inline-flex items-center gap-1 text-sm font-medium text-primary transition hover:underline"
-                                            @click="backFromFormToList"
+                                            @click="addressUi = 'list'"
                                         >
                                             ← Back to saved addresses
                                         </button>
@@ -698,7 +672,7 @@ function selectAddressId(id) {
                                                 <input
                                                     id="ship-name"
                                                     v-model="
-                                                        newAddress.fullName
+                                                        newAddress.full_name
                                                     "
                                                     type="text"
                                                     autocomplete="name"
@@ -760,7 +734,7 @@ function selectAddressId(id) {
                                                 <input
                                                     id="ship-postal"
                                                     v-model="
-                                                        newAddress.postalCode
+                                                        newAddress.postal_code
                                                     "
                                                     type="text"
                                                     autocomplete="postal-code"
