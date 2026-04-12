@@ -173,14 +173,15 @@ const newAddress = ref({
     oneTimeUse: true,
 });
 
-const selected = ref(selectedAddressId.value);
+const selected = ref(null);
 
 function openAddressPicker() {
+    selected.value = selectedAddressId.value;
     addressUi.value = 'list';
 }
 
 function closeAddressPicker() {
-    selected.value = selectedAddressId.value;
+    selected.value = null;
     addressUi.value = 'compact';
 }
 
@@ -191,6 +192,7 @@ function useAddress() {
 
 function saveNewAddress() {
     const n = newAddress.value;
+    console.log(n);
 
     if (!n.full_name.trim() || !n.street.trim() || !n.city.trim()) {
         return;
@@ -210,6 +212,48 @@ const selectedPaymentDescription = computed(() =>
         ? 'Complete payment with bank transfer. We will process your order after confirmation.'
         : 'Pay with cash when your order arrives at your delivery address.',
 );
+
+const addressData = computed(() => {
+    return {
+        id: selectedAddress.value.oneTimeUse ? null : selectedAddress.value.id,
+        full_name: selectedAddress.value.full_name,
+        phone: selectedAddress.value.phone,
+        street: selectedAddress.value.street,
+        city: selectedAddress.value.city,
+        postal_code: selectedAddress.value.postal_code,
+    };
+});
+
+function handleCheckout() {
+    if (!paymentMethod.value || !selectedAddress.value) {
+        toast.error('Please select a payment method and shipping address');
+        return;
+    }
+    const { id, ...addressDataWithoutId } = addressData.value;
+    const orderData = {
+        address_id: addressData.value.id,
+        shipping_address: addressDataWithoutId,
+        payment_method: paymentMethod.value,
+        total_quantity: lines.value.reduce(
+            (sum, line) => sum + line.quantity,
+            0,
+        ),
+        total_amount: orderTotal.value,
+        product_ids: lines.value.map((line) => line.id),
+        quantity: lines.value.map((line) => line.quantity),
+    };
+
+    router.post(route('order.store'), orderData, {
+        preserveScroll: true,
+        preserveState: true,
+        onSuccess: () => {
+            toast.success('Order placed successfully');
+        },
+        onError: (response) => {
+            toast.error(response.errors.message);
+        },
+    });
+}
 </script>
 
 <template>
@@ -954,6 +998,7 @@ const selectedPaymentDescription = computed(() =>
                             <button
                                 type="button"
                                 class="mt-6 w-full rounded-xl bg-primary py-3.5 text-base font-semibold text-primary-foreground shadow-sm transition hover:bg-primary/90"
+                                @click="handleCheckout"
                             >
                                 Proceed to checkout
                             </button>

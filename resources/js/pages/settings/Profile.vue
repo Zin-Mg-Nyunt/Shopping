@@ -23,6 +23,10 @@ defineOptions({
 
 const page = usePage();
 const user = computed(() => page.props.auth.user);
+
+function handleLogout() {
+    sessionStorage.removeItem('addresses');
+}
 </script>
 
 <template>
@@ -109,7 +113,9 @@ const user = computed(() => page.props.auth.user);
                         Saved.
                     </p>
                 </Transition>
-                <Link :href="logout()" as="button">Logout</Link>
+                <Link :href="logout()" as="button" @success="handleLogout"
+                    >Logout</Link
+                >
             </div>
         </Form>
     </div>
