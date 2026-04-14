@@ -2,7 +2,11 @@
 
 namespace App\Providers;
 
+use App\Models\Product;
+use App\Models\Order;
 use App\Models\User;
+use App\Observers\OrderObserver;
+use App\Observers\ProductObserver;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -29,6 +33,8 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('add-to-wishlist', function(User $user){
             return true;
         });
+        Product::observe(ProductObserver::class);
+        Order::observe(OrderObserver::class);
     }
 
     /**

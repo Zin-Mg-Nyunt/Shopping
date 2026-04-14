@@ -13,9 +13,9 @@ Route::post('/wishlist/add/{product}', [ProductController::class, 'addWishlist']
 Route::get('/cart', [CartController::class, 'index'])->name('cart');
 Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update');
 Route::delete('/cart/destroy/{id}', [CartController::class, 'destroy'])->name('cart.destroy');
-Route::post('/order/store', [OrderController::class, 'store'])->name('order.store');
 
 Route::middleware(['auth', 'verified'])->group(function () {
+    Route::post('/order/store', [OrderController::class, 'store'])->name('order.store');
     Route::inertia('dashboard', 'Dashboard')->name('dashboard');
     Route::inertia('admin/dashboard', 'Admin/Dashboard')->name('admin.dashboard');
     Route::get('/admin/products', function () {

@@ -6,6 +6,7 @@ use App\Models\Address;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\Promo;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Schema;
@@ -91,6 +92,32 @@ class DatabaseSeeder extends Seeder
                 'updated_at'=>$date,
             ]);
             $product->categories()->attach($categories->random(rand(1,3))->pluck('id'));
+        });
+
+        $promos = [
+            [
+                'code'=>'SAVE10',
+                'discount_type'=>'percentage',
+                'discount'=>10,
+            ],
+            [
+                'code'=>'SAVE100',
+                'discount_type'=>'fixed',
+                'discount'=>100,
+            ],
+            [
+                'code'=>'SAVE15',
+                'discount_type'=>'percentage',
+                'discount'=>15,
+            ]
+        ];
+
+        collect($promos)->map(function ($promo){
+            Promo::create([
+                'code'=>$promo['code'],
+                'discount_type'=>$promo['discount_type'],
+                'discount'=>$promo['discount'],
+            ]);
         });
     }
 }

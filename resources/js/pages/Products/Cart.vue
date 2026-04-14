@@ -22,6 +22,10 @@ const props = defineProps({
         type: Array,
         required: true,
     },
+    promos: {
+        type: Array,
+        required: true,
+    },
 });
 const lines = ref([]);
 watch(
@@ -60,10 +64,25 @@ const subtotal = computed(() =>
 );
 
 const discountAmount = computed(() => {
-    if (appliedPromo.value === 'SAVE10') {
-        return Math.round(subtotal.value * 0.1 * 100) / 100;
-    }
+    if (appliedPromo.value !== null) {
+        let promo = appliedPromo.value;
 
+        if (promo?.discount_type === 'percentage') {
+            promoFeedback.value = 'success';
+            return Math.round((subtotal.value * promo?.discount) / 100);
+        } else if (
+            promo?.discount_type === 'fixed' &&
+            subtotal.value > 5 * promo?.discount
+        ) {
+            promoFeedback.value = 'success';
+            return promo?.discount;
+        } else {
+            promoFeedback.value = 'idle';
+            toast.error('You must spend at least $500 to use this promo code.');
+            appliedPromo.value = null;
+            return 0;
+        }
+    }
     return 0;
 });
 
@@ -73,9 +92,7 @@ const afterDiscount = computed(() =>
 
 const shipping = computed(() => (afterDiscount.value >= 200 ? 0 : 9.99));
 
-const estimatedTax = computed(
-    () => Math.round(afterDiscount.value * 0.05 * 100) / 100,
-);
+const estimatedTax = computed(() => Math.round(afterDiscount.value * 5) / 100);
 
 const orderTotal = computed(
     () => afterDiscount.value + shipping.value + estimatedTax.value,
@@ -90,6 +107,8 @@ const cartUpdate = debounce((line) => {
     form.quantity = line.quantity;
 
     form.post(route('cart.update'), {
+        preserveScroll: true,
+        preserveState: true,
         onError: (response) => {
             toast.error(response.error);
         },
@@ -120,6 +139,13 @@ function removeLine(id) {
     });
 }
 
+watch(promoInput, () => {
+    if (promoInput.value.trim().length === 0) {
+        appliedPromo.value = null;
+        promoFeedback.value = 'idle';
+    }
+});
+
 function applyPromo() {
     const code = promoInput.value.trim().toUpperCase();
 
@@ -130,9 +156,10 @@ function applyPromo() {
         return;
     }
 
-    if (code === 'SAVE10') {
-        appliedPromo.value = 'SAVE10';
-        promoFeedback.value = 'success';
+    const promo = props.promos.find((promo) => promo.code === code);
+
+    if (promo) {
+        appliedPromo.value = promo;
     } else {
         appliedPromo.value = null;
         promoFeedback.value = 'invalid';
@@ -192,13 +219,11 @@ function useAddress() {
 
 function saveNewAddress() {
     const n = newAddress.value;
-    console.log(n);
 
     if (!n.full_name.trim() || !n.street.trim() || !n.city.trim()) {
         return;
     }
-    const id = allAddresses.value[allAddresses.value.length - 1].id + 1;
-    n.id = id;
+    n.id = 'temp-' + crypto.randomUUID();
     sessionAddresses.value.push(n);
     sessionStorage.setItem('addresses', JSON.stringify(sessionAddresses.value));
     selectedAddressId.value = n.id;
@@ -234,19 +259,17 @@ function handleCheckout() {
         address_id: addressData.value.id,
         shipping_address: addressDataWithoutId,
         payment_method: paymentMethod.value,
-        total_quantity: lines.value.reduce(
-            (sum, line) => sum + line.quantity,
-            0,
-        ),
         total_amount: orderTotal.value,
         product_ids: lines.value.map((line) => line.id),
         quantity: lines.value.map((line) => line.quantity),
+        promo_code: appliedPromo.value?.code,
     };
 
     router.post(route('order.store'), orderData, {
         preserveScroll: true,
         preserveState: true,
         onSuccess: () => {
+            sessionStorage.removeItem('addresses');
             toast.success('Order placed successfully');
         },
         onError: (response) => {
@@ -827,7 +850,7 @@ function handleCheckout() {
                                     class="flex justify-between gap-4"
                                 >
                                     <dt class="text-muted-foreground">
-                                        Discount (SAVE10)
+                                        Discount ({{ appliedPromo?.code }})
                                     </dt>
                                     <dd
                                         class="font-medium text-primary tabular-nums"
@@ -985,7 +1008,8 @@ function handleCheckout() {
                                     v-if="promoFeedback === 'success'"
                                     class="text-xs font-medium text-primary"
                                 >
-                                    Promo applied — 10% off your subtotal.
+                                    Promo applied {{ appliedPromo?.discount }} %
+                                    off your subtotal.
                                 </p>
                                 <p
                                     v-else-if="promoFeedback === 'invalid'"

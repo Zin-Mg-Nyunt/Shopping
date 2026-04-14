@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\Promo;
 use Illuminate\Http\Request;
 
 class CartController extends Controller
@@ -25,7 +26,8 @@ class CartController extends Controller
         }
         return inertia('Products/Cart', [
             'items' => $items,
-            'addresses' => $user ? $user->addresses()->get() : []
+            'addresses' => $user ? $user->addresses()->get() : [],
+            'promos' => Promo::where('is_valid',true)->get()
         ]);
     }
 
