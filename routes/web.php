@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
@@ -16,7 +17,8 @@ Route::delete('/cart/destroy/{id}', [CartController::class, 'destroy'])->name('c
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/order/store', [OrderController::class, 'store'])->name('order.store');
-    Route::inertia('dashboard', 'Dashboard')->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/orders/list', [OrderController::class, 'list'])->name('orders.list');
     Route::inertia('admin/dashboard', 'Admin/Dashboard')->name('admin.dashboard');
     Route::get('/admin/products', function () {
         return inertia('Admin/Products', [

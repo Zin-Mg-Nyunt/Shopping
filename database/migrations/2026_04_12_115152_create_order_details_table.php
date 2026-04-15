@@ -16,6 +16,7 @@ return new class extends Migration
             $table->softDeletes();
             $table->foreignId('order_id')->constrained()->cascadeOnDelete();
             $table->foreignId('product_id')->constrained()->restrictOnDelete();
+            $table->string('product_image')->nullable();
             $table->string('product_name');
             $table->integer('quantity');
             $table->decimal('price', 10, 2);

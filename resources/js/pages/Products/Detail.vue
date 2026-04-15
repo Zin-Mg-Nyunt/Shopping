@@ -107,7 +107,13 @@ function blurQuantity(event) {
                     </div>
 
                     <p class="text-4xl font-bold text-primary">
-                        ${{ product.price }}
+                        {{ product.discount_price ?? product.price }}
+                        <span
+                            v-if="product.discount_price"
+                            class="text-sm text-muted-foreground line-through"
+                        >
+                            {{ product.price }}
+                        </span>
                     </p>
 
                     <p
@@ -120,83 +126,80 @@ function blurQuantity(event) {
                         <p class="text-sm font-semibold text-foreground">
                             Quantity
                         </p>
-                        <div
-                            class="flex w-fit items-center rounded-full border border-border bg-card p-1 shadow-sm"
-                        >
-                            <button
-                                type="button"
-                                class="flex h-9 w-9 items-center justify-center rounded-full text-lg text-muted-foreground transition hover:bg-muted"
-                                @click="quantity = Math.max(1, (quantity -= 1))"
-                                :disabled="quantity <= 1"
+                        <div class="flex flex-col gap-3 sm:flex-row">
+                            <div
+                                class="flex w-full items-center justify-between rounded-full border border-border bg-card p-1 shadow-sm sm:w-fit"
                             >
-                                -
-                            </button>
-                            <input
-                                type="number"
-                                class="w-10 text-center text-sm font-semibold text-foreground"
-                                :value="quantity"
-                                @input="calQuantity($event)"
-                                @blur="blurQuantity($event)"
-                            />
-                            <button
-                                type="button"
-                                class="flex h-9 w-9 items-center justify-center rounded-full text-lg text-muted-foreground transition hover:bg-muted"
-                                @click="
-                                    quantity = Math.min(
-                                        product.stock,
-                                        (quantity += 1),
-                                    )
-                                "
-                                :disabled="quantity >= product.stock"
-                            >
-                                +
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="flex flex-col gap-3 sm:flex-row">
-                        <button
-                            v-if="product.stock > 0"
-                            type="button"
-                            class="rounded-full bg-primary px-8 py-3 text-sm font-semibold text-primary-foreground shadow-sm transition hover:bg-primary/90"
-                            @click="addToCart(product, quantity)"
-                        >
-                            Add to Cart
-                        </button>
-                        <span
-                            v-else
-                            class="flex cursor-not-allowed items-center justify-center gap-2 rounded-full border border-destructive/40 bg-destructive/10 px-4 py-2 text-sm font-semibold text-destructive"
-                        >
-                            Out of stock
-                        </span>
-                        <button
-                            type="button"
-                            class="rounded-full bg-primary/90 px-8 py-3 text-sm font-semibold text-primary-foreground shadow-sm transition hover:bg-primary"
-                        >
-                            Buy Now
-                        </button>
-                        <button
-                            type="button"
-                            class="cursor-pointer rounded-full bg-primary/10 p-3 text-primary shadow-md transition hover:bg-primary/20"
-                            @click="addToWishlist(product.id)"
-                        >
-                            <span class="sr-only">Add to wishlist</span>
-                            <svg
-                                class="h-5 w-5"
-                                :class="{
-                                    'fill-primary text-primary':
-                                        product.wishlisted,
-                                }"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="1.8"
-                            >
-                                <path
-                                    d="M12 20s-7-4.4-9-8.6C1.4 8.1 3.1 5 6.3 5A5 5 0 0 1 12 8a5 5 0 0 1 5.7-3c3.2 0 4.9 3.1 3.3 6.4-2 4.2-9 8.6-9 8.6Z"
+                                <button
+                                    type="button"
+                                    class="flex h-9 w-9 items-center justify-center rounded-full text-lg text-muted-foreground transition hover:bg-muted"
+                                    @click="
+                                        quantity = Math.max(1, (quantity -= 1))
+                                    "
+                                    :disabled="quantity <= 1"
+                                >
+                                    -
+                                </button>
+                                <input
+                                    type="number"
+                                    class="w-10 text-center text-sm font-semibold text-foreground"
+                                    :value="quantity"
+                                    @input="calQuantity($event)"
+                                    @blur="blurQuantity($event)"
                                 />
-                            </svg>
-                        </button>
+                                <button
+                                    type="button"
+                                    class="flex h-9 w-9 items-center justify-center rounded-full text-lg text-muted-foreground transition hover:bg-muted"
+                                    @click="
+                                        quantity = Math.min(
+                                            product.stock,
+                                            (quantity += 1),
+                                        )
+                                    "
+                                    :disabled="quantity >= product.stock"
+                                >
+                                    +
+                                </button>
+                            </div>
+                            <div class="flex gap-3">
+                                <button
+                                    v-if="product.stock > 0"
+                                    type="button"
+                                    class="w-full rounded-full bg-primary px-8 py-3 text-sm font-semibold text-primary-foreground shadow-sm transition hover:bg-primary/90 sm:w-auto"
+                                    @click="addToCart(product, quantity)"
+                                >
+                                    Add to Cart
+                                </button>
+                                <span
+                                    v-else
+                                    class="flex cursor-not-allowed items-center justify-center gap-2 rounded-full border border-destructive/40 bg-destructive/10 px-4 py-2 text-sm font-semibold text-destructive"
+                                >
+                                    Out of stock
+                                </span>
+                                <button
+                                    type="button"
+                                    class="cursor-pointer rounded-full bg-primary/10 p-3 text-primary shadow-md transition hover:bg-primary/20"
+                                    @click="addToWishlist(product.id)"
+                                >
+                                    <span class="sr-only">Add to wishlist</span>
+                                    <svg
+                                        class="h-5 w-5"
+                                        :class="{
+                                            'fill-primary text-primary':
+                                                product.wishlisted,
+                                        }"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="1.8"
+                                    >
+                                        <path
+                                            d="M12 20s-7-4.4-9-8.6C1.4 8.1 3.1 5 6.3 5A5 5 0 0 1 12 8a5 5 0 0 1 5.7-3c3.2 0 4.9 3.1 3.3 6.4-2 4.2-9 8.6-9 8.6Z"
+                                        />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>

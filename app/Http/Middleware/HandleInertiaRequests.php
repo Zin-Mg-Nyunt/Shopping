@@ -50,6 +50,7 @@ class HandleInertiaRequests extends Middleware
                             : array_sum(session()->get('cart',[])),
             'flash' => [
                 'success' => $request->session()->get('success'),
+                'error' => $request->session()->get('error'),
             ],
         ];
     }

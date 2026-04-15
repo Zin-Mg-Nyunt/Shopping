@@ -70,7 +70,7 @@ class CartController extends Controller
     public function destroy($id,Request $request){
         $user = $request->user();
         if($user){
-            $user->carts()->where('product_id',$id)->delete();
+            $user->carts()->where('product_id',$id)->forceDelete();
         }else{
             session()->forget("cart.{$id}");
         }

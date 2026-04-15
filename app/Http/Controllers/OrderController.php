@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
-use App\Models\OrderDetail;
 use App\Models\Product;
 use App\Models\Promo;
 use Illuminate\Http\Request;
@@ -11,6 +10,26 @@ use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
+    public function list(Request $request)
+    {
+        if($request->user()->role === 'admin'){
+            return inertia('Admin/OrderList', [
+                'orders' => Order::with('orderDetails')->paginate(10)->withQueryString(),
+            ]);
+        } else {
+            return inertia('User/OrderList', [
+                'orders' => $request->user()
+                            ->orders()
+                            ->with('orderDetails')
+                            ->when($request->status, function($query) use ($request){
+                                $query->where('status', $request->status);
+                            })
+                            ->paginate(10)
+                            ->withQueryString(),
+            ]);
+        }
+    }
+
     public function store(Request $request)
     {
         $request->validate([
@@ -29,7 +48,7 @@ class OrderController extends Controller
             DB::transaction(function() use ($request){
                 $order=Order::create([
                     'user_id'=>$request->user()->id,
-                    'order_number' => 'ORD-'.now()->format('YmdHis'),
+                    'order_number' => '#ORD-'.now()->format('YmdHis'),
                     'address_id'=>$request->address_id,
                     'shipping_address'=>$request->shipping_address,
                     'payment_method'=>$request->payment_method,
@@ -49,13 +68,14 @@ class OrderController extends Controller
                     $sub_total += $price * $quantity;
 
                     if($product->stock < $quantity){
-                        throw new \Exception('Product out of stock');
+                        throw new \Exception($product->title . ' is out of stock');
                     }
                     
                     $product->decrement('stock', $quantity);
 
                     $order->orderDetails()->create([
                         'product_id'=>$product->id,
+                        'product_image'=>$product->thumbnail,
                         'product_name'=>$product->title,
                         'quantity' => $quantity,
                         'price' => $price,
@@ -84,14 +104,11 @@ class OrderController extends Controller
                     'total_amount' => $total_amount,
                 ]);
     
-                $request->user()->carts()->delete();
-
+                $request->user()->carts()->forceDelete();
             });
             return redirect()->back()->with('success', 'Order created successfully');
-        } catch (\Throwable) {
-            return redirect()->back()->with('error', 'Order failed');
+        } catch (\Throwable $e) {
+            return redirect()->back()->with('error', $e->getMessage());
         }
-        
-        
     }
 }

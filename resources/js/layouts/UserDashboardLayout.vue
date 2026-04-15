@@ -2,20 +2,24 @@
 import { Link } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
 import AppLogo from '@/components/AppLogo.vue';
-import { useCurrentUrl } from '@/composables/useCurrentUrl';
+// import { useCurrentUrl } from '@/composables/useCurrentUrl';
 
-const { isCurrentUrl } = useCurrentUrl();
-
+// const { isCurrentUrl } = useCurrentUrl();
 const navItems = [
+    {
+        label: 'Dashboard',
+        href: route('dashboard'),
+        match: () => route().current('dashboard'),
+    },
     {
         label: 'My Profile',
         href: route('profile.edit'),
-        match: () => isCurrentUrl(route('profile.edit')),
+        match: () => route().current('profile.edit'),
     },
     {
         label: 'Order History',
-        href: '#',
-        match: () => false,
+        href: route('orders.list'),
+        match: () => route().current('orders.list'),
     },
     {
         label: 'My Wishlist',
@@ -30,7 +34,7 @@ const navItems = [
     {
         label: 'Settings',
         href: route('security.edit'),
-        match: () => isCurrentUrl(route('security.edit')),
+        match: () => route().current('security.edit'),
     },
 ];
 </script>

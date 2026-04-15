@@ -268,12 +268,17 @@ function handleCheckout() {
     router.post(route('order.store'), orderData, {
         preserveScroll: true,
         preserveState: true,
-        onSuccess: () => {
+        onSuccess: (response) => {
             sessionStorage.removeItem('addresses');
-            toast.success('Order placed successfully');
+            if (response.props.flash.success) {
+                toast.success(response.props.flash.success);
+            }
+            if (response.props.flash.error) {
+                toast.error(response.props.flash.error);
+            }
         },
-        onError: (response) => {
-            toast.error(response.errors.message);
+        onError: () => {
+            toast.error('Order failed to place');
         },
     });
 }

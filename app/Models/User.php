@@ -39,7 +39,8 @@ class User extends Authenticatable
 
     public function cartProducts(){
         return $this->belongsToMany(Product::class, 'carts')
-                    ->withPivot('quantity');
+                    ->withPivot('quantity')
+                    ->wherePivot('deleted_at',null);
     }
 
     public function wishlistProducts(){
@@ -52,5 +53,9 @@ class User extends Authenticatable
 
     public function addresses(){
         return $this->hasMany(Address::class);
+    }
+
+    public function orders(){
+        return $this->hasMany(Order::class)->where('deleted_at',null);
     }
 }

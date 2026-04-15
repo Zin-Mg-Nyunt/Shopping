@@ -2,9 +2,21 @@
 import { Head } from '@inertiajs/vue3';
 import UserDashboardLayout from '@/layouts/UserDashboardLayout.vue';
 
+const props = defineProps({
+    orders: Array,
+});
+
 defineOptions({
     layout: UserDashboardLayout,
 });
+
+const formatDate = (date) => {
+    return new Date(date).toLocaleDateString('en-US', {
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric',
+    });
+};
 </script>
 
 <template>
@@ -32,7 +44,7 @@ defineOptions({
                         <p
                             class="mt-2 text-3xl font-bold text-foreground tabular-nums"
                         >
-                            24
+                            {{ orders.length }}
                         </p>
                     </div>
                     <div
@@ -59,12 +71,16 @@ defineOptions({
                 <div class="flex items-start justify-between gap-3">
                     <div>
                         <p class="text-sm font-medium text-muted-foreground">
-                            Pending shipments
+                            Pending Orders
                         </p>
                         <p
                             class="mt-2 text-3xl font-bold text-foreground tabular-nums"
                         >
-                            2
+                            {{
+                                orders.filter(
+                                    (order) => order.status === 'pending',
+                                ).length
+                            }}
                         </p>
                     </div>
                     <div
@@ -145,64 +161,28 @@ defineOptions({
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-border">
-                        <tr class="transition hover:bg-muted/50">
+                        <tr
+                            v-for="order in orders"
+                            :key="order.id"
+                            class="transition hover:bg-muted/50"
+                        >
                             <td class="px-5 py-4 font-medium text-foreground">
-                                #ORD-10492
+                                {{ order.order_number }}
                             </td>
                             <td class="px-5 py-4 text-muted-foreground">
-                                Mar 12, 2026
+                                {{ formatDate(order.created_at) }}
                             </td>
                             <td class="px-5 py-4">
                                 <span
                                     class="inline-flex rounded-full border border-primary/20 bg-primary/12 px-2.5 py-0.5 text-xs font-semibold text-primary"
                                 >
-                                    Shipped
+                                    {{ order.status }}
                                 </span>
                             </td>
                             <td
                                 class="px-5 py-4 text-right font-semibold text-foreground"
                             >
-                                $129.00
-                            </td>
-                        </tr>
-                        <tr class="transition hover:bg-muted/50">
-                            <td class="px-5 py-4 font-medium text-foreground">
-                                #ORD-10471
-                            </td>
-                            <td class="px-5 py-4 text-muted-foreground">
-                                Mar 8, 2026
-                            </td>
-                            <td class="px-5 py-4">
-                                <span
-                                    class="inline-flex rounded-full border border-amber-500/25 bg-amber-500/10 px-2.5 py-0.5 text-xs font-semibold text-amber-200/90"
-                                >
-                                    Processing
-                                </span>
-                            </td>
-                            <td
-                                class="px-5 py-4 text-right font-semibold text-foreground"
-                            >
-                                $64.50
-                            </td>
-                        </tr>
-                        <tr class="transition hover:bg-muted/50">
-                            <td class="px-5 py-4 font-medium text-foreground">
-                                #ORD-10455
-                            </td>
-                            <td class="px-5 py-4 text-muted-foreground">
-                                Feb 28, 2026
-                            </td>
-                            <td class="px-5 py-4">
-                                <span
-                                    class="inline-flex rounded-full border border-primary/20 bg-primary/12 px-2.5 py-0.5 text-xs font-semibold text-primary"
-                                >
-                                    Shipped
-                                </span>
-                            </td>
-                            <td
-                                class="px-5 py-4 text-right font-semibold text-foreground"
-                            >
-                                $210.00
+                                {{ order.total_amount }}
                             </td>
                         </tr>
                     </tbody>
