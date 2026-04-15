@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import { Head, router } from '@inertiajs/vue3';
 import UserDashboardLayout from '@/layouts/UserDashboardLayout.vue';
 import Pagination from '@/components/ui/Pagination.vue';
+import OrderDetail from '@/components/Order/OrderDetail.vue';
 
 defineOptions({
     layout: UserDashboardLayout,
@@ -23,10 +24,17 @@ const filters = [
 ];
 
 const activeFilter = ref(null);
+const detailSheetOpen = ref(false);
+const selectedOrder = ref(null);
 
 function orderFilter(status) {
     router.get(route('orders.list', { status }), {}, { preserveState: true });
     activeFilter.value = status;
+}
+
+function openOrderDetails(order) {
+    selectedOrder.value = order;
+    detailSheetOpen.value = true;
 }
 
 const formatDate = (iso) =>
@@ -63,12 +71,6 @@ const statusStyles = {
                     details.
                 </p>
             </div>
-            <button
-                type="button"
-                class="inline-flex shrink-0 items-center justify-center rounded-full border border-border bg-card px-4 py-2 text-sm font-semibold text-foreground shadow-sm transition hover:border-primary/40 hover:bg-muted/50"
-            >
-                Download invoices
-            </button>
         </div>
 
         <div class="flex flex-wrap gap-2">
@@ -117,7 +119,11 @@ const statusStyles = {
                                 <p
                                     class="text-lg font-bold text-foreground tabular-nums"
                                 >
-                                    {{ order.total_amount }}
+                                    {{
+                                        order.status === 'cancelled'
+                                            ? 0
+                                            : order.total_amount
+                                    }}
                                 </p>
                             </div>
                         </div>
@@ -129,6 +135,7 @@ const statusStyles = {
                         <button
                             type="button"
                             class="w-full rounded-full border border-primary bg-card py-2 text-sm font-semibold text-primary transition hover:bg-primary hover:text-primary-foreground sm:w-auto sm:px-4 sm:py-2"
+                            @click="openOrderDetails(order)"
                         >
                             View details
                         </button>
@@ -184,7 +191,7 @@ const statusStyles = {
                     </ul>
                     <p
                         v-if="order.order_details.length > 3"
-                        class="mt-2 text-xs text-muted-foreground"
+                        class="mt-2 text-sm text-muted-foreground"
                     >
                         +{{ order.order_details.length - 3 }} more in this order
                     </p>
@@ -218,5 +225,12 @@ const statusStyles = {
                 </p>
             </div>
         </template>
+
+        <OrderDetail
+            v-if="selectedOrder"
+            :selectedOrder="selectedOrder"
+            :detailSheetOpen="detailSheetOpen"
+            @update:detailSheetOpen="detailSheetOpen = $event"
+        />
     </div>
 </template>
