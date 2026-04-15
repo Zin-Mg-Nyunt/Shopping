@@ -69,8 +69,8 @@ class Product extends Model
         ->when($filters['sort']??false, function($query,$sort){
             match($sort){
                 'newest' => $query->latest(),
-                'low-to-high' => $query->orderBy('price','asc'),
-                'high-to-low' => $query->orderBy('price','desc'),
+                'low-to-high' => $query->orderByRaw('coalesce(discount_price, price) asc'),
+                'high-to-low' => $query->orderByRaw('coalesce(discount_price, price) desc'),
                 default => $query->latest(),
             };
         },function($query){

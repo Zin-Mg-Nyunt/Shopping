@@ -2,22 +2,24 @@
 import { ref } from 'vue';
 import { Head, router } from '@inertiajs/vue3';
 import UserDashboardLayout from '@/layouts/UserDashboardLayout.vue';
+import Pagination from '@/components/ui/Pagination.vue';
 
 defineOptions({
     layout: UserDashboardLayout,
 });
 
-const { orders } = defineProps({
+const { orders, statusCount } = defineProps({
     orders: Object,
+    statusCount: Object,
 });
 
 const filters = [
-    { id: null, label: 'All' },
-    { id: 'pending', label: 'Pending' },
-    { id: 'processing', label: 'Processing' },
-    { id: 'shipped', label: 'Shipped' },
-    { id: 'delivered', label: 'Delivered' },
-    { id: 'cancelled', label: 'Cancelled' },
+    { id: null, label: 'All', count: statusCount.total },
+    { id: 'pending', label: 'Pending', count: statusCount.pending },
+    { id: 'processing', label: 'Processing', count: statusCount.processing },
+    { id: 'shipped', label: 'Shipped', count: statusCount.shipped },
+    { id: 'delivered', label: 'Delivered', count: statusCount.delivered },
+    { id: 'cancelled', label: 'Cancelled', count: statusCount.cancelled },
 ];
 
 const activeFilter = ref(null);
@@ -82,7 +84,7 @@ const statusStyles = {
                 "
                 @click="orderFilter(f.id)"
             >
-                {{ f.label }}
+                {{ f.label }} ({{ f.count }})
             </button>
         </div>
 
@@ -188,6 +190,7 @@ const statusStyles = {
                     </p>
                 </div>
             </article>
+            <Pagination :pagination="orders" />
         </div>
 
         <template v-else>

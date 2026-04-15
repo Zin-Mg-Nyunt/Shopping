@@ -17,14 +17,23 @@ class OrderController extends Controller
                 'orders' => Order::with('orderDetails')->paginate(10)->withQueryString(),
             ]);
         } else {
+            $statusCount = $request->user()->orders()->selectRaw("
+                count(*) as total,
+                count(case when status = 'pending' then 1 end) as pending,
+                count(case when status = 'processing' then 1 end) as processing,
+                count(case when status = 'shipped' then 1 end) as shipped,
+                count(case when status = 'delivered' then 1 end) as delivered,
+                count(case when status = 'cancelled' then 1 end) as cancelled
+            ")->first();
             return inertia('User/OrderList', [
+                'statusCount' => $statusCount,
                 'orders' => $request->user()
                             ->orders()
                             ->with('orderDetails')
                             ->when($request->status, function($query) use ($request){
                                 $query->where('status', $request->status);
                             })
-                            ->paginate(10)
+                            ->paginate(3)
                             ->withQueryString(),
             ]);
         }
