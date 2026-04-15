@@ -19,6 +19,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/order/store', [OrderController::class, 'store'])->name('order.store');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/orders/list', [OrderController::class, 'list'])->name('orders.list');
+    Route::get('/wishlist', [ProductController::class, 'showWishlist'])->name('user.wishlist');
+    Route::delete('/wishlist/remove/{product}', [ProductController::class, 'removeWishlist'])->name('user.wishlist.remove');
+
     Route::inertia('admin/dashboard', 'Admin/Dashboard')->name('admin.dashboard');
     Route::get('/admin/products', function () {
         return inertia('Admin/Products', [

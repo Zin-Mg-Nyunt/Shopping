@@ -78,4 +78,22 @@ class ProductController extends Controller
         }
         return redirect()->route('login');
     }
+
+    public function showWishlist(Request $request){
+        $total = $request->user()->wishlistProducts()->count();
+        $wishlist = $request->user()->wishlistProducts()
+                        ->with('brand')
+                        ->filterBy($request->all())
+                        ->paginate(6)
+                        ->withQueryString();
+        return inertia('User/Wishlist', [
+            'wishlist' => $wishlist,
+            'total' => $total
+        ]);
+    }
+
+    public function removeWishlist(Product $product, Request $request){
+        $request->user()->wishlistProducts()->detach($product->id);
+        return redirect()->back();
+    }
 }

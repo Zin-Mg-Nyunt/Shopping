@@ -1,10 +1,15 @@
 <script setup>
 import { Link } from '@inertiajs/vue3';
-import { route } from 'ziggy-js';
+import { ref, watch } from 'vue';
 import AppLogo from '@/components/AppLogo.vue';
+import { useCartCount } from '@/composables/useCartCount';
+import { Toaster } from 'vue-sonner';
+import 'vue-sonner/style.css';
 // import { useCurrentUrl } from '@/composables/useCurrentUrl';
 
 // const { isCurrentUrl } = useCurrentUrl();
+const { cartCount } = useCartCount();
+const bounce = ref(false);
 const navItems = [
     {
         label: 'Dashboard',
@@ -23,8 +28,8 @@ const navItems = [
     },
     {
         label: 'My Wishlist',
-        href: '#',
-        match: () => false,
+        href: route('user.wishlist'),
+        match: () => route().current('user.wishlist'),
     },
     {
         label: 'Shipping Address',
@@ -37,10 +42,19 @@ const navItems = [
         match: () => route().current('security.edit'),
     },
 ];
+watch(cartCount, (newCount, oldCount) => {
+    if (newCount > oldCount) {
+        bounce.value = true;
+        setTimeout(() => {
+            bounce.value = false;
+        }, 1000);
+    }
+});
 </script>
 
 <template>
     <div class="flex min-h-screen flex-col bg-muted text-foreground">
+        <Toaster position="top-right" richColors />
         <header
             class="border-b border-border bg-card shadow-sm dark:bg-card/95"
         >
@@ -93,11 +107,12 @@ const navItems = [
                 <nav class="ml-auto flex shrink-0 items-center gap-2 sm:gap-3">
                     <Link
                         :href="route('cart')"
-                        class="rounded-full border border-border bg-card p-2 text-muted-foreground transition hover:border-primary/40 hover:text-primary"
+                        class="relative rounded-full border border-border bg-card p-2 text-muted-foreground transition hover:border-primary/40 hover:text-primary"
                     >
                         <span class="sr-only">Cart</span>
                         <svg
                             class="h-5 w-5"
+                            :class="{ 'cart-shake': bounce }"
                             viewBox="0 0 24 24"
                             fill="none"
                             stroke="currentColor"
@@ -109,6 +124,12 @@ const navItems = [
                                 d="M3 4h2l2.2 10.5a1 1 0 0 0 1 .8h9.6a1 1 0 0 0 1-.8L21 7H6.2"
                             />
                         </svg>
+                        <span
+                            v-if="cartCount > 0"
+                            class="absolute -top-1 -right-1 inline-flex min-h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[11px] leading-none font-semibold text-primary-foreground"
+                        >
+                            {{ cartCount }}
+                        </span>
                     </Link>
                     <details class="relative">
                         <summary
@@ -247,3 +268,28 @@ const navItems = [
         </footer>
     </div>
 </template>
+<style scoped>
+@keyframes cart-shake {
+    0%,
+    100% {
+        transform: rotate(0deg);
+    }
+    20% {
+        transform: rotate(-10deg);
+    }
+    40% {
+        transform: rotate(8deg);
+    }
+    60% {
+        transform: rotate(-6deg);
+    }
+    80% {
+        transform: rotate(4deg);
+    }
+}
+
+.cart-shake {
+    animation: cart-shake 420ms ease-in-out;
+    transform-origin: center;
+}
+</style>
