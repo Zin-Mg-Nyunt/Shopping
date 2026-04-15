@@ -1,14 +1,14 @@
 <script setup>
-import { route } from 'ziggy-js';
 import { router } from '@inertiajs/vue3';
+import { useAddToCart } from '@/composables/useAddToCart';
+import { useAddToWishlist } from '@/composables/useAddToWishlist';
 
 const { products } = defineProps({
     products: Array,
 });
 
-const addToCard = (product) => {
-    alert(product.name);
-};
+const { addToCart } = useAddToCart();
+const { addToWishlist } = useAddToWishlist();
 </script>
 
 <template>
@@ -16,15 +16,18 @@ const addToCard = (product) => {
         v-for="product in products"
         :key="product.id"
         class="group relative cursor-pointer overflow-hidden rounded-2xl border border-border bg-card p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
-        @click="router.visit(route('product.detail', { slug: product.slug }))"
+        @click="router.get(route('product.detail', { slug: product.slug }))"
     >
         <button
             type="button"
-            class="absolute top-4 right-4 rounded-full border border-border bg-card p-1.5 text-muted-foreground transition hover:border-primary/40 hover:text-primary"
+            class="absolute top-4 right-4 cursor-pointer rounded-full border border-border bg-card p-1.5 text-muted-foreground transition"
+            :class="{ 'bg-primary/10': product.wishlisted }"
+            @click.stop="addToWishlist(product.id)"
         >
             <span class="sr-only">Add to wishlist</span>
             <svg
-                class="h-4 w-4"
+                class="h-4 w-4 transition"
+                :class="{ 'fill-primary text-primary': product.wishlisted }"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -52,16 +55,29 @@ const addToCard = (product) => {
                 {{ product.description }}
             </p>
             <p class="text-lg font-bold text-primary">
-                {{ product.price }}
+                {{ product.discount_price ?? product.price }}
+                <span
+                    v-if="product.discount_price"
+                    class="text-sm text-muted-foreground line-through"
+                >
+                    {{ product.price }}
+                </span>
             </p>
         </div>
 
         <button
             type="button"
+            v-if="product.stock > 0"
             class="mt-4 w-full rounded-full border border-primary bg-card px-4 py-2 text-sm font-semibold text-primary transition hover:bg-primary hover:text-primary-foreground"
-            @click.stop="addToCard(product)"
+            @click.stop="addToCart(product, 1)"
         >
             Add to Cart
         </button>
+        <span
+            v-else
+            class="mt-4 flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-full border border-destructive/40 bg-destructive/10 px-4 py-2 text-sm font-semibold text-destructive"
+        >
+            Out of stock
+        </span>
     </article>
 </template>

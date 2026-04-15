@@ -10,17 +10,30 @@ use Illuminate\Support\Facades\Gate;
 
 class ProductController extends Controller
 {
-    public function index(){
-        $products = Product::with('brand','categories')->latest()->take(4)->get();
+    public function index(Request $request){
+        $products = Product::with('brand','categories')
+                    ->when($request->user(), function ($query) use ($request){
+                        $query->withExists('wishlistUsers as wishlisted', function($q) use ($request){
+                            $q->where('user_id',$request->user()->id);
+                        });
+                    })
+                    ->latest()
+                    ->take(4)
+                    ->get();
         return inertia('Welcome', [
             'products' => $products
         ]);
     }
 
     public function list(Request $request){
-        $products = Product::with('brand','categories')
+        $products = Product::query()
+                    ->with('brand','categories')
                     ->filterBy($request->all())
-                    ->latest()
+                    ->when($request->user(), function ($query) use ($request){
+                        $query->withExists('wishlistUsers as wishlisted', function($q) use ($request){
+                            $q->where('user_id',$request->user()->id);
+                        });
+                    })
                     ->paginate(4)
                     ->withQueryString();
         return inertia('Products/List', [

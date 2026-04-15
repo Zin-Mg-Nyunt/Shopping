@@ -1,33 +1,14 @@
 <script setup>
-import { useCustomToast } from '@/composables/useCustomToast';
 import { ref } from 'vue';
-import { router } from '@inertiajs/vue3';
-import { toast } from 'vue-sonner';
+import { useAddToCart } from '@/composables/useAddToCart';
+import { useAddToWishlist } from '@/composables/useAddToWishlist';
 
 const { product } = defineProps({
     product: Object,
 });
-const { customToast } = useCustomToast();
 const quantity = ref(1);
-
-function addToCart(product) {
-    router.post(
-        route('cart.add'),
-        {
-            product_id: product.id,
-            quantity: quantity.value,
-        },
-        {
-            preserveScroll: true,
-            onSuccess: () => {
-                customToast(
-                    product.thumbnail,
-                    ` x${quantity.value} added to cart`,
-                );
-            },
-        },
-    );
-}
+const { addToCart } = useAddToCart();
+const { addToWishlist } = useAddToWishlist();
 
 function calQuantity(event) {
     const target = event.target;
@@ -43,18 +24,6 @@ function blurQuantity(event) {
     if (event.target.value == '') {
         quantity.value = 1;
     }
-}
-
-function addToWishlist(id) {
-    router.post(
-        route('wishlist.add', id),
-        {},
-        {
-            preserveScroll: true,
-            onSuccess: (response) =>
-                toast.success(response.props.flash.success),
-        },
-    );
 }
 </script>
 <template>
@@ -187,12 +156,19 @@ function addToWishlist(id) {
 
                     <div class="flex flex-col gap-3 sm:flex-row">
                         <button
+                            v-if="product.stock > 0"
                             type="button"
                             class="rounded-full bg-primary px-8 py-3 text-sm font-semibold text-primary-foreground shadow-sm transition hover:bg-primary/90"
-                            @click="addToCart(product)"
+                            @click="addToCart(product, quantity)"
                         >
                             Add to Cart
                         </button>
+                        <span
+                            v-else
+                            class="flex cursor-not-allowed items-center justify-center gap-2 rounded-full border border-destructive/40 bg-destructive/10 px-4 py-2 text-sm font-semibold text-destructive"
+                        >
+                            Out of stock
+                        </span>
                         <button
                             type="button"
                             class="rounded-full bg-primary/90 px-8 py-3 text-sm font-semibold text-primary-foreground shadow-sm transition hover:bg-primary"
