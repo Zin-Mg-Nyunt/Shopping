@@ -45,12 +45,13 @@ class HandleInertiaRequests extends Middleware
             ],
             'categories' => Category::all(),
             'brands' => Brand::all(),
-            'cart_count' => $request->user() 
+            'cart_count' => $request->user()
                             ? (int) $request->user()->cartProducts()->sum('quantity')
-                            : array_sum(session()->get('cart',[])),
+                            : array_sum(session()->get('cart', [])),
             'flash' => [
                 'success' => $request->session()->get('success'),
                 'error' => $request->session()->get('error'),
+                'info' => $request->session()->get('info'),
             ],
         ];
     }

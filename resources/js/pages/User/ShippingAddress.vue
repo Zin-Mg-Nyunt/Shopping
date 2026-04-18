@@ -1,13 +1,21 @@
 <script setup>
-import { Head } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { Head, router, useForm } from '@inertiajs/vue3';
+import { ref, watch } from 'vue';
 import UserDashboardLayout from '@/layouts/UserDashboardLayout.vue';
 import { Card } from '@/components/ui/card';
 import { PlusIcon } from 'lucide-vue-next';
-import { useForm } from '@inertiajs/vue3';
 import { toast } from 'vue-sonner';
 import InputError from '@/components/InputError.vue';
 import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 
 defineOptions({
     layout: UserDashboardLayout,
@@ -22,6 +30,9 @@ const { addresses } = defineProps({
 
 const showAddAddressForm = ref(false);
 const editingAddressId = ref(null);
+const removeModalOpen = ref(false);
+const removingAddress = ref(null);
+
 const form = useForm({
     label: '',
     full_name: '',
@@ -32,21 +43,35 @@ const form = useForm({
     is_default: false,
 });
 
+function addNewAddress() {
+    editingAddressId.value = null;
+    form.defaults({
+        label: '',
+        full_name: '',
+        phone: '',
+        street: '',
+        city: '',
+        postal_code: '',
+        is_default: false,
+    });
+    form.reset();
+    form.clearErrors();
+    showAddAddressForm.value = true;
+}
+
 function hideAddressForm() {
     editingAddressId.value = null;
     showAddAddressForm.value = false;
+    form.clearErrors();
     form.reset();
 }
 
 function editAddress(address) {
     editingAddressId.value = address.id;
 
-    form.full_name = address.full_name;
-    form.phone = address.phone;
-    form.street = address.street;
-    form.city = address.city;
-    form.postal_code = address.postal_code;
-    form.is_default = address.is_default;
+    form.defaults(address);
+    form.reset();
+
     showAddAddressForm.value = true;
 }
 
@@ -57,10 +82,12 @@ function submitForm() {
 function createAddress() {
     form.post(route('user.address.store'), {
         preserveScroll: true,
-        onSuccess: () => {
+        onSuccess: (response) => {
             hideAddressForm();
             form.reset();
-            toast.success('Address created successfully');
+            if (response.props.flash.success) {
+                toast.success(response.props.flash.success);
+            }
         },
         onError: (errors) => {
             if (errors.address) {
@@ -71,11 +98,58 @@ function createAddress() {
 }
 
 function updateAddress() {
+    if (!form.isDirty) {
+        toast.info('No changes to update');
+        return;
+    }
     form.put(route('user.address.update', editingAddressId.value), {
-        onSuccess: () => {
-            hideAddressForm();
+        preserveScroll: true,
+        onSuccess: (response) => {
             form.reset();
-            toast.success('Address updated successfully');
+            hideAddressForm();
+            if (response.props.flash.success) {
+                toast.success(response.props.flash.success);
+            } else if (response.props.flash.info) {
+                toast.info(response.props.flash.info);
+            }
+        },
+        onError: (errors) => {
+            if (errors.address) {
+                toast.error(errors.address);
+            }
+        },
+    });
+}
+
+function openRemoveConfirmation(address) {
+    removingAddress.value = address;
+    removeModalOpen.value = true;
+}
+
+function closeRemoveModal() {
+    removingAddress.value = null;
+    removeModalOpen.value = false;
+}
+
+function submitRemoveAddress() {
+    if (!removingAddress.value) {
+        return;
+    }
+
+    const id = removingAddress.value.id;
+
+    router.delete(route('user.address.destroy', id), {
+        preserveScroll: true,
+        onSuccess: (response) => {
+            closeRemoveModal();
+            if (response.props.flash?.success) {
+                toast.success(response.props.flash.success);
+            } else {
+                toast.success('Address removed successfully');
+            }
+        },
+        onError: () => {
+            toast.error('Could not remove this address. Please try again.');
         },
     });
 }
@@ -99,7 +173,7 @@ function updateAddress() {
 
             <button
                 class="inline-flex items-center gap-2 rounded-full border border-primary bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground transition hover:opacity-90"
-                @click="showAddAddressForm = true"
+                @click="addNewAddress"
             >
                 <PlusIcon class="size-4" /> Add new shipping address
             </button>
@@ -152,6 +226,7 @@ function updateAddress() {
                     <button
                         type="button"
                         class="rounded-full border border-border bg-card px-3 py-1.5 text-xs font-semibold text-muted-foreground transition hover:border-destructive/35 hover:text-destructive"
+                        @click="openRemoveConfirmation(address)"
                     >
                         Remove
                     </button>
@@ -320,5 +395,47 @@ function updateAddress() {
                 </form>
             </Card>
         </Transition>
+
+        <Dialog v-model:open="removeModalOpen">
+            <DialogContent class="border-destructive/20 sm:max-w-md">
+                <DialogHeader>
+                    <DialogTitle>Remove this address?</DialogTitle>
+                    <DialogDescription>
+                        This address will no longer appear at checkout. You can
+                        add it again later if you need it.
+                    </DialogDescription>
+                </DialogHeader>
+                <div
+                    v-if="removingAddress"
+                    class="rounded-xl border border-border bg-muted/40 p-3 text-sm text-foreground"
+                >
+                    <p class="font-medium">
+                        {{ removingAddress.label ?? 'Untitled' }}
+                    </p>
+                    <p class="mt-1 text-xs text-muted-foreground">
+                        {{ removingAddress.full_name }} ·
+                        {{ removingAddress.phone }}
+                    </p>
+                    <p
+                        class="mt-2 text-xs leading-relaxed text-muted-foreground"
+                    >
+                        {{ removingAddress.street }},
+                        {{ removingAddress.city }},
+                        {{ removingAddress.postal_code }}
+                    </p>
+                </div>
+                <DialogFooter class="gap-2">
+                    <Button variant="outline" @click="closeRemoveModal">
+                        Cancel
+                    </Button>
+                    <Button
+                        class="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        @click="submitRemoveAddress"
+                    >
+                        Remove address
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     </section>
 </template>
