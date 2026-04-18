@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB;
 
 class Product extends Model
 {
@@ -64,7 +65,7 @@ class Product extends Model
             });
         })
         ->when($filters['price']??false, function($query,$price){
-            $query->whereBetween('price',[0,$price]);
+            $query->whereBetween(DB::raw('coalesce(discount_price, price)'),[0,$price]);
         })
         ->when($filters['sort']??false, function($query,$sort){
             match($sort){

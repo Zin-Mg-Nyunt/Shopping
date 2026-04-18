@@ -10,10 +10,10 @@ test('products list renders paginated inertia response', function () {
     $response->assertSuccessful();
     $response->assertInertia(fn ($page) => $page
         ->component('Products/List')
-        ->where('products.per_page', 8)
+        ->where('products.per_page', 4)
         ->where('products.total', 10)
-        ->where('products.last_page', 2)
-        ->has('products.data', 8)
+        ->where('products.last_page', 3)
+        ->has('products.data', 4)
         ->has('products.links'));
 });
 

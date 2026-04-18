@@ -52,7 +52,7 @@ watch(
 </script>
 
 <template>
-    <main class="bg-background">
+    <main class="">
         <div class="mx-auto w-full max-w-7xl px-6 py-10 lg:px-8">
             <div class="grid gap-8 lg:grid-cols-[280px_minmax(0,1fr)]">
                 <aside

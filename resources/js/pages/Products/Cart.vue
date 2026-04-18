@@ -287,7 +287,7 @@ function handleCheckout() {
 <template>
     <Head title="Shopping Cart" />
 
-    <main class="bg-background">
+    <main class="">
         <div class="mx-auto w-full max-w-7xl px-6 py-10 lg:px-8">
             <!-- Empty state -->
             <div

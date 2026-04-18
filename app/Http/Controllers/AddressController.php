@@ -34,7 +34,7 @@ class AddressController extends Controller
             $request->user()->addresses()->create($validated);
         });
 
-        return redirect()->back()->with('success', 'Address created successfully');
+        return back()->with('success', 'Address created successfully');
     }
 
     public function update(Request $request, Address $address)

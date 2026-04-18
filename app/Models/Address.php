@@ -9,7 +9,7 @@ class Address extends Model
 {
     /** @use HasFactory<\Database\Factories\AddressFactory> */
     use HasFactory;
-    protected $guarded = ['id'];
+    protected $guarded = ['id','user_id'];
 
     public function user(){
         return $this->belongsTo(User::class);
