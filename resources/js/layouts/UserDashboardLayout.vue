@@ -23,8 +23,8 @@ const navItems = [
     },
     {
         label: 'Order History',
-        href: route('orders.list'),
-        match: () => route().current('orders.list'),
+        href: route('user.orders.list'),
+        match: () => route().current('user.orders.list'),
     },
     {
         label: 'My Wishlist',
@@ -33,8 +33,8 @@ const navItems = [
     },
     {
         label: 'Shipping Address',
-        href: '#',
-        match: () => false,
+        href: route('user.shipping.address'),
+        match: () => route().current('user.shipping.address'),
     },
     {
         label: 'Settings',

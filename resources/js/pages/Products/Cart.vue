@@ -574,7 +574,17 @@ function handleCheckout() {
                                             <ul
                                                 class="space-y-1 pr-16 text-sm text-foreground"
                                             >
-                                                <li class="font-semibold">
+                                                <li
+                                                    class="text-sm font-semibold text-foreground"
+                                                >
+                                                    {{
+                                                        selectedAddress.label ??
+                                                        'Untitled'
+                                                    }}
+                                                </li>
+                                                <li
+                                                    class="text-sm text-muted-foreground"
+                                                >
                                                     {{
                                                         selectedAddress.full_name
                                                     }}
@@ -663,12 +673,27 @@ function handleCheckout() {
                                                         <span
                                                             class="flex items-center gap-2"
                                                         >
-                                                            <span
-                                                                class="font-medium text-foreground"
-                                                                >{{
-                                                                    addr.full_name
-                                                                }}</span
+                                                            <div
+                                                                class="flex flex-col gap-1"
                                                             >
+                                                                <span
+                                                                    class="text-sm font-semibold text-foreground"
+                                                                >
+                                                                    {{
+                                                                        addr.label ??
+                                                                        'Untitled'
+                                                                    }}
+                                                                </span>
+
+                                                                <span
+                                                                    class="text-sm text-muted-foreground"
+                                                                >
+                                                                    {{
+                                                                        addr.full_name
+                                                                    }}
+                                                                </span>
+                                                            </div>
+
                                                             <span
                                                                 v-if="
                                                                     addr.is_default

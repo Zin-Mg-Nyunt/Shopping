@@ -28,7 +28,11 @@ const detailSheetOpen = ref(false);
 const selectedOrder = ref(null);
 
 function orderFilter(status) {
-    router.get(route('orders.list', { status }), {}, { preserveState: true });
+    router.get(
+        route('user.orders.list', { status }),
+        {},
+        { preserveState: true },
+    );
     activeFilter.value = status;
 }
 

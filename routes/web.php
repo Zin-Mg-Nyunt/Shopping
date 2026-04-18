@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AddressController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OrderController;
@@ -18,9 +19,13 @@ Route::delete('/cart/destroy/{id}', [CartController::class, 'destroy'])->name('c
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/order/store', [OrderController::class, 'store'])->name('order.store');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/orders/list', [OrderController::class, 'list'])->name('orders.list');
+    Route::get('/orders/list', [OrderController::class, 'list'])->name('user.orders.list');
     Route::get('/wishlist', [ProductController::class, 'showWishlist'])->name('user.wishlist');
     Route::delete('/wishlist/remove/{product}', [ProductController::class, 'removeWishlist'])->name('user.wishlist.remove');
+    Route::get('/shipping/address', [AddressController::class, 'index'])->name('user.shipping.address');
+    Route::post('/shipping/address/store', [AddressController::class, 'store'])->name('user.address.store');
+    Route::put('/shipping/address/update/{address}', [AddressController::class, 'update'])->name('user.address.update');
+    Route::delete('/shipping/address/destroy/{address}', [AddressController::class, 'destroy'])->name('user.address.destroy');
 
     Route::inertia('admin/dashboard', 'Admin/Dashboard')->name('admin.dashboard');
     Route::get('/admin/products', function () {

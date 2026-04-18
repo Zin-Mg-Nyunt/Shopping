@@ -33,6 +33,7 @@ class OrderController extends Controller
                             ->when($request->status, function($query) use ($request){
                                 $query->where('status', $request->status);
                             })
+                            ->latest()
                             ->paginate(3)
                             ->withQueryString(),
             ]);
