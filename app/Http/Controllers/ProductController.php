@@ -26,8 +26,7 @@ class ProductController extends Controller
     }
 
     public function list(Request $request){
-        $products = Product::query()
-                    ->with('brand','categories')
+        $products = Product::with('brand','categories')
                     ->filterBy($request->all())
                     ->when($request->user(), function ($query) use ($request){
                         $query->withExists('wishlistUsers as wishlisted', function($q) use ($request){
