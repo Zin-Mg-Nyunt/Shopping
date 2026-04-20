@@ -39,12 +39,13 @@ class CartController extends Controller
             'quantity' => 'required|integer|min:1',
         ]);
         if($request->user()){
-            Cart::updateOrCreate([
+            $cart=Cart::firstOrCreate([
                 'user_id' => $request->user()->id,
                 'product_id' => $request->product_id,
             ],[
-                'quantity' => DB::raw('quantity + '.$request->quantity)
+                'quantity' => 0
             ]);
+            $cart->increment('quantity', $request->quantity);
         }else{
             $cart = session()->get('cart',[]);
             $cart[$request->product_id] = ($cart[$request->product_id] ?? 0) + $request->quantity;
