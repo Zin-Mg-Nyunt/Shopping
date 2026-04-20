@@ -30,9 +30,6 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
-        Gate::define('add-to-wishlist', function(User $user){
-            return true;
-        });
         Product::observe(ProductObserver::class);
         Order::observe(OrderObserver::class);
     }

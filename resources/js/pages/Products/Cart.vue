@@ -172,13 +172,13 @@ function lineSubtotal(line) {
 
 const addressUi = ref('compact');
 
-const sessionAddresses = ref(
-    JSON.parse(sessionStorage.getItem('addresses')) || [],
+const localStorageAddress = ref(
+    JSON.parse(localStorage.getItem('addresses')) || [],
 );
 
 let allAddresses = computed(() => [
     ...props.addresses,
-    ...sessionAddresses.value,
+    ...localStorageAddress.value,
 ]);
 
 const selectedAddressId = ref(
@@ -224,8 +224,11 @@ function saveNewAddress() {
         return;
     }
     n.id = 'temp-' + crypto.randomUUID();
-    sessionAddresses.value.push(n);
-    sessionStorage.setItem('addresses', JSON.stringify(sessionAddresses.value));
+    localStorageAddress.value.push(n);
+    localStorage.setItem(
+        'addresses',
+        JSON.stringify(localStorageAddress.value),
+    );
     selectedAddressId.value = n.id;
     addressUi.value = 'compact';
 }
@@ -269,8 +272,8 @@ function handleCheckout() {
         preserveScroll: true,
         preserveState: true,
         onSuccess: (response) => {
-            sessionStorage.removeItem('addresses');
             if (response.props.flash.success) {
+                localStorage.removeItem('addresses');
                 toast.success(response.props.flash.success);
             }
             if (response.props.flash.error) {

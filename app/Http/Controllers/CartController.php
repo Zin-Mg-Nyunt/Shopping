@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cart;
 use App\Models\Product;
 use App\Models\Promo;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CartController extends Controller
 {
@@ -29,6 +31,26 @@ class CartController extends Controller
             'addresses' => $user ? $user->addresses()->get() : [],
             'promos' => Promo::where('is_valid',true)->get()
         ]);
+    }
+
+    public function addToCart(Request $request){
+        $request->validate([
+            'product_id' => 'required|exists:products,id',
+            'quantity' => 'required|integer|min:1',
+        ]);
+        if($request->user()){
+            Cart::updateOrCreate([
+                'user_id' => $request->user()->id,
+                'product_id' => $request->product_id,
+            ],[
+                'quantity' => DB::raw('quantity + '.$request->quantity)
+            ]);
+        }else{
+            $cart = session()->get('cart',[]);
+            $cart[$request->product_id] = ($cart[$request->product_id] ?? 0) + $request->quantity;
+            session()->put('cart',$cart);
+        }
+        return redirect()->back()->with('success', 'Product added to cart successfully');
     }
 
     public function update(Request $request)

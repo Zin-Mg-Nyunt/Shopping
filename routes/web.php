@@ -10,18 +10,20 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [ProductController::class, 'index'])->name('home');
 Route::get('/products', [ProductController::class, 'list'])->name('products.list');
 Route::get('/products/{product:slug}', [ProductController::class, 'detail'])->name('product.detail');
-Route::post('/cart/add', [ProductController::class, 'addToCart'])->name('cart.add');
-Route::post('/wishlist/add/{product}', [ProductController::class, 'addWishlist'])->name('wishlist.add');
 Route::get('/cart', [CartController::class, 'index'])->name('cart');
+Route::post('/cart/add', [CartController::class, 'addToCart'])->name('cart.add');
 Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update');
 Route::delete('/cart/destroy/{id}', [CartController::class, 'destroy'])->name('cart.destroy');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::post('/order/store', [OrderController::class, 'store'])->name('order.store');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::post('/order/store', [OrderController::class, 'store'])->name('order.store');
     Route::get('/orders/list', [OrderController::class, 'list'])->name('user.orders.list');
+
+    Route::post('/wishlist/add/{product}', [ProductController::class, 'addWishlist'])->name('wishlist.add');
     Route::get('/wishlist', [ProductController::class, 'showWishlist'])->name('user.wishlist');
     Route::delete('/wishlist/remove/{product}', [ProductController::class, 'removeWishlist'])->name('user.wishlist.remove');
+
     Route::get('/shipping/address', [AddressController::class, 'index'])->name('user.shipping.address');
     Route::post('/shipping/address/store', [AddressController::class, 'store'])->name('user.address.store');
     Route::put('/shipping/address/update/{address}', [AddressController::class, 'update'])->name('user.address.update');

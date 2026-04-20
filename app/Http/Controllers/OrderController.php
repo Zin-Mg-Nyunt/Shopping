@@ -78,7 +78,7 @@ class OrderController extends Controller
                     $sub_total += $price * $quantity;
 
                     if($product->stock < $quantity){
-                        throw new \Exception($product->title . ' is out of stock');
+                        throw new \Exception($product->title . ' is only ' . $product->stock . ' in stock');
                     }
                     
                     $product->decrement('stock', $quantity);

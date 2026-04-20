@@ -3,10 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
-use App\Models\Cart;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Gate;
 
 class ProductController extends Controller
 {
@@ -49,33 +46,10 @@ class ProductController extends Controller
         ]);
     }
 
-    public function addToCart(Request $request){
-        $request->validate([
-            'product_id' => 'required|exists:products,id',
-            'quantity' => 'required|integer|min:1',
-        ]);
-        if($request->user()){
-            Cart::updateOrCreate([
-                'user_id' => $request->user()->id,
-                'product_id' => $request->product_id,
-            ],[
-                'quantity' => DB::raw('quantity + '.$request->quantity)
-            ]);
-        }else{
-            $cart = session()->get('cart',[]);
-            $cart[$request->product_id] = ($cart[$request->product_id] ?? 0) + $request->quantity;
-            session()->put('cart',$cart);
-        }
-        return redirect()->back()->with('success', 'Product added to cart successfully');
-    }
-
     public function addWishlist(Product $product, Request $request){
-        if(Gate::allows('add-to-wishlist')){
-            $result=$request->user()->wishlistProducts()->toggle($product->id);
-            $result['attached'] ? $message = 'Added to wishlist' : $message = 'Removed from wishlist';
-            return redirect()->back()->with('success', $message);
-        }
-        return redirect()->route('login');
+        $result=$request->user()->wishlistProducts()->toggle($product->id);
+        $result['attached'] ? $message = 'Added to wishlist' : $message = 'Removed from wishlist';
+        return redirect()->back()->with('success', $message);
     }
 
     public function showWishlist(Request $request){

@@ -113,8 +113,7 @@ test('guest is redirected to login when trying to wishlist and redirect back to 
     $product = Product::factory()->create(['slug'=>'apple-iphone-14']);
     $user = User::factory()->create();
 
-    $this->from($url)
-        ->post(route('wishlist.add',$product->id))
+    $this->post(route('wishlist.add',$product->id))
         ->assertRedirect(route('login'));
 
     $this->withSession(['url.intended'=>$url])
@@ -128,3 +127,48 @@ test('guest is redirected to login when trying to wishlist and redirect back to 
     fn()=>route('products.list'),
     fn()=>route('product.detail',['apple-iphone-14'])
 ]);
+
+test('user can view wishlist page', function(){
+    $user = User::factory()->create();
+    $category = Category::factory()->create(['name'=>'Electronics', 'slug'=>'electronics']);
+    $products=Product::factory(10)->create([]);
+    $products->each(function($p) use ($category){
+        $p->categories()->attach($category->id);
+    });
+    $user->wishlistProducts()->attach($products->pluck('id'));
+
+
+    $this->get(route('user.wishlist'))
+    ->assertRedirect(route('login'));
+
+    $this->actingAs($user)
+        ->get(route('user.wishlist',['category'=>$category->slug]))
+        ->assertOk()
+        ->assertInertia(fn($page)=>$page
+        ->component('User/Wishlist')
+        ->has('wishlist')
+        ->has('wishlist.links')
+        ->where('wishlist.total', 10)
+        ->has('wishlist.data', 6)
+        ->where('wishlist.first_page_url', fn($url)=>str_contains($url,"category={$category->slug}"))
+    );
+});
+
+test('user can remove product from wishlist', function(){
+
+    $user = User::factory()->create();
+    $product = Product::factory()->create();
+    $user->wishlistProducts()->attach($product->id);
+
+    $this->delete(route('user.wishlist.remove',$product->id))
+        ->assertRedirect(route('login'));
+
+    $this->actingAs($user)
+        ->delete(route('user.wishlist.remove', $product->id))
+        ->assertRedirect();
+        
+    $this->assertDatabaseMissing('wishlists',[
+        'user_id'=>$user->id,
+        'product_id'=>$product->id
+    ]);
+});
