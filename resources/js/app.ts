@@ -1,9 +1,11 @@
 import { createInertiaApp } from '@inertiajs/vue3';
+import { createApp, h } from 'vue';
+import type { DefineComponent } from 'vue';
+import VueApexCharts from 'vue3-apexcharts';
+import { ZiggyVue } from 'ziggy-js';
 import { initializeTheme } from '@/composables/useAppearance';
 import DefaultLayout from '@/layouts/DefaultLayout.vue';
-import { ZiggyVue } from 'ziggy-js';
 import { Ziggy } from './ziggy';
-import { createApp, DefineComponent, h } from 'vue';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -28,6 +30,7 @@ createInertiaApp({
         })
             .use(plugin)
             .use(ZiggyVue, Ziggy)
+            .use(VueApexCharts)
             .mount(el);
     },
 });

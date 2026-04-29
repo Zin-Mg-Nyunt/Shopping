@@ -2,8 +2,8 @@
 
 namespace App\Providers;
 
-use App\Models\Product;
 use App\Models\Order;
+use App\Models\Product;
 use App\Models\User;
 use App\Observers\OrderObserver;
 use App\Observers\ProductObserver;
@@ -30,6 +30,12 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
+        Gate::define('admin', function (User $user) {
+            return $user->role === 'admin';
+        });
+        Gate::define('user', function (User $user) {
+            return $user->role === 'user';
+        });
         Product::observe(ProductObserver::class);
         Order::observe(OrderObserver::class);
     }

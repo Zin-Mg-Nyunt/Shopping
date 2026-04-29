@@ -17,6 +17,9 @@ Route::delete('/cart/destroy/{id}', [CartController::class, 'destroy'])->name('c
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/admin/dashboard', [DashboardController::class, 'adminDashboard'])->name('admin.dashboard');
+    Route::get('/user/dashboard', [DashboardController::class, 'userDashboard'])->name('user.dashboard');
+
     Route::post('/order/store', [OrderController::class, 'store'])->name('order.store');
     Route::get('/orders/list', [OrderController::class, 'list'])->name('user.orders.list');
 
@@ -29,7 +32,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/shipping/address/update/{address}', [AddressController::class, 'update'])->name('user.address.update');
     Route::delete('/shipping/address/destroy/{address}', [AddressController::class, 'destroy'])->name('user.address.destroy');
 
-    Route::inertia('admin/dashboard', 'Admin/Dashboard')->name('admin.dashboard');
     Route::get('/admin/products', function () {
         return inertia('Admin/Products', [
             'products' => [
