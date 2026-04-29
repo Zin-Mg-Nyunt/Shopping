@@ -14,10 +14,8 @@ import {
 import { computed, onUnmounted, ref, watch } from 'vue';
 import { route } from 'ziggy-js';
 import AppLogo from '@/components/AppLogo.vue';
-import { useCurrentUrl } from '@/composables/useCurrentUrl';
 
 const page = usePage();
-const { isCurrentUrl } = useCurrentUrl();
 
 const sidebarOpen = ref(false);
 
@@ -26,19 +24,19 @@ const adminNav = [
         label: 'Overview',
         href: route('admin.dashboard'),
         icon: LayoutDashboard,
-        match: () => isCurrentUrl(route('admin.dashboard')),
+        match: () => route().current('admin.dashboard'),
     },
     {
         label: 'Orders',
-        href: '#',
+        href: route('admin.orders'),
         icon: ShoppingBag,
-        match: () => false,
+        match: () => route().current('admin.orders'),
     },
     {
         label: 'Products',
         href: route('admin.products'),
         icon: Package,
-        match: () => isCurrentUrl(route('admin.products')),
+        match: () => route().current('admin.products'),
     },
     {
         label: 'Customers',

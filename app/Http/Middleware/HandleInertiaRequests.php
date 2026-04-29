@@ -53,6 +53,14 @@ class HandleInertiaRequests extends Middleware
                 'error' => $request->session()->get('error'),
                 'info' => $request->session()->get('info'),
             ],
+            'statusFilters' => [
+                ['id' => null, 'label' => 'All'],
+                ['id' => 'pending', 'label' => 'Pending'],
+                ['id' => 'processing', 'label' => 'Processing'],
+                ['id' => 'shipped', 'label' => 'Shipped'],
+                ['id' => 'delivered', 'label' => 'Delivered'],
+                ['id' => 'cancelled', 'label' => 'Cancelled'],
+            ],
         ];
     }
 }

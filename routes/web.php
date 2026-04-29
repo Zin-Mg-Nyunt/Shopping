@@ -21,7 +21,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/user/dashboard', [DashboardController::class, 'userDashboard'])->name('user.dashboard');
 
     Route::post('/order/store', [OrderController::class, 'store'])->name('order.store');
-    Route::get('/orders/list', [OrderController::class, 'list'])->name('user.orders.list');
+    Route::get('/orders/list', [OrderController::class, 'userList'])->name('user.orders.list');
+    Route::get('/admin/orders', [OrderController::class, 'adminList'])->name('admin.orders');
 
     Route::post('/wishlist/add/{product}', [ProductController::class, 'addWishlist'])->name('wishlist.add');
     Route::get('/wishlist', [ProductController::class, 'showWishlist'])->name('user.wishlist');

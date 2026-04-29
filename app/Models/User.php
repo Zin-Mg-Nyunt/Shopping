@@ -32,6 +32,11 @@ class User extends Authenticatable
         ];
     }
 
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
     public function products()
     {
         return $this->hasMany(Product::class);

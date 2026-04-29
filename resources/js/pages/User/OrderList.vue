@@ -1,39 +1,35 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { Head, router } from '@inertiajs/vue3';
 import UserDashboardLayout from '@/layouts/UserDashboardLayout.vue';
 import Pagination from '@/components/ui/Pagination.vue';
 import OrderDetail from '@/components/Order/OrderDetail.vue';
+import { usePage } from '@inertiajs/vue3';
 
 defineOptions({
     layout: UserDashboardLayout,
 });
 
+const page = usePage();
 const { orders, statusCount } = defineProps({
     orders: Object,
     statusCount: Object,
 });
 
-const filters = [
-    { id: null, label: 'All', count: statusCount.total },
-    { id: 'pending', label: 'Pending', count: statusCount.pending },
-    { id: 'processing', label: 'Processing', count: statusCount.processing },
-    { id: 'shipped', label: 'Shipped', count: statusCount.shipped },
-    { id: 'delivered', label: 'Delivered', count: statusCount.delivered },
-    { id: 'cancelled', label: 'Cancelled', count: statusCount.cancelled },
-];
+const statusFilters = computed(() =>
+    page.props.statusFilters.map((status) => ({
+        ...status,
+        count: statusCount[status.label.toLowerCase()],
+    })),
+);
 
-const activeFilter = ref(null);
+const activeStatus = ref(null);
 const detailSheetOpen = ref(false);
 const selectedOrder = ref(null);
 
 function orderFilter(status) {
-    router.get(
-        route('user.orders.list', { status }),
-        {},
-        { preserveState: true },
-    );
-    activeFilter.value = status;
+    router.get(route('user.orders.list'), { status }, { preserveState: true });
+    activeStatus.value = status;
 }
 
 function openOrderDetails(order) {
@@ -79,12 +75,12 @@ const statusStyles = {
 
         <div class="flex flex-wrap gap-2">
             <button
-                v-for="f in filters"
+                v-for="f in statusFilters"
                 :key="f.id"
                 type="button"
                 class="rounded-full border px-3.5 py-1.5 text-xs font-semibold transition"
                 :class="
-                    activeFilter === f.id
+                    activeStatus === f.id
                         ? 'border-primary bg-primary/12 text-primary shadow-sm'
                         : 'border-border bg-card text-muted-foreground hover:border-primary/30 hover:text-foreground'
                 "

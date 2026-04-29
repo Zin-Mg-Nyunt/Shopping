@@ -27,4 +27,19 @@ class Order extends Model
     public function address(){
         return $this->belongsTo(Address::class);
     }
+
+    public function scopeFilterBy($query, $filters){
+        return $query->when($filters['status']??false, function ($query, $status) {
+            $query->where('status', $status);
+        })
+        ->when($filters['search']??false, function ($query, $search) {
+            $query->where(function ($subQuery) use ($search) {
+                $subQuery->where('order_number', 'like', "%{$search}%")
+                    ->orWhereHas('user', function ($userQuery) use ($search) {
+                        $userQuery->where('name', 'like', "%{$search}%")
+                            ->orWhere('email', 'like', "%{$search}%");
+                    });
+            });
+        });
+    }
 }
