@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Order;
 use App\Services\OrderService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\Rule;
 
 class OrderController extends Controller
 {
@@ -16,7 +18,7 @@ class OrderController extends Controller
             'statusCount' => $orderService->getStatusCount($request),
         ]);
     }
-    
+
     public function userList(Request $request, OrderService $orderService)
     {
         return inertia('User/OrderList', [
@@ -40,5 +42,20 @@ class OrderController extends Controller
         ]);
 
         return $orderService->store($request);
+    }
+
+    public function updateStatus(Request $request, Order $order)
+    {
+        Gate::authorize('admin');
+
+        $validated = $request->validate([
+            'status' => ['required', Rule::in(['pending', 'processing', 'shipped', 'delivered', 'cancelled'])],
+        ]);
+
+        $order->update([
+            'status' => $validated['status'],
+        ]);
+
+        return redirect()->back()->with('success', 'Order status updated successfully.');
     }
 }

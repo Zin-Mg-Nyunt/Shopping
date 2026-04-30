@@ -64,8 +64,20 @@ class Product extends Model
                 $query->where('slug',$slug);
             });
         })
-        ->when($filters['price']??false, function($query,$price){
-            $query->whereBetween(DB::raw('coalesce(discount_price, price)'),[0,$price]);
+        ->when($filters['price']??false, function($query,$price,$startPrice = 0){
+            match($price){
+                'under100' => $query->whereBetween(DB::raw('coalesce(discount_price, price)'),[$startPrice,100]),
+                '100to500' => $query->whereBetween(DB::raw('coalesce(discount_price, price)'),[100,500]),
+                'over500' => $query->where(DB::raw('coalesce(discount_price, price)'),'>',500),
+                default => $query->whereBetween(DB::raw('coalesce(discount_price, price)'),[$startPrice,$price]),
+            };
+        })
+        ->when($filters['stock']??false, function($query,$stock){
+            match($stock){
+                'low' => $query->where('stock','<',10),
+                'out' => $query->where('stock',0),
+                default => $query->where('stock','>',0),
+            };
         })
         ->when($filters['sort']??false, function($query,$sort){
             match($sort){

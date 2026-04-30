@@ -1,10 +1,18 @@
 <script setup>
 import { Head, router } from '@inertiajs/vue3';
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { route } from 'ziggy-js';
 import Pagination from '@/components/ui/Pagination.vue';
 import AdminDashboardLayout from '@/layouts/AdminDashboardLayout.vue';
 import { usePage } from '@inertiajs/vue3';
+import {
+    Listbox,
+    ListboxButton,
+    ListboxOptions,
+    ListboxOption,
+} from '@headlessui/vue';
+import useFilterBy from '@/composables/useFilterBy';
+import { toast } from 'vue-sonner';
 
 defineOptions({
     layout: AdminDashboardLayout,
@@ -35,20 +43,27 @@ const statusStyles = {
     cancelled: 'border-destructive/30 bg-destructive/10 text-destructive',
 };
 
-const rows = computed(() => orders?.data ?? []);
+const rows = ref([]);
+watch(
+    () => orders,
+    () => {
+        rows.value = (orders?.data ?? []).map((order) => ({
+            ...order,
+            next_status: order.status,
+        }));
+    },
+    { immediate: true },
+);
 
-function applyFilters(status) {
-    activeStatus.value = status;
+const availableStatuses = [
+    'pending',
+    'processing',
+    'shipped',
+    'delivered',
+    'cancelled',
+];
 
-    router.get(
-        route('admin.orders'),
-        {
-            status: status ?? undefined,
-            search: search.value || undefined,
-        },
-        { preserveState: true, preserveScroll: true, replace: true },
-    );
-}
+const { filterBy } = useFilterBy();
 
 function formatDate(dateValue) {
     return new Date(dateValue).toLocaleDateString('en-US', {
@@ -56,6 +71,41 @@ function formatDate(dateValue) {
         day: 'numeric',
         year: 'numeric',
     });
+}
+
+function formatAddress(shippingAddress) {
+    if (!shippingAddress) {
+        return '-';
+    }
+
+    if (typeof shippingAddress === 'string') {
+        return shippingAddress;
+    }
+
+    const parts = [
+        shippingAddress.street,
+        shippingAddress.city,
+        shippingAddress.postal_code,
+    ].filter(Boolean);
+
+    return parts.length > 0 ? parts.join(', ') : '-';
+}
+
+function updateStatus(order) {
+    if (!order.next_status || order.next_status === order.status) {
+        return;
+    }
+
+    router.patch(
+        route('admin.orders.status.update', order.id),
+        { status: order.next_status },
+        {
+            preserveScroll: true,
+            onSuccess: () => {
+                toast.success(page.props.flash.success);
+            },
+        },
+    );
 }
 </script>
 
@@ -85,8 +135,14 @@ function formatDate(dateValue) {
                         type="search"
                         placeholder="Search by order no, name, email..."
                         class="w-full rounded-xl border border-border bg-muted/40 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-[#FF6600] focus:ring-2 focus:ring-[#FF6600]/25 focus:outline-none"
-                        @keyup.enter="applyFilters()"
-                        @blur="search === '' ? applyFilters() : null"
+                        @keyup.enter="
+                            filterBy('search', search, 'admin.orders')
+                        "
+                        @blur="
+                            search === ''
+                                ? filterBy('search', '', 'admin.orders')
+                                : null
+                        "
                     />
                 </div>
 
@@ -101,7 +157,10 @@ function formatDate(dateValue) {
                                 ? 'border-primary bg-primary/12 text-primary'
                                 : 'border-border bg-card text-muted-foreground hover:border-primary/30 hover:text-foreground'
                         "
-                        @click="applyFilters(f.id)"
+                        @click="
+                            (filterBy('status', f.id, 'admin.orders'),
+                            (activeStatus = f.id))
+                        "
                     >
                         {{ f.label }} ({{ f.count }})
                     </button>
@@ -120,10 +179,12 @@ function formatDate(dateValue) {
                         <tr>
                             <th class="px-4 py-3">Order</th>
                             <th class="px-4 py-3">Customer</th>
+                            <th class="px-4 py-3">Address</th>
                             <th class="px-4 py-3">Items</th>
                             <th class="px-4 py-3">Total</th>
                             <th class="px-4 py-3">Status</th>
                             <th class="px-4 py-3">Placed at</th>
+                            <th class="px-4 py-3">Action</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-border">
@@ -148,6 +209,9 @@ function formatDate(dateValue) {
                                     {{ order.user?.email ?? '-' }}
                                 </p>
                             </td>
+                            <td class="px-4 py-3 text-sm text-muted-foreground">
+                                {{ formatAddress(order.shipping_address) }}
+                            </td>
                             <td class="px-4 py-3 text-sm text-foreground">
                                 {{ order.total_quantity }}
                             </td>
@@ -157,23 +221,64 @@ function formatDate(dateValue) {
                                 {{ Number(order.total_amount).toFixed(2) }}
                             </td>
                             <td class="px-4 py-3">
-                                <span
-                                    class="inline-flex rounded-full border px-2.5 py-0.5 text-xs font-semibold capitalize"
-                                    :class="
-                                        statusStyles[order.status] ??
-                                        'border-border bg-muted text-foreground'
-                                    "
-                                >
-                                    {{ order.status }}
-                                </span>
+                                <Listbox v-model="order.next_status">
+                                    <div class="relative mt-1">
+                                        <ListboxButton
+                                            class="inline-flex cursor-pointer rounded-full border px-2.5 py-0.5 text-xs font-semibold capitalize"
+                                            :class="
+                                                statusStyles[
+                                                    order.next_status
+                                                ] ??
+                                                'border-border bg-muted text-foreground'
+                                            "
+                                        >
+                                            {{ order.next_status }}
+                                        </ListboxButton>
+
+                                        <transition
+                                            enter-active-class="transition duration-100 ease-out"
+                                            enter-from-class="transform scale-95 opacity-0"
+                                            enter-to-class="transform scale-100 opacity-100"
+                                            leave-active-class="transition duration-75 ease-in"
+                                            leave-from-class="transform scale-100 opacity-100"
+                                            leave-to-class="transform scale-95 opacity-0"
+                                        >
+                                            <ListboxOptions
+                                                class="absolute -top-15 -right-18 z-50 mt-1 w-full rounded-md border bg-card shadow-lg"
+                                            >
+                                                <ListboxOption
+                                                    v-for="status in availableStatuses"
+                                                    :key="status"
+                                                    :value="status"
+                                                    class="cursor-pointer px-4 py-2 text-xs font-medium capitalize hover:bg-muted"
+                                                >
+                                                    {{ status }}
+                                                </ListboxOption>
+                                            </ListboxOptions>
+                                        </transition>
+                                    </div>
+                                </Listbox>
                             </td>
                             <td class="px-4 py-3 text-sm text-muted-foreground">
                                 {{ formatDate(order.created_at) }}
                             </td>
+                            <td class="px-4 py-3">
+                                <button
+                                    type="button"
+                                    class="cursor-pointer rounded-lg border border-primary/40 bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary transition hover:bg-primary/20 disabled:cursor-not-allowed disabled:opacity-50"
+                                    :disabled="
+                                        !order.next_status ||
+                                        order.next_status === order.status
+                                    "
+                                    @click="updateStatus(order)"
+                                >
+                                    Update
+                                </button>
+                            </td>
                         </tr>
                         <tr v-if="rows.length === 0">
                             <td
-                                colspan="6"
+                                colspan="8"
                                 class="px-4 py-10 text-center text-sm text-muted-foreground"
                             >
                                 No orders found for current filters.

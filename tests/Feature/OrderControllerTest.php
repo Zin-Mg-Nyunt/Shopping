@@ -122,3 +122,64 @@ test('order can not store if not enough stock', function () {
     $this->assertDatabaseCount('orders', 0);
     $this->assertDatabaseCount('order_details', 0);
 });
+
+test('admin can update order status', function () {
+    $admin = User::factory()->create(['role' => 'admin']);
+    $user = User::factory()->create();
+
+    $order = Order::create([
+        'user_id' => $user->id,
+        'order_number' => '1234567890',
+        'shipping_address' => [
+            'full_name' => 'John Doe',
+            'phone' => '1234567890',
+            'street' => '123 Main St',
+            'city' => 'Yangon',
+            'postal_code' => '12345',
+        ],
+        'payment_method' => 'cash',
+        'total_quantity' => 2,
+        'total_amount' => 200,
+        'status' => 'pending',
+        'promo_code' => null,
+    ]);
+
+    $this->actingAs($admin)
+        ->patch(route('admin.orders.status.update', $order), [
+            'status' => 'processing',
+        ])
+        ->assertRedirect()
+        ->assertSessionHas('success', 'Order status updated successfully.');
+
+    expect($order->refresh()->status)->toBe('processing');
+});
+
+test('non admin can not update order status', function () {
+    $user = User::factory()->create();
+    $otherUser = User::factory()->create();
+
+    $order = Order::create([
+        'user_id' => $otherUser->id,
+        'order_number' => '1234567890',
+        'shipping_address' => [
+            'full_name' => 'John Doe',
+            'phone' => '1234567890',
+            'street' => '123 Main St',
+            'city' => 'Yangon',
+            'postal_code' => '12345',
+        ],
+        'payment_method' => 'cash',
+        'total_quantity' => 2,
+        'total_amount' => 200,
+        'status' => 'pending',
+        'promo_code' => null,
+    ]);
+
+    $this->actingAs($user)
+        ->patch(route('admin.orders.status.update', $order), [
+            'status' => 'processing',
+        ])
+        ->assertForbidden();
+
+    expect($order->refresh()->status)->toBe('pending');
+});

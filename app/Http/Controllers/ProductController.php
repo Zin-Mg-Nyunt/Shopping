@@ -37,6 +37,16 @@ class ProductController extends Controller
         ]);
     }
 
+    public function adminList(Request $request){
+        $products = Product::with('brand','categories')
+                    ->filterBy($request->all())
+                    ->paginate(7)
+                    ->withQueryString();
+        return inertia('Admin/Products', [
+            'products' => $products
+        ]);
+    }
+
     public function detail(Product $product, Request $request){
         $product->wishlisted = $request->user() 
                                 ? $product->wishlistUsers()->where('user_id',$request->user()->id)->exists() 

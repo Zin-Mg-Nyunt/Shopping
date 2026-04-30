@@ -14,6 +14,8 @@ import {
 import { computed, onUnmounted, ref, watch } from 'vue';
 import { route } from 'ziggy-js';
 import AppLogo from '@/components/AppLogo.vue';
+import { Toaster } from 'vue-sonner';
+import 'vue-sonner/style.css';
 
 const page = usePage();
 
@@ -95,6 +97,7 @@ onUnmounted(() => {
 
 <template>
     <div class="min-h-screen bg-muted text-foreground">
+        <Toaster position="top-right" richColors />
         <!-- Mobile overlay -->
         <Transition
             enter-active-class="transition-opacity duration-300 ease-out"

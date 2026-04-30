@@ -1,10 +1,11 @@
 <?php
+
 namespace App\Services;
 
-use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\Promo;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class OrderService
@@ -14,11 +15,12 @@ class OrderService
         $query = $request?->user() && $request->user()->isAdmin()
                     ? Order::query()->with(['user:id,name,email', 'orderDetails'])
                     : $request->user()->orders()->with('orderDetails');
-        $limit = $request?->user() ? 10 : 3;
+        $limit = $request?->user()->isAdmin() ? 10 : 3;
+
         return $query->filterBy($request->all())
-                    ->latest()
-                    ->paginate($limit)
-                    ->withQueryString();
+            ->latest()
+            ->paginate($limit)
+            ->withQueryString();
     }
 
     public function getStatusCount(?Request $request)
@@ -26,6 +28,7 @@ class OrderService
         $query = $request?->user() && $request->user()->isAdmin()
                     ? Order::query()
                     : $request->user()->orders();
+
         return $query->selectRaw("
                 count(*) as `all`,
                 count(case when status = 'pending' then 1 end) as pending,
@@ -36,7 +39,8 @@ class OrderService
         ")->first();
     }
 
-    public function store(Request $request){
+    public function store(Request $request)
+    {
         try {
             DB::transaction(function () use ($request) {
                 $order = Order::create([
@@ -99,7 +103,7 @@ class OrderService
 
                 $request->user()->carts()->forceDelete();
             });
-            
+
             return redirect()->back()->with('success', 'Order created successfully');
         } catch (\Throwable $e) {
             return redirect()->back()->with('error', $e->getMessage());
