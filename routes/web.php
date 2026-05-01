@@ -35,6 +35,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/shipping/address/destroy/{address}', [AddressController::class, 'destroy'])->name('user.address.destroy');
 
     Route::get('/admin/products', [ProductController::class, 'adminList'])->name('admin.products');
+    Route::delete('/admin/products', [ProductController::class, 'destroy'])->name('admin.products.destroy');
 });
 
 require __DIR__.'/settings.php';

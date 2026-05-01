@@ -105,6 +105,7 @@ export default defineConfigWithVueTs(
             'resources/js/layouts/AdminDashboardLayout.vue',
             'resources/js/pages/Admin/Dashboard.vue',
             'resources/js/pages/Admin/Products.vue',
+            'resources/js/components/admin/ProductFormDialog.vue',
             'resources/js/pages/Products/Cart.vue',
         ],
         rules: {

@@ -1,5 +1,5 @@
 <script setup>
-import { Head, Link, usePage } from '@inertiajs/vue3';
+import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import {
     ChevronLeft,
     ChevronRight,
@@ -12,6 +12,8 @@ import {
     Trash2,
 } from 'lucide-vue-next';
 import { computed, nextTick, ref, watch } from 'vue';
+import { toast } from 'vue-sonner';
+import { route } from 'ziggy-js';
 import ProductFormDialog from '@/components/admin/ProductFormDialog.vue';
 import ProductPreviewDialog from '@/components/admin/ProductPreviewDialog.vue';
 import { Button } from '@/components/ui/button';
@@ -35,7 +37,19 @@ const props = defineProps({
 });
 
 const page = usePage();
-const rows = computed(() => props.products?.data);
+const rows = ref([]);
+
+watch(
+    () => props.products?.data,
+    (data) => {
+        rows.value = data ?? [];
+    },
+    { immediate: true },
+);
+
+const categories = computed(() => page.props.categories ?? []);
+const brands = computed(() => page.props.brands ?? []);
+
 const search = ref('');
 const stock = ref('');
 const price = ref('');
@@ -46,6 +60,7 @@ const selectAllRef = ref(null);
 
 const deleteOpen = ref(false);
 const deleteTargetIds = ref([]);
+const deleteProcessing = ref(false);
 
 const viewOpen = ref(false);
 const viewProduct = ref(null);
@@ -53,14 +68,13 @@ const viewProduct = ref(null);
 const editOpen = ref(false);
 const editMode = ref('add');
 const editProduct = ref(null);
-const saveLoading = ref(false);
 
 const currency = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
 });
 const paginationLinks = computed(() => props.products?.links ?? []);
-const pageIds = computed(() => rows.value.map((row) => row.id));
+const pageIds = computed(() => (rows.value ?? []).map((row) => row.id));
 
 const allPageSelected = computed(
     () =>
@@ -155,13 +169,27 @@ function openBulkDelete() {
 }
 
 function confirmDelete() {
-    const ids = new Set(deleteTargetIds.value);
-    rows.value = rows.value.filter((row) => !ids.has(row.id));
-    selectedIds.value = new Set(
-        [...selectedIds.value].filter((id) => !ids.has(id)),
-    );
-    deleteTargetIds.value = [];
+    const ids = [...deleteTargetIds.value];
+
+    if (ids.length === 0) {
+        return;
+    }
+
+    deleteProcessing.value = true;
     deleteOpen.value = false;
+    deleteTargetIds.value = [];
+
+    router.delete(route('admin.products.destroy'), {
+        data: { ids },
+        preserveScroll: true,
+        onSuccess: () => {
+            selectedIds.value = new Set();
+            toast.success(page.props.flash.success);
+        },
+        onFinish: () => {
+            deleteProcessing.value = false;
+        },
+    });
 }
 
 function openView(row) {
@@ -179,51 +207,6 @@ function openEdit(row) {
     editMode.value = 'edit';
     editProduct.value = row;
     editOpen.value = true;
-}
-
-async function saveEdit(payload) {
-    saveLoading.value = true;
-
-    try {
-        await new Promise((resolve) => setTimeout(resolve, 900));
-
-        if (editMode.value === 'edit' && payload.id != null) {
-            const index = rows.value.findIndex((row) => row.id === payload.id);
-
-            if (index !== -1) {
-                rows.value[index] = {
-                    ...rows.value[index],
-                    title: payload.title.trim(),
-                    slug: payload.slug || rows.value[index].slug,
-                    description: payload.description.trim(),
-                    category_name: payload.category,
-                    price: payload.price,
-                    discount_price: payload.discount_price,
-                    stock: payload.stock,
-                };
-            }
-        } else {
-            const maxId = rows.value.reduce(
-                (max, row) => Math.max(max, row.id),
-                0,
-            );
-            rows.value.push({
-                id: maxId + 1,
-                title: payload.title.trim(),
-                slug: `new-product-${maxId + 1}`,
-                description: payload.description.trim(),
-                category_name: payload.category,
-                price: payload.price,
-                discount_price: payload.discount_price,
-                stock: payload.stock,
-                thumbnail: null,
-            });
-        }
-
-        editOpen.value = false;
-    } finally {
-        saveLoading.value = false;
-    }
 }
 </script>
 
@@ -354,7 +337,6 @@ async function saveEdit(payload) {
                 </Button>
             </div>
         </Transition>
-
         <!-- Table card -->
         <div
             class="overflow-hidden rounded-2xl border border-border bg-card shadow-sm"
@@ -584,10 +566,9 @@ async function saveEdit(payload) {
                 <DialogHeader>
                     <DialogTitle>Delete product(s)?</DialogTitle>
                     <DialogDescription>
-                        This will remove
+                        This will permanently remove
                         {{ deleteTargetIds.length }} product(s) from the
-                        inventory list. This demo only updates the page — wire
-                        to your API for real deletes.
+                        catalog. This action cannot be undone.
                     </DialogDescription>
                 </DialogHeader>
                 <DialogFooter class="gap-2 sm:gap-0">
@@ -596,6 +577,7 @@ async function saveEdit(payload) {
                     </Button>
                     <Button
                         class="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        :disabled="deleteProcessing"
                         @click="confirmDelete"
                     >
                         Confirm delete
@@ -607,12 +589,10 @@ async function saveEdit(payload) {
         <ProductPreviewDialog v-model:open="viewOpen" :product="viewProduct" />
 
         <ProductFormDialog
-            v-model:open="editOpen"
+            v-if="editOpen"
             :mode="editMode"
             :product="editProduct"
-            :saving="saveLoading"
-            :category-options="categoryOptions"
-            @submit="saveEdit"
+            @update:open="editOpen = false"
         />
     </div>
 </template>
