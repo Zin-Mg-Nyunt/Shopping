@@ -1,7 +1,7 @@
 <script setup>
 import { useForm, usePage } from '@inertiajs/vue3';
 import { ImagePlus, Loader2, Upload } from 'lucide-vue-next';
-import { computed, onUnmounted, ref } from 'vue';
+import { computed, onUnmounted, ref, watch } from 'vue';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -11,6 +11,8 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import InputError from '@/components/InputError.vue';
+import { toast } from 'vue-sonner';
 
 const props = defineProps({
     mode: { type: String, default: 'add' },
@@ -37,6 +39,7 @@ const brandOptions = computed(() => [
 const productForm = useForm({
     id: props.product?.id ?? null,
     title: props.product?.title ?? '',
+    slug: props.product?.slug ?? '',
     description: props.product?.description ?? '',
     price: props.product?.price ?? 0,
     percentage: props.product?.percentage ?? 0,
@@ -45,8 +48,8 @@ const productForm = useForm({
     thumbnail: props.product?.thumbnail ?? null,
     categories: props.product?.categories?.map((category) => category.id) ?? [],
     new_categories: [],
-    brand: props.product?.brand?.id ?? null,
-    new_brand: '',
+    brand_id: props.product?.brand?.id ?? null,
+    new_brand: null,
 });
 
 const discountPrice = computed({
@@ -96,8 +99,46 @@ const percentage = computed({
     },
 });
 
+watch(
+    () => productForm.price,
+    (newVal) => {
+        if (productForm.percentage <= 0 || productForm.percentage > 100) {
+            return;
+        }
+        productForm.discount_price = Math.max(
+            newVal - newVal * (productForm.percentage / 100),
+            0,
+        );
+    },
+);
+
+const manuallyUpdatedSlug = ref(false);
+
+function slugify(text) {
+    productForm.clearErrors('slug');
+    return text
+        .toLowerCase()
+        .replace(/ /g, '-')
+        .replace(/[^a-z0-9-]+/g, '');
+}
+
+watch(
+    () => productForm.title,
+    (newVal) => {
+        if (!manuallyUpdatedSlug.value) {
+            productForm.slug = slugify(newVal);
+        }
+    },
+);
+
+function handleSlugInput() {
+    manuallyUpdatedSlug.value = true;
+}
+
 function addCategoryOption() {
+    productForm.clearErrors('categories');
     const name = newCategoryName.value.trim();
+
     if (!name) return;
 
     const duplicate = categoryOptions.value.some(
@@ -109,6 +150,7 @@ function addCategoryOption() {
 
         return;
     }
+
     const formattedName = name.charAt(0).toUpperCase() + name.slice(1);
     const newCategory = {
         name: formattedName,
@@ -127,9 +169,12 @@ function selectCategory(id) {
 }
 
 function toggleCategory(cat) {
+    productForm.clearErrors('categories');
     const id = cat.id;
+
     if (selectCategory(id)) {
         productForm.categories = productForm.categories.filter((c) => c !== id);
+
         if (cat.isNew) {
             productForm.new_categories = productForm.new_categories.filter(
                 (c) => c !== cat.name,
@@ -137,12 +182,17 @@ function toggleCategory(cat) {
         }
     } else {
         productForm.categories.push(id);
-        if (cat.isNew) productForm.new_categories.push(cat.name);
+
+        if (cat.isNew) {
+            productForm.new_categories.push(cat.name);
+        }
     }
 }
 
 function addBrandOption() {
+    productForm.clearErrors('brand_id');
     const name = newBrandName.value.trim();
+
     if (!name) return;
 
     const duplicate = brandOptions.value.some(
@@ -162,23 +212,31 @@ function addBrandOption() {
         id: new Date().getTime(),
     };
     customBrands.value.push(newBrand);
-    productForm.brand = newBrand.id;
+    productForm.brand_id = newBrand.id;
     productForm.new_brand = newBrand.name;
     newBrandName.value = '';
 }
 
 function selectBrand(id) {
-    return productForm.brand === id;
+    return productForm.brand_id === id;
 }
 
 function toggleBrand(brand) {
+    productForm.clearErrors('brand_id');
     const id = brand.id;
+
     if (selectBrand(id)) {
-        productForm.brand = null;
-        if (brand.isNew) productForm.new_brand = '';
+        productForm.brand_id = null;
+
+        if (brand.isNew) {
+            productForm.new_brand = '';
+        }
     } else {
-        productForm.brand = id;
-        if (brand.isNew) productForm.new_brand = brand.name;
+        productForm.brand_id = id;
+
+        if (brand.isNew) {
+            productForm.new_brand = brand.name;
+        }
     }
 }
 
@@ -197,15 +255,63 @@ function uploadThumbnail(event) {
     productForm.thumbnail = file;
 }
 
-function submitForm() {
-    const routeName =
-        props.mode === 'add' ? 'products.store' : 'products.update';
+function validateForm() {
+    productForm.clearErrors();
+    let errors = {};
 
-    productForm.post(routeName, {
-        onSuccess: () => {
-            emit('update:open', false);
-        },
-    });
+    if (!productForm.thumbnail) {
+        errors.thumbnail = 'Thumbnail is required';
+    }
+    if (!productForm.title.trim()) {
+        errors.title = 'Title is required';
+    }
+    if (!productForm.slug.trim()) {
+        errors.slug = 'Slug is required';
+    }
+    if (!productForm.description.trim()) {
+        errors.description = 'Description is required';
+    }
+    if (!productForm.categories.length) {
+        errors.categories = 'Categories are required';
+    }
+    if (!productForm.brand_id) {
+        errors.brand_id = 'Brand is required';
+    }
+    if (!productForm.price) {
+        errors.price = 'Price is required';
+    }
+    if (!productForm.stock) {
+        errors.stock = 'Stock is required';
+    }
+    if (Object.keys(errors).length > 0) {
+        productForm.setError(errors);
+        return false;
+    }
+    return true;
+}
+
+function submitForm() {
+    if (!validateForm()) {
+        return;
+    }
+
+    const routeName =
+        props.mode === 'add' ? 'admin.products.store' : 'admin.products.update';
+
+    productForm
+        .transform((data) => ({
+            ...data,
+            _method: props.mode === 'add' ? 'POST' : 'PUT',
+        }))
+        .post(route(routeName, { product: props.product?.id }), {
+            onSuccess: () => {
+                toast.success(page.props.flash.success);
+                emit('update:open', false);
+            },
+            onError: () => {
+                toast.error(page.props.flash.error);
+            },
+        });
 }
 
 onUnmounted(() => {
@@ -296,20 +402,7 @@ onUnmounted(() => {
                                 </span>
                             </template>
                         </button>
-                        <!-- <div
-                            v-if="form.imageFile"
-                            class="flex max-w-[240px] flex-wrap gap-2"
-                        >
-                            <Button
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                class="text-xs"
-                                @click="clearThumbnailPick"
-                            >
-                                Remove new file
-                            </Button>
-                        </div> -->
+                        <InputError :message="productForm.errors.thumbnail" />
                     </div>
 
                     <!-- Fields -->
@@ -321,8 +414,26 @@ onUnmounted(() => {
                             <Input
                                 id="edit-name"
                                 v-model="productForm.title"
-                                required
+                                @input="productForm.clearErrors('title')"
                             />
+                            <InputError :message="productForm.errors.title" />
+                        </div>
+
+                        <div class="grid gap-2">
+                            <Label for="edit-slug">Slug</Label>
+                            <Input
+                                id="edit-slug"
+                                v-model="productForm.slug"
+                                type="text"
+                                autocomplete="off"
+                                placeholder="e.g. wireless-mouse-pro"
+                                class="font-mono text-sm"
+                                @input="
+                                    handleSlugInput;
+                                    productForm.clearErrors('slug');
+                                "
+                            />
+                            <InputError :message="productForm.errors.slug" />
                         </div>
 
                         <div class="grid gap-2">
@@ -332,6 +443,10 @@ onUnmounted(() => {
                                 v-model="productForm.description"
                                 rows="4"
                                 class="w-full resize-y rounded-lg border border-border bg-background px-3 py-2.5 text-sm focus:border-[#FF6600] focus:ring-2 focus:ring-[#FF6600]/20 focus:outline-none"
+                                @input="productForm.clearErrors('description')"
+                            />
+                            <InputError
+                                :message="productForm.errors.description"
                             />
                         </div>
 
@@ -385,6 +500,9 @@ onUnmounted(() => {
                                     Add category
                                 </Button>
                             </div>
+                            <InputError
+                                :message="productForm.errors.categories"
+                            />
                         </div>
 
                         <div class="grid gap-2">
@@ -435,6 +553,9 @@ onUnmounted(() => {
                                     Add brand
                                 </Button>
                             </div>
+                            <InputError
+                                :message="productForm.errors.brand_id"
+                            />
                         </div>
 
                         <div
@@ -448,6 +569,10 @@ onUnmounted(() => {
                                     type="number"
                                     step="0.01"
                                     min="0"
+                                    @input="productForm.clearErrors('price')"
+                                />
+                                <InputError
+                                    :message="productForm.errors.price"
                                 />
                             </div>
                             <div class="grid gap-2">
@@ -480,6 +605,10 @@ onUnmounted(() => {
                                     type="number"
                                     min="0"
                                     step="1"
+                                    @input="productForm.clearErrors('stock')"
+                                />
+                                <InputError
+                                    :message="productForm.errors.stock"
                                 />
                             </div>
                         </div>
@@ -507,7 +636,15 @@ onUnmounted(() => {
                         v-if="productForm.processing"
                         class="mr-2 h-4 w-4 animate-spin"
                     />
-                    {{ productForm.processing ? 'Saving…' : 'Save product' }}
+                    {{
+                        mode === 'add'
+                            ? productForm.processing
+                                ? 'Adding…'
+                                : 'Add product'
+                            : productForm.processing
+                              ? 'Updating…'
+                              : 'Update product'
+                    }}
                 </Button>
             </div>
         </DialogContent>

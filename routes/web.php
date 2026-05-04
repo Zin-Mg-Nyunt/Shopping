@@ -36,6 +36,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/admin/products', [ProductController::class, 'adminList'])->name('admin.products');
     Route::delete('/admin/products', [ProductController::class, 'destroy'])->name('admin.products.destroy');
+    Route::post('/admin/products', [ProductController::class, 'adminStore'])->name('admin.products.store');
+    Route::put('/admin/products/{product}', [ProductController::class, 'adminUpdate'])->name('admin.products.update');
 });
 
 require __DIR__.'/settings.php';
