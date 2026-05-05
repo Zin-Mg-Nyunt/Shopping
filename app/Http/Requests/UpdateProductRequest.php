@@ -6,6 +6,9 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Gate;
+
+use function PHPUnit\Framework\isEmpty;
 
 class UpdateProductRequest extends FormRequest
 {
@@ -14,7 +17,8 @@ class UpdateProductRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->role === 'admin';
+        Gate::authorize('admin');
+        return true;
     }
 
     /**
@@ -24,7 +28,7 @@ class UpdateProductRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
+        $rules = [
             'title' => ['required', 'string', 'max:255'],
             'slug' => ['required', 'string', 'max:255', Rule::unique('products', 'slug')->ignore($this->product->id)],
             'description' => ['required', 'string'],
@@ -34,9 +38,9 @@ class UpdateProductRequest extends FormRequest
             'thumbnail' => [
                 'nullable',
                 function($attribute, $value, $fail) {
-                    if (request()->hasFile('thumbnail')) {
+                    if ($this->hasFile('thumbnail')) {
                         $validator = Validator::make(['thumbnail' => $value], 
-                        ['thumbnail' => ['image', 'mimes:jpeg,png,jpg,webp', 'max:2048']]);
+                        ['thumbnail' => ['image', 'mimes:jpeg,png,jpg,svg,webp', 'max:2048']]);
                         if ($validator->fails()) {
                             $fail($validator->errors()->first('thumbnail'));
                         }
@@ -44,10 +48,15 @@ class UpdateProductRequest extends FormRequest
                 }
             ],
             'categories' => ['required', 'array', 'min:1'],
-            'new_categories' => ['nullable', 'array', 'min:1'],
-            'new_categories.*' => ['string', 'max:255'],
             'brand_id' => ['required', 'integer'],
-            'new_brand' => ['nullable', 'string', 'max:255'],
         ];
+        if(!empty($this->new_categories) && count($this->new_categories) > 0) {
+            $rules['new_categories'] = ['array', 'min:1'];
+            $rules['new_categories.*'] = ['string', 'max:255'];
+        }
+        if($this->new_brand !== null) {
+            $rules['new_brand'] = ['string', 'max:255'];
+        }
+        return $rules;
     }
 }

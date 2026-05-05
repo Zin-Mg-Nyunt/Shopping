@@ -297,19 +297,24 @@ function submitForm() {
 
     const routeName =
         props.mode === 'add' ? 'admin.products.store' : 'admin.products.update';
-
     productForm
         .transform((data) => ({
             ...data,
+            discount_price:
+                data.discount_price == 0 ? null : data.discount_price,
             _method: props.mode === 'add' ? 'POST' : 'PUT',
         }))
         .post(route(routeName, { product: props.product?.id }), {
             onSuccess: () => {
-                toast.success(page.props.flash.success);
+                if (page.props.flash.success) {
+                    toast.success(page.props.flash.success);
+                } else {
+                    toast.error(page.props.flash.error);
+                }
                 emit('update:open', false);
             },
             onError: () => {
-                toast.error(page.props.flash.error);
+                toast.error('Something went wrong');
             },
         });
 }
