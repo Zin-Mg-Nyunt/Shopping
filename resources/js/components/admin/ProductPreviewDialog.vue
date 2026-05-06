@@ -1,7 +1,14 @@
-<script setup lang="ts">
+<script setup>
 import { Package } from 'lucide-vue-next';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 
 defineProps({
     open: { type: Boolean, required: true },
@@ -32,8 +39,12 @@ function formatPrice(value) {
                 v-if="product"
                 class="grid gap-6 py-1 md:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]"
             >
-                <div class="overflow-hidden rounded-2xl border border-border bg-card p-3">
-                    <div class="aspect-square overflow-hidden rounded-xl bg-muted">
+                <div
+                    class="overflow-hidden rounded-2xl border border-border bg-card p-3"
+                >
+                    <div
+                        class="aspect-square overflow-hidden rounded-xl bg-muted"
+                    >
                         <img
                             v-if="product.thumbnail"
                             :src="product.thumbnail"
@@ -44,7 +55,9 @@ function formatPrice(value) {
                             v-else
                             class="flex h-full w-full items-center justify-center"
                         >
-                            <Package class="h-12 w-12 text-muted-foreground/50" />
+                            <Package
+                                class="h-12 w-12 text-muted-foreground/50"
+                            />
                         </div>
                     </div>
                 </div>
@@ -65,11 +78,28 @@ function formatPrice(value) {
                     </div>
 
                     <div class="grid grid-cols-2 gap-3 text-sm">
-                        <div class="rounded-lg border border-border bg-muted/30 p-3">
-                            <p class="text-xs text-muted-foreground">Category</p>
-                            <p class="font-medium">{{ product.category_name || '-' }}</p>
+                        <div
+                            class="rounded-lg border border-border bg-muted/30 p-3"
+                        >
+                            <p class="text-xs text-muted-foreground">
+                                Category
+                            </p>
+                            <span
+                                class="font-medium"
+                                v-for="(category, index) in product.categories"
+                                :key="category.id"
+                            >
+                                {{ category.name }}
+                                {{
+                                    product.categories.length - 1 > index
+                                        ? ', '
+                                        : ''
+                                }}
+                            </span>
                         </div>
-                        <div class="rounded-lg border border-border bg-muted/30 p-3">
+                        <div
+                            class="rounded-lg border border-border bg-muted/30 p-3"
+                        >
                             <p class="text-xs text-muted-foreground">Stock</p>
                             <p class="font-medium">{{ product.stock }}</p>
                         </div>

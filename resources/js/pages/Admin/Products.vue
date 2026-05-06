@@ -113,10 +113,7 @@ function formatPrice(amount) {
 }
 
 function stockPercent(row) {
-    return Math.min(
-        100,
-        Math.round((row.stock / Math.max(1, row.stock)) * 100),
-    );
+    return Math.min(100, Math.max(0, row.stock));
 }
 
 function stockBarClass(row) {
@@ -360,6 +357,7 @@ function openEdit(row) {
                             <th class="px-4 py-3 font-semibold">Image</th>
                             <th class="px-4 py-3 font-semibold">Product</th>
                             <th class="px-4 py-3 font-semibold">Slug</th>
+                            <th class="px-4 py-3 font-semibold">Brand</th>
                             <th class="px-4 py-3 font-semibold">Category</th>
                             <th class="px-4 py-3 font-semibold">Price</th>
                             <th class="px-4 py-3 font-semibold">
@@ -416,6 +414,11 @@ function openEdit(row) {
                                 class="px-4 py-3 align-middle font-mono text-xs text-muted-foreground"
                             >
                                 {{ row.slug }}
+                            </td>
+                            <td
+                                class="px-4 py-3 align-middle text-sm text-primary"
+                            >
+                                {{ row.brand?.name || '-' }}
                             </td>
                             <td class="max-w-[200px] px-2 py-3">
                                 <div class="flex flex-wrap items-start gap-2">

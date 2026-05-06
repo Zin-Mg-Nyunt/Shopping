@@ -42,9 +42,9 @@ const adminNav = [
     },
     {
         label: 'Customers',
-        href: '#',
+        href: route('admin.customers'),
         icon: Users,
-        match: () => false,
+        match: () => route().current('admin.customers'),
     },
     {
         label: 'Analytics',

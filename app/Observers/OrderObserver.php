@@ -3,9 +3,13 @@
 namespace App\Observers;
 
 use App\Models\Order;
+use App\Services\OrderService;
 
 class OrderObserver
 {
+    public function __construct(protected OrderService $orderService)
+    {
+    }
     /**
      * Handle the Order "created" event.
      */
@@ -19,7 +23,11 @@ class OrderObserver
      */
     public function updated(Order $order): void
     {
-        //
+        if($order->isDirty('status') && $order->status === 'delivered')
+        {
+            $this->orderService->completeOrder($order);
+        }
+        
     }
 
     /**

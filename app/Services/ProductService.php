@@ -9,7 +9,6 @@ use App\Models\Brand;
 use App\Models\Product;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 class ProductService
 {
@@ -147,5 +146,18 @@ class ProductService
             : 'Selected products deleted successfully.';
 
         return $message;
+    }
+
+    public function getWishlistAndCount()
+    {
+        $request = request();
+        $total = $request->user()->wishlistProducts()->count();
+        $wishlist = $request->user()->wishlistProducts()
+            ->with('brand')
+            ->filterBy($request->all())
+            ->paginate(6)
+            ->withQueryString();
+
+        return [$total, $wishlist];
     }
 }

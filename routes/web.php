@@ -5,6 +5,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [ProductController::class, 'index'])->name('home');
@@ -38,6 +39,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/admin/products', [ProductController::class, 'destroy'])->name('admin.products.destroy');
     Route::post('/admin/products', [ProductController::class, 'adminStore'])->name('admin.products.store');
     Route::put('/admin/products/{product}', [ProductController::class, 'adminUpdate'])->name('admin.products.update');
+    Route::get('/admin/customers', [UserController::class, 'customerList'])->name('admin.customers');
 });
 
 require __DIR__.'/settings.php';

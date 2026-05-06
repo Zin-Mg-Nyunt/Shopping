@@ -109,4 +109,9 @@ class OrderService
             return redirect()->back()->with('error', $e->getMessage());
         }
     }
+
+    public function completeOrder(Order $order)
+    {
+       $order->user()->increment('cached_orders_count');
+    }
 }

@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\DestroyProductRequest;
+use App\Http\Requests\StoreProductRequest;
+use App\Http\Requests\UpdateProductRequest;
 use App\Models\Product;
+use App\Services\ProductService;
 use Exception;
 use Illuminate\Http\Request;
-use App\Http\Requests\DestroyProductRequest;
-use App\Http\Requests\UpdateProductRequest;
-use App\Http\Requests\StoreProductRequest;
-use App\Services\ProductService;
 
 class ProductController extends Controller
 {
@@ -38,6 +38,7 @@ class ProductController extends Controller
         $validated = $request->validated();
         try {
             $productService->store($request, $validated);
+
             return redirect()->back()->with('success', 'Product created successfully.');
         } catch (Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
@@ -49,6 +50,7 @@ class ProductController extends Controller
         $validated = $request->validated();
         try {
             $productService->update($request, $product, $validated);
+
             return redirect()->back()->with('success', 'Product updated successfully.');
         } catch (Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
@@ -59,6 +61,7 @@ class ProductController extends Controller
     {
         $validated = $request->validated();
         $message = $productService->destroy($validated);
+
         return redirect()->back()->with('success', $message);
     }
 
@@ -83,14 +86,9 @@ class ProductController extends Controller
         return redirect()->back()->with('success', $message);
     }
 
-    public function showWishlist(Request $request)
+    public function showWishlist(ProductService $productService)
     {
-        $total = $request->user()->wishlistProducts()->count();
-        $wishlist = $request->user()->wishlistProducts()
-            ->with('brand')
-            ->filterBy($request->all())
-            ->paginate(6)
-            ->withQueryString();
+        [$total, $wishlist] = $productService->getWishlistAndCount();
 
         return inertia('User/Wishlist', [
             'wishlist' => $wishlist,
