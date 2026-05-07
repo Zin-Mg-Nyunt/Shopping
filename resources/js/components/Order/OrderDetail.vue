@@ -7,7 +7,7 @@ import {
     SheetTitle,
 } from '@/components/ui/sheet';
 
-const props = defineProps({
+defineProps({
     selectedOrder: Object,
     detailSheetOpen: Boolean,
 });
@@ -18,6 +18,13 @@ const formatDate = (iso) =>
         day: 'numeric',
         year: 'numeric',
     });
+
+const currency = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+});
+
+const formatMoney = (value) => currency.format(Number(value ?? 0));
 
 const statusStyles = {
     pending:
@@ -131,6 +138,37 @@ const emit = defineEmits(['update:detailSheetOpen']);
                                 {{ selectedOrder.promo_code }}
                             </p>
                         </div>
+                    </div>
+
+                    <div
+                        class="rounded-xl border border-border bg-muted/20 p-4"
+                    >
+                        <h3 class="text-sm font-semibold text-foreground">
+                            Order summary
+                        </h3>
+                        <dl class="mt-3 space-y-2 text-sm text-muted-foreground">
+                            <div class="flex items-center justify-between gap-3">
+                                <dt>Tax</dt>
+                                <dd class="font-medium text-foreground tabular-nums">
+                                    {{ formatMoney(selectedOrder.tax) }}
+                                </dd>
+                            </div>
+                            <div class="flex items-center justify-between gap-3">
+                                <dt>Shipping fees</dt>
+                                <dd class="font-medium text-foreground tabular-nums">
+                                    {{ formatMoney(selectedOrder.shipping_fees) }}
+                                </dd>
+                            </div>
+                            <div
+                                v-if="selectedOrder.points_used > 0"
+                                class="flex items-center justify-between gap-3"
+                            >
+                                <dt>Points used</dt>
+                                <dd class="font-medium text-foreground tabular-nums">
+                                    -{{ formatMoney(selectedOrder.points_used) }}
+                                </dd>
+                            </div>
+                        </dl>
                     </div>
 
                     <div

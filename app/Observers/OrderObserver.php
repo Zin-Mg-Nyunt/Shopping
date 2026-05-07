@@ -23,9 +23,13 @@ class OrderObserver
      */
     public function updated(Order $order): void
     {
-        if($order->isDirty('status') && $order->status === 'delivered')
+        if ($order->isDirty('status') 
+            && $order->status === 'delivered' 
+            && !$order->is_counted_in_cache)
         {
             $this->orderService->completeOrder($order);
+            $order->is_counted_in_cache = true;
+            $order->saveQuietly();
         }
         
     }

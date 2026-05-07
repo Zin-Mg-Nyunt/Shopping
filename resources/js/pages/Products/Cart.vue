@@ -1,5 +1,5 @@
 <script setup>
-import { Head, Link, router, useForm } from '@inertiajs/vue3';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
 import {
     MapPin,
     Minus,
@@ -47,6 +47,8 @@ watch(
 const promoInput = ref('');
 const appliedPromo = ref(null);
 const promoFeedback = ref('idle');
+const usePoints = ref(false);
+const userPoints = computed(() => usePage().props.auth?.user?.points);
 
 const isEmpty = computed(() => lines.value.length === 0);
 
@@ -94,9 +96,14 @@ const shipping = computed(() => (afterDiscount.value >= 200 ? 0 : 9.99));
 
 const estimatedTax = computed(() => Math.round(afterDiscount.value * 5) / 100);
 
-const orderTotal = computed(
-    () => afterDiscount.value + shipping.value + estimatedTax.value,
-);
+const orderTotal = computed(() => {
+    let total = afterDiscount.value + shipping.value + estimatedTax.value;
+    if (usePoints.value && userPoints.value > 0) {
+        let pointsToUse = Math.min(userPoints.value, total);
+        total -= pointsToUse;
+    }
+    return total;
+});
 
 const form = useForm({
     product_id: null,
@@ -266,6 +273,7 @@ function handleCheckout() {
         product_ids: lines.value.map((line) => line.id),
         quantity: lines.value.map((line) => line.quantity),
         promo_code: appliedPromo.value?.code,
+        use_points: usePoints.value,
     };
 
     router.post(route('order.store'), orderData, {
@@ -930,6 +938,25 @@ function handleCheckout() {
                                     {{ formatMoney(orderTotal) }}
                                 </span>
                             </div>
+
+                            <label
+                                v-if="userPoints > 0"
+                                for="use-points"
+                                class="mt-4 flex cursor-pointer items-start gap-3 rounded-xl border border-border bg-background p-3 text-sm transition hover:border-primary/50"
+                            >
+                                <input
+                                    id="use-points"
+                                    v-model="usePoints"
+                                    type="checkbox"
+                                    class="mt-0.5 h-4 w-4 rounded border-border text-primary focus:ring-primary"
+                                />
+                                <span class="text-muted-foreground">
+                                    Use your points for this order? ({{
+                                        userPoints
+                                    }}
+                                    points available)
+                                </span>
+                            </label>
 
                             <section
                                 class="mt-6"

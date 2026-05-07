@@ -20,9 +20,13 @@ return new class extends Migration
             $table->json('shipping_address');
             $table->string('payment_method');
             $table->integer('total_quantity');
+            $table->integer('tax');
+            $table->decimal('shipping_fees', 10, 2);
             $table->decimal('total_amount', 10, 2);
             $table->string('status')->default('pending');
             $table->string('promo_code')->nullable();
+            $table->integer('points_used')->default(0);
+            $table->boolean('is_counted_in_cache')->default(false);
             $table->timestamps();
         });
     }

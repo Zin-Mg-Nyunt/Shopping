@@ -43,15 +43,19 @@ class OrderService
     {
         try {
             DB::transaction(function () use ($request) {
+                $user = $request->user();
                 $order = Order::create([
-                    'user_id' => $request->user()->id,
+                    'user_id' => $user->id,
                     'order_number' => '#ORD-'.now()->format('YmdHis'),
                     'address_id' => $request->address_id,
                     'shipping_address' => $request->shipping_address,
                     'payment_method' => $request->payment_method,
                     'total_quantity' => 0,
                     'total_amount' => 0,
+                    'tax' => 0,
+                    'shipping_fees' => 0,
                     'promo_code' => $request->promo_code,
+                    'points_used' => 0,
                 ]);
 
                 $sub_total = 0;
@@ -95,13 +99,23 @@ class OrderService
                     }
                 }
                 $total_amount = $sub_total - $discount_amount + $tax + $shipping_fees;
+                
+                $pointsUsed = 0;
+                if ($request->use_points && $user->points > 0) {
+                    $pointsUsed = min($user->points, $total_amount);
+                    $total_amount -= $pointsUsed;
+                    $user->decrement('points', $pointsUsed);
+                }
 
                 $order->update([
                     'total_quantity' => array_sum($request->quantity),
                     'total_amount' => $total_amount,
+                    'points_used' => $pointsUsed,
+                    'tax' => $tax,
+                    'shipping_fees' => $shipping_fees,
                 ]);
 
-                $request->user()->carts()->forceDelete();
+                $user->carts()->forceDelete();
             });
 
             return redirect()->back()->with('success', 'Order created successfully');

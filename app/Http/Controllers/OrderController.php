@@ -39,6 +39,7 @@ class OrderController extends Controller
             'quantity' => 'required|array',
             'quantity.*' => 'required|integer|min:1',
             'promo_code' => 'nullable|string|exists:promos,code',
+            'use_points' => 'nullable|boolean',
         ]);
 
         return $orderService->store($request);
