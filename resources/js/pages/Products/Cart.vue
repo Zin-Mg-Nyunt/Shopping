@@ -1,4 +1,6 @@
 <script setup>
+import ProductPriceLoyalty from '@/components/Products/ProductPriceLoyalty.vue';
+import { useProductLoyalPricing } from '@/composables/useProductLoyalPricing';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
 import {
     MapPin,
@@ -27,6 +29,8 @@ const props = defineProps({
         required: true,
     },
 });
+const { lineUnitPrice } = useProductLoyalPricing();
+
 const lines = ref([]);
 watch(
     () => props.items,
@@ -34,7 +38,6 @@ watch(
         lines.value = props.items.map((item) => ({
             ...item,
             quantity: item.pivot?.quantity ?? item.quantity,
-            price: item.discount_price ?? item.price,
             brand: item.brand?.name,
         }));
     },
@@ -62,7 +65,10 @@ function formatMoney(value) {
 }
 
 const subtotal = computed(() =>
-    lines.value.reduce((sum, line) => sum + line.price * line.quantity, 0),
+    lines.value.reduce(
+        (sum, line) => sum + lineUnitPrice(line) * line.quantity,
+        0,
+    ),
 );
 
 const discountAmount = computed(() => {
@@ -174,7 +180,7 @@ function applyPromo() {
 }
 
 function lineSubtotal(line) {
-    return line.price * line.quantity;
+    return lineUnitPrice(line) * line.quantity;
 }
 
 const addressUi = ref('compact');
@@ -440,14 +446,12 @@ function handleCheckout() {
                                 >
                                     {{ line.title }}
                                 </h2>
-                                <p class="mt-1 text-sm text-muted-foreground">
-                                    {{
-                                        formatMoney(
-                                            line.discount_price ?? line.price,
-                                        )
-                                    }}
-                                    each
-                                </p>
+                                <div class="mt-1">
+                                    <ProductPriceLoyalty
+                                        :product="line"
+                                        variant="compact"
+                                    />
+                                </div>
 
                                 <div
                                     class="mt-4 flex flex-wrap items-center gap-4"

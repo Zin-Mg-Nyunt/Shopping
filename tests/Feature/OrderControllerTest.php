@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Order;
+use App\Models\OrderDetail;
 use App\Models\Product;
 use App\Models\User;
 
@@ -152,6 +153,74 @@ test('admin can update order status', function () {
         ->assertSessionHas('success', 'Order status updated successfully.');
 
     expect($order->refresh()->status)->toBe('processing');
+});
+
+test('order store uses loyal unit price for loyalty customers', function () {
+    $user = User::factory()->create(['cached_orders_count' => 100]);
+    $product = Product::factory()->create([
+        'price' => 100,
+        'discount_price' => 80,
+        'stock' => 5,
+    ]);
+    $product->refresh();
+
+    expect((float) $product->loyal_price)->toBe(76.0);
+
+    $this->actingAs($user)
+        ->post(route('order.store'), [
+            'address_id' => null,
+            'shipping_address' => [
+                'full_name' => 'John Doe',
+                'phone' => '1234567890',
+                'street' => '123 Main St',
+                'city' => 'Yangon',
+                'postal_code' => '12345',
+            ],
+            'payment_method' => 'cod',
+            'total_amount' => 200,
+            'product_ids' => [$product->id],
+            'quantity' => [1],
+            'promo_code' => null,
+        ])
+        ->assertRedirect()
+        ->assertSessionHas('success', 'Order created successfully');
+
+    $detail = OrderDetail::query()->where('product_id', $product->id)->first();
+    expect($detail)->not->toBeNull();
+    expect((float) $detail->price)->toBe(76.0);
+});
+
+test('order store uses standard unit price for non loyalty customers', function () {
+    $user = User::factory()->create(['cached_orders_count' => 0]);
+    $product = Product::factory()->create([
+        'price' => 100,
+        'discount_price' => 80,
+        'stock' => 5,
+    ]);
+    $product->refresh();
+
+    $this->actingAs($user)
+        ->post(route('order.store'), [
+            'address_id' => null,
+            'shipping_address' => [
+                'full_name' => 'John Doe',
+                'phone' => '1234567890',
+                'street' => '123 Main St',
+                'city' => 'Yangon',
+                'postal_code' => '12345',
+            ],
+            'payment_method' => 'cod',
+            'total_amount' => 200,
+            'product_ids' => [$product->id],
+            'quantity' => [1],
+            'promo_code' => null,
+        ])
+        ->assertRedirect()
+        ->assertSessionHas('success', 'Order created successfully');
+
+    $detail = OrderDetail::query()->where('product_id', $product->id)->first();
+    expect($detail)->not->toBeNull();
+    expect((float) $detail->price)->toBe(80.0);
 });
 
 test('non admin can not update order status', function () {

@@ -65,7 +65,7 @@ class OrderService
 
                 $quantities = array_combine($request->product_ids, $request->quantity);
                 foreach ($products as $product) {
-                    $price = $product->discount_price ?? $product->price;
+                    $price = $product->unitPriceFor($user);
                     $quantity = $quantities[$product->id];
                     $sub_total += $price * $quantity;
 

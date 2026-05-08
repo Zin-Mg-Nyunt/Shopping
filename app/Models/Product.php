@@ -110,4 +110,18 @@ class Product extends Model
                     : Storage::url($value))
         );
     }
+
+    /**
+     * Unit price charged for this product for the given user at checkout.
+     */
+    public function unitPriceFor(?User $user): float
+    {
+        $standard = (float) ($this->discount_price ?? $this->price);
+
+        if ($user !== null && $user->isLoyaltyCustomer() && $this->loyal_price !== null) {
+            return (float) $this->loyal_price;
+        }
+
+        return $standard;
+    }
 }

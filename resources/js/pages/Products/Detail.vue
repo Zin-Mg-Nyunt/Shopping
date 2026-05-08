@@ -1,4 +1,5 @@
 <script setup>
+import ProductPriceLoyalty from '@/components/Products/ProductPriceLoyalty.vue';
 import { ref } from 'vue';
 import { useAddToCart } from '@/composables/useAddToCart';
 import { useAddToWishlist } from '@/composables/useAddToWishlist';
@@ -106,15 +107,9 @@ function blurQuantity(event) {
                         </div>
                     </div>
 
-                    <p class="text-4xl font-bold text-primary">
-                        {{ product.discount_price ?? product.price }}
-                        <span
-                            v-if="product.discount_price"
-                            class="text-sm text-muted-foreground line-through"
-                        >
-                            {{ product.price }}
-                        </span>
-                    </p>
+                    <div class="space-y-1">
+                        <ProductPriceLoyalty :product="product" variant="detail" />
+                    </div>
 
                     <p
                         class="max-w-xl text-base leading-relaxed text-muted-foreground"

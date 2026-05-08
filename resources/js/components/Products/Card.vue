@@ -1,5 +1,6 @@
 <script setup>
 import { router } from '@inertiajs/vue3';
+import ProductPriceLoyalty from '@/components/Products/ProductPriceLoyalty.vue';
 import { useAddToCart } from '@/composables/useAddToCart';
 import { useAddToWishlist } from '@/composables/useAddToWishlist';
 
@@ -54,15 +55,7 @@ const { addToWishlist } = useAddToWishlist();
             <p class="truncate text-sm text-muted-foreground">
                 {{ product.description }}
             </p>
-            <p class="text-lg font-bold text-primary">
-                {{ product.discount_price ?? product.price }}
-                <span
-                    v-if="product.discount_price"
-                    class="text-sm text-muted-foreground line-through"
-                >
-                    {{ product.price }}
-                </span>
-            </p>
+            <ProductPriceLoyalty :product="product" variant="card" />
         </div>
 
         <button
