@@ -5,21 +5,26 @@ import {
     Bell,
     LayoutDashboard,
     Menu,
+    Moon,
     Package,
     Search,
     ShoppingBag,
+    Sun,
     Users,
     X,
 } from 'lucide-vue-next';
 import { computed, onUnmounted, ref, watch } from 'vue';
 import { route } from 'ziggy-js';
 import AppLogo from '@/components/AppLogo.vue';
+import { useAppearance } from '@/composables/useAppearance';
 import { Toaster } from 'vue-sonner';
 import 'vue-sonner/style.css';
 
 const page = usePage();
 
 const sidebarOpen = ref(false);
+const { resolvedAppearance, updateAppearance } = useAppearance();
+const isDark = computed(() => resolvedAppearance.value === 'dark');
 
 const adminNav = [
     {
@@ -93,6 +98,10 @@ onUnmounted(() => {
         document.documentElement.classList.remove('overflow-hidden');
     }
 });
+
+function toggleTheme() {
+    updateAppearance(isDark.value ? 'light' : 'dark');
+}
 </script>
 
 <template>
@@ -224,31 +233,25 @@ onUnmounted(() => {
                     <Menu class="h-5 w-5" stroke-width="2" />
                 </button>
 
-                <div class="relative min-w-0 flex-1 max-lg:max-w-none">
-                    <label for="admin-search" class="sr-only"
-                        >Search admin</label
-                    >
-                    <Search
-                        class="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground"
-                        stroke-width="2"
-                    />
-                    <input
-                        id="admin-search"
-                        type="search"
-                        placeholder="Search orders, products, users…"
-                        class="w-full rounded-xl border border-border bg-muted/50 py-2 pr-3 pl-9 text-sm text-foreground placeholder:text-muted-foreground focus:border-[#FF6600] focus:bg-card focus:ring-2 focus:ring-[#FF6600]/25 focus:outline-none"
-                    />
-                </div>
-
                 <button
                     type="button"
-                    class="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-border text-muted-foreground transition hover:border-primary/40 hover:text-[#FF6600]"
+                    class="relative ml-auto flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-border text-muted-foreground transition hover:border-primary/40 hover:text-[#FF6600]"
                     aria-label="Notifications"
                 >
                     <Bell class="h-5 w-5" stroke-width="2" />
                     <span
                         class="absolute top-2 right-2 h-2 w-2 rounded-full bg-[#FF6600] ring-2 ring-card"
                     />
+                </button>
+
+                <button
+                    type="button"
+                    class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-border text-muted-foreground transition hover:border-primary/40 hover:text-[#FF6600]"
+                    aria-label="Toggle dark mode"
+                    @click="toggleTheme"
+                >
+                    <Sun v-if="isDark" class="h-5 w-5" stroke-width="2" />
+                    <Moon v-else class="h-5 w-5" stroke-width="2" />
                 </button>
 
                 <div

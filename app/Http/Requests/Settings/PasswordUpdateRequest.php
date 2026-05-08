@@ -22,4 +22,15 @@ class PasswordUpdateRequest extends FormRequest
             'password' => $this->passwordRules(),
         ];
     }
+    public function messages(): array
+    {
+        return [
+            'current_password.required' => 'The current password field is required.',
+            'current_password.string' => 'The current password field must be a string.',
+            'current_password.current_password' => 'The current password is incorrect.',
+            'password.required' => 'The password field is required.',
+            'password.string' => 'The password field must be a string.',
+            'password.confirmed' => 'The password confirmation does not match.',
+        ];
+    }
 }

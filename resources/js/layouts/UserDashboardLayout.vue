@@ -1,7 +1,9 @@
 <script setup>
 import { Link } from '@inertiajs/vue3';
-import { ref, watch } from 'vue';
+import { Moon, Sun } from 'lucide-vue-next';
+import { computed, ref, watch } from 'vue';
 import AppLogo from '@/components/AppLogo.vue';
+import { useAppearance } from '@/composables/useAppearance';
 import { useCartCount } from '@/composables/useCartCount';
 import { Toaster } from 'vue-sonner';
 import 'vue-sonner/style.css';
@@ -10,11 +12,13 @@ import 'vue-sonner/style.css';
 // const { isCurrentUrl } = useCurrentUrl();
 const { cartCount } = useCartCount();
 const bounce = ref(false);
+const { resolvedAppearance, updateAppearance } = useAppearance();
+const isDark = computed(() => resolvedAppearance.value === 'dark');
 const navItems = [
     {
         label: 'Dashboard',
-        href: route('dashboard'),
-        match: () => route().current('dashboard'),
+        href: route('user.dashboard'),
+        match: () => route().current('user.dashboard'),
     },
     {
         label: 'My Profile',
@@ -36,11 +40,6 @@ const navItems = [
         href: route('user.shipping.address'),
         match: () => route().current('user.shipping.address'),
     },
-    {
-        label: 'Settings',
-        href: route('security.edit'),
-        match: () => route().current('security.edit'),
-    },
 ];
 watch(cartCount, (newCount, oldCount) => {
     if (newCount > oldCount) {
@@ -50,6 +49,10 @@ watch(cartCount, (newCount, oldCount) => {
         }, 1000);
     }
 });
+
+function toggleTheme() {
+    updateAppearance(isDark.value ? 'light' : 'dark');
+}
 </script>
 
 <template>
@@ -76,35 +79,16 @@ watch(cartCount, (newCount, oldCount) => {
                     </Link>
                 </div>
 
-                <div class="w-full flex-1 md:max-w-md">
-                    <label for="order-search" class="sr-only"
-                        >Search order with order number</label
-                    >
-                    <div class="relative">
-                        <input
-                            id="order-search"
-                            type="search"
-                            placeholder="Search order with order number"
-                            class="w-full rounded-full border border-border bg-muted py-2 pr-10 pl-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:bg-card focus:outline-none"
-                        />
-                        <span
-                            class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-muted-foreground"
-                        >
-                            <svg
-                                class="h-5 w-5"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="1.8"
-                            >
-                                <circle cx="11" cy="11" r="7" />
-                                <path d="m20 20-3.5-3.5" />
-                            </svg>
-                        </span>
-                    </div>
-                </div>
-
                 <nav class="ml-auto flex shrink-0 items-center gap-2 sm:gap-3">
+                    <button
+                        type="button"
+                        class="rounded-full border border-border bg-card p-2 text-muted-foreground transition hover:border-primary/40 hover:text-primary"
+                        aria-label="Toggle dark mode"
+                        @click="toggleTheme"
+                    >
+                        <Sun v-if="isDark" class="h-5 w-5" />
+                        <Moon v-else class="h-5 w-5" />
+                    </button>
                     <Link
                         :href="route('cart')"
                         class="relative rounded-full border border-border bg-card p-2 text-muted-foreground transition hover:border-primary/40 hover:text-primary"
@@ -158,7 +142,7 @@ watch(cartCount, (newCount, oldCount) => {
                                     {{ $page.props.auth.user.name }}
                                 </p>
                                 <Link
-                                    :href="route('dashboard')"
+                                    :href="route('user.dashboard')"
                                     class="block rounded-lg px-3 py-2 text-sm transition hover:bg-accent hover:text-primary"
                                 >
                                     Dashboard

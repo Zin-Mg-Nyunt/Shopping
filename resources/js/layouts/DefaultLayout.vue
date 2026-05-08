@@ -1,15 +1,19 @@
 <script setup>
 import { Link } from '@inertiajs/vue3';
+import { Moon, Sun } from 'lucide-vue-next';
 import AppLogo from '@/components/AppLogo.vue';
+import { useAppearance } from '@/composables/useAppearance';
 import useFilterBy from '@/composables/useFilterBy';
 import { useCartCount } from '@/composables/useCartCount';
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { Toaster } from 'vue-sonner';
 import 'vue-sonner/style.css';
 
 const bounce = ref(false);
 const { cartCount } = useCartCount();
 const { filterBy } = useFilterBy();
+const { resolvedAppearance, updateAppearance } = useAppearance();
+const isDark = computed(() => resolvedAppearance.value === 'dark');
 watch(cartCount, (newCount, oldCount) => {
     if (newCount > oldCount) {
         bounce.value = true;
@@ -18,6 +22,10 @@ watch(cartCount, (newCount, oldCount) => {
         }, 1000);
     }
 });
+
+function toggleTheme() {
+    updateAppearance(isDark.value ? 'light' : 'dark');
+}
 </script>
 <template>
     <Toaster position="top-right" richColors />
@@ -60,6 +68,15 @@ watch(cartCount, (newCount, oldCount) => {
                 </div>
 
                 <nav class="ml-auto flex items-center gap-3">
+                    <button
+                        type="button"
+                        class="rounded-full border border-border bg-card p-2 text-muted-foreground transition hover:border-primary/40 hover:text-primary"
+                        aria-label="Toggle dark mode"
+                        @click="toggleTheme"
+                    >
+                        <Sun v-if="isDark" class="h-5 w-5" />
+                        <Moon v-else class="h-5 w-5" />
+                    </button>
                     <Link
                         :href="route('cart')"
                         class="relative rounded-full border border-border bg-card p-2 text-muted-foreground transition hover:border-primary/40 hover:text-primary"

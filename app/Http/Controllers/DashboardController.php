@@ -28,7 +28,7 @@ class DashboardController extends Controller
         Gate::authorize('user');
 
         return inertia('User/Dashboard', [
-            'orders' => $request->user()->orders()->with('orderDetails')->get(),
+            'user' => $request->user()->load('orders'),
         ]);
     }
 }

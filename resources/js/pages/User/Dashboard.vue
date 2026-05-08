@@ -3,7 +3,7 @@ import { Head } from '@inertiajs/vue3';
 import UserDashboardLayout from '@/layouts/UserDashboardLayout.vue';
 
 const props = defineProps({
-    orders: Array,
+    user: Object,
 });
 
 defineOptions({
@@ -16,6 +16,16 @@ const formatDate = (date) => {
         day: 'numeric',
         year: 'numeric',
     });
+};
+
+const statusStyles = {
+    pending:
+        'border-amber-500/25 bg-amber-500/10 text-amber-800 dark:text-amber-400',
+    processing: 'border-primary/25 bg-primary/12 text-primary',
+    shipped: 'border-sky-500/25 bg-sky-500/10 text-sky-800 dark:text-sky-300',
+    delivered:
+        'border-emerald-500/25 bg-emerald-500/10 text-emerald-800 dark:text-emerald-400',
+    cancelled: 'border-destructive/30 bg-destructive/10 text-destructive',
 };
 </script>
 
@@ -44,7 +54,7 @@ const formatDate = (date) => {
                         <p
                             class="mt-2 text-3xl font-bold text-foreground tabular-nums"
                         >
-                            {{ orders.length }}
+                            {{ user.orders.length }}
                         </p>
                     </div>
                     <div
@@ -77,7 +87,7 @@ const formatDate = (date) => {
                             class="mt-2 text-3xl font-bold text-foreground tabular-nums"
                         >
                             {{
-                                orders.filter(
+                                user.orders.filter(
                                     (order) => order.status === 'pending',
                                 ).length
                             }}
@@ -107,12 +117,12 @@ const formatDate = (date) => {
                 <div class="flex items-start justify-between gap-3">
                     <div>
                         <p class="text-sm font-medium text-muted-foreground">
-                            Loyalty points
+                            Points
                         </p>
                         <p
                             class="mt-2 text-3xl font-bold text-foreground tabular-nums"
                         >
-                            1,280
+                            {{ user.points }}
                         </p>
                     </div>
                     <div
@@ -162,7 +172,7 @@ const formatDate = (date) => {
                     </thead>
                     <tbody class="divide-y divide-border">
                         <tr
-                            v-for="order in orders"
+                            v-for="order in user.orders"
                             :key="order.id"
                             class="transition hover:bg-muted/50"
                         >
@@ -174,7 +184,8 @@ const formatDate = (date) => {
                             </td>
                             <td class="px-5 py-4">
                                 <span
-                                    class="inline-flex rounded-full border border-primary/20 bg-primary/12 px-2.5 py-0.5 text-xs font-semibold text-primary"
+                                    class="inline-flex cursor-pointer rounded-full border px-2.5 py-0.5 text-xs font-semibold capitalize"
+                                    :class="statusStyles[order.status]"
                                 >
                                     {{ order.status }}
                                 </span>

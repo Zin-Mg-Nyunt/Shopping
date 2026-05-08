@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\Promo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class OrderService
 {
@@ -99,7 +100,7 @@ class OrderService
                     }
                 }
                 $total_amount = $sub_total - $discount_amount + $tax + $shipping_fees;
-                
+
                 $pointsUsed = 0;
                 if ($request->use_points && $user->points > 0) {
                     $pointsUsed = min($user->points, $total_amount);
@@ -126,6 +127,9 @@ class OrderService
 
     public function completeOrder(Order $order)
     {
-       $order->user()->increment('cached_orders_count');
+        $order->user()->increment('cached_orders_count');
+        if ($order->user->cached_orders_count === 100) {
+            Log::info('User is a loyalty customer', ['user_id' => $order->user->id]);
+        }
     }
 }
