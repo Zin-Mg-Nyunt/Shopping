@@ -105,16 +105,20 @@ function formatPrice(value) {
                         </div>
                     </div>
 
-                    <div class="rounded-xl border border-border bg-card p-4">
-                        <p class="text-xs text-muted-foreground">Price</p>
-                        <p class="text-2xl font-bold text-[#FF6600]">
-                            {{ formatPrice(product.price) }}
+                    <div
+                        class="space-y-1 rounded-xl border border-border bg-card p-4"
+                    >
+                        <p class="text-md text-[#FF6600]">
+                            Loyal Price: {{ formatPrice(product.loyal_price) }}
                         </p>
                         <p
                             v-if="product.discount_price"
-                            class="mt-1 text-sm font-semibold text-emerald-600"
+                            class="text-md text-emerald-600"
                         >
                             Discount: {{ formatPrice(product.discount_price) }}
+                        </p>
+                        <p class="text-md text-muted-foreground">
+                            Original Price: {{ formatPrice(product.price) }}
                         </p>
                     </div>
                 </div>

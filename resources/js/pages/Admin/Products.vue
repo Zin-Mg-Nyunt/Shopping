@@ -47,9 +47,6 @@ watch(
     { immediate: true },
 );
 
-const categories = computed(() => page.props.categories ?? []);
-const brands = computed(() => page.props.brands ?? []);
-
 const search = ref('');
 const stock = ref('');
 const price = ref('');
@@ -210,12 +207,10 @@ function openEdit(row) {
 <template>
     <Head title="Admin · Product inventory" />
 
-    <div
-        class="-mx-4 -mt-4 min-h-[calc(100vh-4rem)] w-[calc(100%+2rem)] max-w-none px-4 pt-4 pb-8 md:-mx-6 md:mt-0 md:w-[calc(100%+3rem)] md:px-6 md:pt-6 lg:-mx-8 lg:w-[calc(100%+4rem)] lg:px-8 lg:pt-8"
-    >
+    <div class="space-y-6">
         <!-- Header -->
         <div
-            class="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between"
+            class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between"
         >
             <div>
                 <h1 class="text-2xl font-bold tracking-tight text-foreground">
@@ -236,7 +231,7 @@ function openEdit(row) {
 
         <!-- Toolbar -->
         <div
-            class="mb-4 flex flex-col gap-3 rounded-2xl border border-border bg-card p-4 shadow-sm sm:flex-row sm:flex-wrap sm:items-center"
+            class="flex flex-col gap-3 rounded-2xl border border-border bg-card p-4 shadow-sm sm:flex-row sm:flex-wrap sm:items-center"
         >
             <div class="relative min-w-[200px] flex-1">
                 <Search
@@ -316,7 +311,7 @@ function openEdit(row) {
         >
             <div
                 v-if="selectedIds.size > 0"
-                class="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#FF6600]/30 bg-[#FF6600]/8 px-4 py-3 dark:bg-[#FF6600]/10"
+                class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#FF6600]/30 bg-[#FF6600]/8 px-4 py-3 dark:bg-[#FF6600]/10"
             >
                 <p class="text-sm font-medium text-foreground">
                     <span class="font-semibold text-[#FF6600]">{{
@@ -363,6 +358,7 @@ function openEdit(row) {
                             <th class="px-4 py-3 font-semibold">
                                 Discount Price
                             </th>
+                            <th class="px-4 py-3 font-semibold">Loyal Price</th>
                             <th class="min-w-[140px] px-4 py-3 font-semibold">
                                 Stock
                             </th>
@@ -440,18 +436,23 @@ function openEdit(row) {
                                 </div>
                             </td>
                             <td
-                                class="px-4 py-3 align-middle font-medium text-foreground tabular-nums"
+                                class="px-4 py-3 align-middle font-medium text-muted-foreground tabular-nums"
                             >
                                 {{ formatPrice(row.price) }}
                             </td>
                             <td
-                                class="px-4 py-3 align-middle font-medium text-primary tabular-nums"
+                                class="px-4 py-3 align-middle font-medium text-primary/70 tabular-nums"
                             >
                                 {{
                                     row.discount_price
                                         ? formatPrice(row.discount_price)
                                         : '-'
                                 }}
+                            </td>
+                            <td
+                                class="px-4 py-3 align-middle font-medium text-primary/80 tabular-nums"
+                            >
+                                {{ formatPrice(row.loyal_price) }}
                             </td>
                             <td class="px-4 py-3 align-middle">
                                 <div class="flex items-center gap-2">
@@ -562,40 +563,40 @@ function openEdit(row) {
                 </nav>
             </div>
         </div>
-
-        <!-- Delete confirmation -->
-        <Dialog v-model:open="deleteOpen">
-            <DialogContent class="border-destructive/20 sm:max-w-md">
-                <DialogHeader>
-                    <DialogTitle>Delete product(s)?</DialogTitle>
-                    <DialogDescription>
-                        This will permanently remove
-                        {{ deleteTargetIds.length }} product(s) from the
-                        catalog. This action cannot be undone.
-                    </DialogDescription>
-                </DialogHeader>
-                <DialogFooter class="gap-2 sm:gap-0">
-                    <Button variant="outline" @click="deleteOpen = false">
-                        Cancel
-                    </Button>
-                    <Button
-                        class="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                        :disabled="deleteProcessing"
-                        @click="confirmDelete"
-                    >
-                        Confirm delete
-                    </Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
-
-        <ProductPreviewDialog v-model:open="viewOpen" :product="viewProduct" />
-
-        <ProductFormDialog
-            v-if="editOpen"
-            :mode="editMode"
-            :product="editProduct"
-            @update:open="editOpen = false"
-        />
     </div>
+
+    <!-- Delete confirmation -->
+    <Dialog v-model:open="deleteOpen">
+        <DialogContent class="border-destructive/20 sm:max-w-md">
+            <DialogHeader>
+                <DialogTitle>Delete product(s)?</DialogTitle>
+                <DialogDescription>
+                    This will permanently remove
+                    {{ deleteTargetIds.length }} product(s) from the catalog.
+                    This action cannot be undone.
+                </DialogDescription>
+            </DialogHeader>
+            <DialogFooter class="gap-2 sm:gap-0">
+                <Button variant="outline" @click="deleteOpen = false">
+                    Cancel
+                </Button>
+                <Button
+                    class="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    :disabled="deleteProcessing"
+                    @click="confirmDelete"
+                >
+                    Confirm delete
+                </Button>
+            </DialogFooter>
+        </DialogContent>
+    </Dialog>
+
+    <ProductPreviewDialog v-model:open="viewOpen" :product="viewProduct" />
+
+    <ProductFormDialog
+        v-if="editOpen"
+        :mode="editMode"
+        :product="editProduct"
+        @update:open="editOpen = false"
+    />
 </template>

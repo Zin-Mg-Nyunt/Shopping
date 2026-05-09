@@ -1,13 +1,12 @@
 <script setup>
 import { Link, usePage } from '@inertiajs/vue3';
 import {
-    BarChart3,
     Bell,
     LayoutDashboard,
     Menu,
     Moon,
     Package,
-    Search,
+    SlidersHorizontal,
     ShoppingBag,
     Sun,
     Users,
@@ -17,6 +16,7 @@ import { computed, onUnmounted, ref, watch } from 'vue';
 import { route } from 'ziggy-js';
 import AppLogo from '@/components/AppLogo.vue';
 import { useAppearance } from '@/composables/useAppearance';
+import { logout } from '@/routes';
 import { Toaster } from 'vue-sonner';
 import 'vue-sonner/style.css';
 
@@ -34,10 +34,10 @@ const adminNav = [
         match: () => route().current('admin.dashboard'),
     },
     {
-        label: 'Orders',
-        href: route('admin.orders'),
-        icon: ShoppingBag,
-        match: () => route().current('admin.orders'),
+        label: 'Catalog Settings',
+        href: route('admin.catalog.settings'),
+        icon: SlidersHorizontal,
+        match: () => route().current('admin.catalog.settings'),
     },
     {
         label: 'Products',
@@ -52,10 +52,10 @@ const adminNav = [
         match: () => route().current('admin.customers'),
     },
     {
-        label: 'Analytics',
-        href: '#',
-        icon: BarChart3,
-        match: () => false,
+        label: 'Orders',
+        href: route('admin.orders'),
+        icon: ShoppingBag,
+        match: () => route().current('admin.orders'),
     },
 ];
 
@@ -208,13 +208,23 @@ function toggleTheme() {
             </nav>
 
             <div class="shrink-0 border-t border-border p-3">
-                <Link
-                    :href="route('home')"
-                    class="flex w-full items-center justify-center rounded-xl border border-border py-2.5 text-sm font-medium text-muted-foreground transition hover:border-primary/40 hover:text-primary"
-                    @click="onNavInteract"
-                >
-                    View storefront
-                </Link>
+                <div class="space-y-2">
+                    <Link
+                        :href="route('home')"
+                        class="flex w-full items-center justify-center rounded-xl border border-border py-2.5 text-sm font-medium text-muted-foreground transition hover:border-primary/40 hover:text-primary"
+                        @click="onNavInteract"
+                    >
+                        View storefront
+                    </Link>
+                    <Link
+                        :href="logout()"
+                        as="button"
+                        class="flex w-full items-center justify-center rounded-xl border border-destructive/40 py-2.5 text-sm font-medium text-destructive transition hover:bg-destructive/10"
+                        @click="onNavInteract"
+                    >
+                        Log out
+                    </Link>
+                </div>
             </div>
         </aside>
 

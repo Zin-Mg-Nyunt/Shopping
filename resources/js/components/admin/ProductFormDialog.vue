@@ -131,7 +131,11 @@ watch(
     },
 );
 
-function handleSlugInput() {
+function handleSlugInput(event) {
+    if (event.target.value === '') {
+        manuallyUpdatedSlug.value = false;
+        return;
+    }
     manuallyUpdatedSlug.value = true;
 }
 
@@ -434,7 +438,7 @@ onUnmounted(() => {
                                 placeholder="e.g. wireless-mouse-pro"
                                 class="font-mono text-sm"
                                 @input="
-                                    handleSlugInput;
+                                    handleSlugInput($event);
                                     productForm.clearErrors('slug');
                                 "
                             />

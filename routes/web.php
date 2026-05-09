@@ -1,10 +1,14 @@
 <?php
 
 use App\Http\Controllers\AddressController;
+use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\CatalogSettingController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\PromoController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -40,6 +44,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/admin/products', [ProductController::class, 'adminStore'])->name('admin.products.store');
     Route::put('/admin/products/{product}', [ProductController::class, 'adminUpdate'])->name('admin.products.update');
     Route::get('/admin/customers', [UserController::class, 'customerList'])->name('admin.customers');
+
+    Route::get('/admin/catalog-settings', [CatalogSettingController::class, 'index'])->name('admin.catalog.settings');
+    Route::post('/admin/categories', [CategoryController::class, 'store'])->name('admin.categories.store');
+    Route::put('/admin/categories/{category}', [CategoryController::class, 'update'])->name('admin.categories.update');
+    Route::delete('/admin/categories/{category}', [CategoryController::class, 'destroy'])->name('admin.categories.destroy');
+    Route::post('/admin/brands', [BrandController::class, 'store'])->name('admin.brands.store');
+    Route::put('/admin/brands/{brand}', [BrandController::class, 'update'])->name('admin.brands.update');
+    Route::delete('/admin/brands/{brand}', [BrandController::class, 'destroy'])->name('admin.brands.destroy');
+    Route::post('/admin/promos', [PromoController::class, 'store'])->name('admin.promos.store');
+    Route::put('/admin/promos/{promo}', [PromoController::class, 'update'])->name('admin.promos.update');
+    Route::delete('/admin/promos/{promo}', [PromoController::class, 'destroy'])->name('admin.promos.destroy');
 });
 
 require __DIR__.'/settings.php';

@@ -57,11 +57,9 @@ function formatDate(value) {
 <template>
     <Head title="Admin · Customers" />
 
-    <div
-        class="-mx-4 -mt-4 min-h-[calc(100vh-4rem)] w-[calc(100%+2rem)] max-w-none px-4 pt-4 pb-8 md:-mx-6 md:mt-0 md:w-[calc(100%+3rem)] md:px-6 md:pt-6 lg:-mx-8 lg:w-[calc(100%+4rem)] lg:px-8 lg:pt-8"
-    >
+    <div class="space-y-6">
         <div
-            class="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between"
+            class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between"
         >
             <div>
                 <h1 class="text-2xl font-bold tracking-tight text-foreground">
@@ -73,7 +71,7 @@ function formatDate(value) {
             </div>
         </div>
 
-        <div class="mb-4 grid grid-cols-1 gap-3 md:grid-cols-3">
+        <div class="grid grid-cols-1 gap-3 md:grid-cols-3">
             <div class="rounded-xl border border-border bg-card p-4 shadow-sm">
                 <p class="text-xs text-muted-foreground">Total customers</p>
                 <p class="mt-1 text-2xl font-bold text-foreground">
@@ -114,9 +112,7 @@ function formatDate(value) {
             </div>
         </div>
 
-        <div
-            class="mb-4 rounded-2xl border border-border bg-card p-4 shadow-sm"
-        >
+        <div class="rounded-2xl border border-border bg-card p-4 shadow-sm">
             <div class="relative max-w-md">
                 <Search
                     class="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground"
