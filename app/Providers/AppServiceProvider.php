@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Observers\OrderObserver;
 use App\Observers\ProductObserver;
 use Carbon\CarbonImmutable;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -38,6 +39,10 @@ class AppServiceProvider extends ServiceProvider
         });
         Product::observe(ProductObserver::class);
         Order::observe(OrderObserver::class);
+        Relation::morphMap([
+            'user' => User::class,
+            'product' => Product::class,
+        ]);
     }
 
     /**

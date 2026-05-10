@@ -16,7 +16,7 @@ class PromoController extends Controller
     {
         $discountRules = ['required', 'numeric', 'min:0'];
 
-        if ($request->input('discount_type') === 'percentage') {
+        if ($request->discount_type === 'percentage') {
             $discountRules[] = 'max:100';
         }
 

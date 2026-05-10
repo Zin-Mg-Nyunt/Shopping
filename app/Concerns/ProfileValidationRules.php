@@ -56,6 +56,6 @@ trait ProfileValidationRules
      */
     protected function photoRules(): array
     {
-        return ['nullable', 'image', 'max:2048'];
+        return ['nullable', 'image', 'max:2048', 'mimes:jpeg,png,jpg,webp,svg'];
     }
 }

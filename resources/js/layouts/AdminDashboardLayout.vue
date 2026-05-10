@@ -11,6 +11,7 @@ import {
     Sun,
     Users,
     X,
+    User,
 } from 'lucide-vue-next';
 import { computed, onUnmounted, ref, watch } from 'vue';
 import { route } from 'ziggy-js';
@@ -56,6 +57,12 @@ const adminNav = [
         href: route('admin.orders'),
         icon: ShoppingBag,
         match: () => route().current('admin.orders'),
+    },
+    {
+        label: 'My Profile',
+        href: route('profile.edit'),
+        icon: User,
+        match: () => route().current('profile.edit'),
     },
 ];
 

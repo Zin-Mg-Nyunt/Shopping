@@ -10,6 +10,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PromoController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\Settings\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [ProductController::class, 'index'])->name('home');
@@ -24,6 +25,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/admin/dashboard', [DashboardController::class, 'adminDashboard'])->name('admin.dashboard');
     Route::get('/user/dashboard', [DashboardController::class, 'userDashboard'])->name('user.dashboard');
+    Route::delete('/profile/photo/destroy', [ProfileController::class, 'profilePhotoDestroy'])->name('profile.photo.destroy');
 
     Route::post('/order/store', [OrderController::class, 'store'])->name('order.store');
     Route::get('/orders/list', [OrderController::class, 'userList'])->name('user.orders.list');

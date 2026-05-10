@@ -83,13 +83,14 @@ class DatabaseSeeder extends Seeder
         Product::factory(10)->create(
             [
                 'user_id'=>$admin->id,
-                'brand_id'=>fn()=>$brands->random()->id
+                'brand_id'=>fn()=>$brands->random()->id,
+                'created_at'=>now()->subDays(rand(1,5)),
+                'updated_at'=>now()->subDays(rand(1,5)),
             ]
         )->each(function($product) use($categories){
-            $date = now()->subDays(rand(1,5));
             $product->update([
-                'created_at'=>$date,
-                'updated_at'=>$date,
+                'discount_price'=>$product->price * 0.95,
+                'loyal_price'=>$product->price * 0.9
             ]);
             $product->categories()->attach($categories->random(rand(1,3))->pluck('id'));
         });

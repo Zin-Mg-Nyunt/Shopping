@@ -1,8 +1,7 @@
 <script setup>
-import { Form, Head, Link, useForm } from '@inertiajs/vue3';
-import { Crown, UserRound } from 'lucide-vue-next';
-import { computed, ref } from 'vue';
-import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
+import { Head, Link, useForm } from '@inertiajs/vue3';
+import { Crown, Trash2, UserRound } from 'lucide-vue-next';
+import { computed, onUnmounted, ref } from 'vue';
 import DeleteUser from '@/components/DeleteUser.vue';
 import InputError from '@/components/InputError.vue';
 import PasswordInput from '@/components/PasswordInput.vue';
@@ -20,6 +19,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import UserDashboardLayout from '@/layouts/UserDashboardLayout.vue';
+import AdminDashboardLayout from '@/layouts/AdminDashboardLayout.vue';
 import { logout } from '@/routes';
 import { route } from 'ziggy-js';
 import { toast } from 'vue-sonner';
@@ -29,21 +29,39 @@ const { user } = defineProps({
 });
 
 defineOptions({
-    layout: UserDashboardLayout,
+    layout: (h, page) => {
+        const role = page.props.auth.user.role;
+        const layout =
+            role === 'admin' ? AdminDashboardLayout : UserDashboardLayout;
+        return h(layout, [page]);
+    },
 });
 
 const userInitial = computed(
     () => user.name?.trim()?.charAt(0)?.toUpperCase() ?? 'U',
 );
+
+const previewPhoto = ref(null);
 const profilePhotoInput = ref(null);
 const isEditingName = ref(false);
 const isEditingEmail = ref(false);
 const isPasswordDialogOpen = ref(false);
-const profilePhotoUrl = computed(() =>
-    user.value?.profile_photo_path
-        ? `/storage/${user.value.profile_photo_path}`
-        : null,
+const isProfilePhotoModalOpen = ref(false);
+
+const displayProfilePhoto = computed(
+    () => previewPhoto.value ?? user.profile_photo?.path ?? null,
 );
+
+const photoForm = useForm({
+    name: user.name ?? '',
+    email: user.email ?? '',
+    photo: user.profilePhoto?.path ?? null,
+});
+
+const hasPendingPhoto = computed(
+    () => photoForm.photo !== null && previewPhoto.value !== null,
+);
+
 const nameForm = useForm({
     name: user.name ?? '',
     email: user.email ?? '',
@@ -70,10 +88,57 @@ const canSaveEmail = computed(
         emailForm.email !== user.email,
 );
 
-function handlePhotoSelected(event, submit) {
-    if (event.target.files?.length) {
-        submit();
-    }
+function clearPhoto() {
+    if (previewPhoto.value) URL.revokeObjectURL(previewPhoto.value);
+
+    previewPhoto.value = null;
+    photoForm.photo = user.profilePhoto?.path ?? null;
+    photoForm.clearErrors('photo');
+}
+
+function handlePhotoSelected(event) {
+    const file = event.target.files?.[0];
+
+    if (!file) return;
+
+    clearPhoto();
+
+    previewPhoto.value = URL.createObjectURL(file);
+    photoForm.photo = file;
+}
+
+function uploadPhoto() {
+    if (!photoForm.photo) return;
+
+    photoForm.name = user.name ?? '';
+    photoForm.email = user.email ?? '';
+
+    photoForm.patch(route('profile.update'), {
+        preserveScroll: true,
+        forceFormData: true,
+        onSuccess: () => {
+            clearPhoto();
+            toast.success('Profile photo updated');
+        },
+    });
+}
+
+onUnmounted(() => {
+    clearPhoto();
+});
+
+function deleteProfilePhoto() {
+    photoForm.delete(route('profile.photo.destroy'), {
+        preserveScroll: true,
+        onSuccess: () => {
+            clearPhoto();
+            toast.success('Profile photo deleted');
+            isProfilePhotoModalOpen.value = false;
+        },
+        onError: () => {
+            toast.error('Failed to delete profile photo');
+        },
+    });
 }
 
 function handleLogout() {
@@ -159,8 +224,16 @@ function savePassword() {
             >
                 <div class="flex flex-wrap items-start justify-between gap-6">
                     <div class="flex items-center gap-4">
+                        <img
+                            v-if="user.profile_photo?.path"
+                            :src="user.profile_photo?.path"
+                            alt="Profile photo"
+                            class="h-20 w-20 shrink-0 cursor-pointer rounded-2xl border border-border object-cover ring-offset-2 transition hover:opacity-90 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
+                            @click="isProfilePhotoModalOpen = true"
+                        />
                         <div
-                            class="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-primary/15 text-2xl font-semibold text-primary ring-1 ring-primary/25"
+                            v-else
+                            class="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-primary/15 text-2xl font-semibold text-primary ring-1 ring-primary/25"
                         >
                             {{ userInitial }}
                         </div>
@@ -175,6 +248,7 @@ function savePassword() {
                     </div>
 
                     <span
+                        v-if="user.role !== 'admin'"
                         class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold"
                         :class="
                             user.is_loyal
@@ -190,16 +264,15 @@ function savePassword() {
                     </span>
                 </div>
 
-                <div class="mt-4">
-                    <Button as-child variant="outline" size="sm">
-                        <Link
-                            :href="logout()"
-                            method="post"
-                            @success="handleLogout"
-                        >
-                            Logout
-                        </Link>
-                    </Button>
+                <div v-if="user.role !== 'admin'" class="mt-4">
+                    <Link
+                        :href="logout()"
+                        as="button"
+                        class="inline-flex items-center justify-center rounded-md border border-destructive/40 px-3 py-1.5 text-sm font-medium text-destructive transition hover:bg-destructive/10"
+                        @click="handleLogout"
+                    >
+                        Log out
+                    </Link>
                 </div>
             </div>
 
@@ -210,8 +283,8 @@ function savePassword() {
                     </p>
                     <div class="mt-3 flex items-center gap-3">
                         <img
-                            v-if="profilePhotoUrl"
-                            :src="profilePhotoUrl"
+                            v-if="displayProfilePhoto"
+                            :src="displayProfilePhoto"
                             alt="Profile photo"
                             class="h-11 w-11 rounded-xl border border-border object-cover"
                         />
@@ -222,36 +295,47 @@ function savePassword() {
                             {{ userInitial }}
                         </div>
                         <p class="text-sm text-muted-foreground">
-                            Upload your own profile photo.
+                            Choose a photo, preview it, then upload when ready.
                         </p>
                     </div>
-                    <Form
-                        v-bind="ProfileController.update.form()"
-                        v-slot="{ errors, processing, submit }"
-                        class="mt-4 space-y-2"
-                    >
+                    <div class="mt-4 flex flex-wrap items-center gap-2">
                         <input
                             ref="profilePhotoInput"
                             type="file"
-                            name="photo"
                             accept="image/*"
                             class="hidden"
-                            @change="
-                                (event) => handlePhotoSelected(event, submit)
-                            "
+                            @change="handlePhotoSelected"
                         />
-                        <input type="hidden" name="name" :value="user.name" />
-                        <input type="hidden" name="email" :value="user.email" />
                         <Button
                             type="button"
                             variant="outline"
-                            :disabled="processing"
+                            :disabled="photoForm.processing"
                             @click="profilePhotoInput.click()"
                         >
-                            Change photo
+                            Choose photo
                         </Button>
-                        <InputError :message="errors.photo" />
-                    </Form>
+                        <Button
+                            v-if="hasPendingPhoto"
+                            type="button"
+                            :disabled="photoForm.processing"
+                            @click="uploadPhoto"
+                        >
+                            Upload
+                        </Button>
+                        <Button
+                            v-if="hasPendingPhoto"
+                            type="button"
+                            variant="ghost"
+                            :disabled="photoForm.processing"
+                            @click="clearPhoto"
+                        >
+                            Cancel
+                        </Button>
+                        <InputError
+                            class="basis-full"
+                            :message="photoForm.errors.photo"
+                        />
+                    </div>
                 </div>
 
                 <div class="rounded-2xl border border-border bg-background p-4">
@@ -443,6 +527,47 @@ function savePassword() {
             </div>
         </div>
     </section>
+
+    <Dialog v-model:open="isProfilePhotoModalOpen">
+        <DialogContent
+            class="max-w-2xl gap-0 overflow-hidden border-border p-0 sm:max-w-3xl"
+        >
+            <DialogHeader class="border-b border-border px-6 py-4 text-left">
+                <DialogTitle>Profile photo</DialogTitle>
+                <DialogDescription class="sr-only">
+                    Full-size preview of your profile picture
+                </DialogDescription>
+            </DialogHeader>
+
+            <div
+                class="flex max-h-[min(75vh,560px)] items-center justify-center bg-muted/40 px-4 py-6"
+            >
+                <img
+                    v-if="user.profile_photo?.path"
+                    :src="user.profile_photo?.path"
+                    alt=""
+                    class="max-h-[min(70vh,520px)] w-full max-w-full object-contain"
+                />
+            </div>
+
+            <DialogFooter
+                class="flex-col-reverse gap-2 border-t border-border bg-muted/30 px-6 py-4 sm:flex-row sm:justify-end"
+            >
+                <DialogClose as-child>
+                    <Button type="button" variant="outline"> Close </Button>
+                </DialogClose>
+                <Button
+                    type="button"
+                    variant="destructive"
+                    class="gap-2"
+                    @click="deleteProfilePhoto"
+                >
+                    <Trash2 class="h-4 w-4" aria-hidden="true" />
+                    Delete photo
+                </Button>
+            </DialogFooter>
+        </DialogContent>
+    </Dialog>
 
     <DeleteUser />
 </template>

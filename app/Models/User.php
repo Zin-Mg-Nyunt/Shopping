@@ -81,4 +81,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Order::class)->where('deleted_at', null);
     }
+
+    public function profilePhoto()
+    {
+        return $this->morphOne(Image::class, 'imageable');
+    }
 }
