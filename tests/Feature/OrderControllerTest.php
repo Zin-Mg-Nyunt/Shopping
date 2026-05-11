@@ -65,7 +65,7 @@ test('order store', function () {
     $user = User::factory()->create();
     $product = Product::factory()->create(['stock' => 2]);
     $this->actingAs($user)
-        ->post(route('order.store'), [
+        ->post(route('user.order.store'), [
             'address_id' => null,
             'shipping_address' => [
                 'full_name' => 'John Doe',
@@ -100,7 +100,7 @@ test('order can not store if not enough stock', function () {
     $user = User::factory()->create();
     $product = Product::factory()->create(['stock' => 5]);
     $this->actingAs($user)
-        ->post(route('order.store'), [
+        ->post(route('user.order.store'), [
             'address_id' => null,
             'shipping_address' => [
                 'full_name' => 'John Doe',
@@ -167,7 +167,7 @@ test('order store uses loyal unit price for loyalty customers', function () {
     expect((float) $product->loyal_price)->toBe(76.0);
 
     $this->actingAs($user)
-        ->post(route('order.store'), [
+        ->post(route('user.order.store'), [
             'address_id' => null,
             'shipping_address' => [
                 'full_name' => 'John Doe',
@@ -200,7 +200,7 @@ test('order store uses standard unit price for non loyalty customers', function 
     $product->refresh();
 
     $this->actingAs($user)
-        ->post(route('order.store'), [
+        ->post(route('user.order.store'), [
             'address_id' => null,
             'shipping_address' => [
                 'full_name' => 'John Doe',

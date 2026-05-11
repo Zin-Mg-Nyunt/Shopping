@@ -26,3 +26,12 @@ test('admins can visit the admin dashboard', function () {
     $response->assertOk();
     $response->assertInertia(fn ($page) => $page->component('Admin/Dashboard'));
 });
+
+test('shared auth user includes profile photo for inertia', function () {
+    $admin = User::factory()->create(['role' => 'admin']);
+    $this->actingAs($admin);
+
+    $response = $this->get(route('admin.dashboard'));
+
+    $response->assertInertia(fn ($page) => $page->has('auth.user.profile_photo'));
+});

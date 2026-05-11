@@ -4,7 +4,7 @@ import { toast } from 'vue-sonner';
 export function useAddToWishlist() {
     function addToWishlist(id) {
         router.post(
-            route('wishlist.add', id),
+            route('user.wishlist.add', id),
             {},
             {
                 preserveScroll: true,

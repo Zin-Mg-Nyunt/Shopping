@@ -282,7 +282,7 @@ function handleCheckout() {
         use_points: usePoints.value,
     };
 
-    router.post(route('order.store'), orderData, {
+    router.post(route('user.order.store'), orderData, {
         preserveScroll: true,
         preserveState: true,
         onSuccess: (response) => {

@@ -1,7 +1,14 @@
 <script setup>
 import { Link } from '@inertiajs/vue3';
-import { Moon, Sun } from 'lucide-vue-next';
+import {
+    Moon,
+    Sun,
+    UserCircleIcon,
+    UserIcon,
+    UserRound,
+} from 'lucide-vue-next';
 import AppLogo from '@/components/AppLogo.vue';
+import UserNavAvatar from '@/components/UserNavAvatar.vue';
 import { useAppearance } from '@/composables/useAppearance';
 import useFilterBy from '@/composables/useFilterBy';
 import { useCartCount } from '@/composables/useCartCount';
@@ -105,19 +112,19 @@ function toggleTheme() {
                     </Link>
                     <details class="relative">
                         <summary
-                            class="list-none rounded-full border border-border bg-card p-2 text-muted-foreground transition hover:border-primary/40 hover:text-primary [&::-webkit-details-marker]:hidden"
+                            class="list-none [&::-webkit-details-marker]:hidden"
                         >
                             <span class="sr-only">Account menu</span>
-                            <svg
-                                class="h-5 w-5"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="1.8"
+                            <UserNavAvatar
+                                v-if="$page.props.auth?.user"
+                                :user="$page.props.auth.user"
+                            />
+                            <span
+                                v-else
+                                class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border bg-card text-muted-foreground transition hover:border-primary/40 hover:text-primary"
                             >
-                                <circle cx="12" cy="8" r="4" />
-                                <path d="M4 20c1.5-3.5 4.5-5 8-5s6.5 1.5 8 5" />
-                            </svg>
+                                <UserRound class="h-5 w-5 stroke-1" />
+                            </span>
                         </summary>
 
                         <div

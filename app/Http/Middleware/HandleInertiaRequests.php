@@ -41,7 +41,9 @@ class HandleInertiaRequests extends Middleware
             ...parent::share($request),
             'name' => config('app.name'),
             'auth' => [
-                'user' => $request->user(),
+                'user' => $request->user()
+                    ? $request->user()->loadMissing(['profilePhoto'])
+                    : null,
             ],
             'categories' => Category::all(),
             'brands' => Brand::all(),

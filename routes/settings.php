@@ -6,9 +6,11 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', '/settings/profile');
-
-    Route::get('settings/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('settings/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::controller(ProfileController::class)->group(function (){
+        Route::get('settings/profile', 'edit')->name('profile.edit');
+        Route::patch('settings/profile', 'update')->name('profile.update');
+        Route::delete('/profile/photo/destroy', 'profilePhotoDestroy')->name('profile.photo.destroy');
+    });
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {

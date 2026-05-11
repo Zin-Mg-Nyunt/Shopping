@@ -85,12 +85,12 @@ test('auth user can toggle product to wishlist', function($url){
 
     $this->actingAs($user)
         ->from($url)
-        ->post(route('wishlist.add',$productA->id))
+        ->post(route('user.wishlist.add',$productA->id))
         ->assertRedirect($url)
         ->assertSessionHas('success', 'Added to wishlist');
 
     $this->actingAs($user) 
-        ->post(route('wishlist.add',$productB->id))
+        ->post(route('user.wishlist.add',$productB->id))
         ->assertRedirect($url)
         ->assertSessionHas('success', 'Removed from wishlist');
 
@@ -113,7 +113,7 @@ test('guest is redirected to login when trying to wishlist and redirect back to 
     $product = Product::factory()->create(['slug'=>'apple-iphone-14']);
     $user = User::factory()->create();
 
-    $this->post(route('wishlist.add',$product->id))
+    $this->post(route('user.wishlist.add',$product->id))
         ->assertRedirect(route('login'));
 
     $this->withSession(['url.intended'=>$url])

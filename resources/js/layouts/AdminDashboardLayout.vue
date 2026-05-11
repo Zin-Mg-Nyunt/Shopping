@@ -16,6 +16,7 @@ import {
 import { computed, onUnmounted, ref, watch } from 'vue';
 import { route } from 'ziggy-js';
 import AppLogo from '@/components/AppLogo.vue';
+import UserNavAvatar from '@/components/UserNavAvatar.vue';
 import { useAppearance } from '@/composables/useAppearance';
 import { logout } from '@/routes';
 import { Toaster } from 'vue-sonner';
@@ -67,16 +68,6 @@ const adminNav = [
 ];
 
 const adminUser = computed(() => page.props.auth?.user);
-const adminInitials = computed(() => {
-    const name = adminUser.value?.name || 'Admin';
-    const parts = name.split(/\s+/).filter(Boolean);
-
-    if (parts.length >= 2) {
-        return (parts[0][0] + parts[1][0]).toUpperCase();
-    }
-
-    return name.slice(0, 2).toUpperCase();
-});
 
 function openSidebar() {
     sidebarOpen.value = true;
@@ -271,12 +262,14 @@ function toggleTheme() {
                     <Moon v-else class="h-5 w-5" stroke-width="2" />
                 </button>
 
-                <div
-                    class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-sm font-bold text-[#FF6600] ring-1 ring-primary/30"
-                    :title="adminUser?.name || 'Administrator'"
-                >
-                    {{ adminInitials }}
-                </div>
+                <UserNavAvatar
+                    v-if="adminUser"
+                    :user="adminUser"
+                    frame-class="!bg-primary/15"
+                    size-class="h-10 w-10 rounded-xl ring-1 ring-primary/30"
+                    text-class="text-sm font-bold text-[#FF6600]"
+                    :title="adminUser.name || 'Administrator'"
+                />
             </header>
 
             <main class="flex-1 p-4 md:p-6 lg:p-8">
